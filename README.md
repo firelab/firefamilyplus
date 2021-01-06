@@ -1,2 +1,4 @@
 # firefamilyplus
-Windows application for climatology, NFDRS, fires, and fire danger
+RD-FireFamilyPlus
+
+Placeholder until projrect is completely migrated to VS2019
