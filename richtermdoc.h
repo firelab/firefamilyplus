@@ -1,0 +1,89 @@
+// wordpdoc.h : interface of the CRichDoc class
+//
+// This is a part of the Microsoft Foundation Classes C++ library.
+// Copyright (C) 1992-1997 Microsoft Corporation
+// All rights reserved.
+//
+// This source code is only intended as a supplement to the
+// Microsoft Foundation Classes Reference and related
+// electronic documentation provided with the library.
+// See these sources for detailed information regarding the
+// Microsoft Foundation Classes product.
+
+class CRichView;
+#include "TermData.h"
+
+class CRichTermDoc : public CRichEditDoc
+{
+protected: // create from serialization only
+	CRichTermDoc();
+	~CRichTermDoc();
+	DECLARE_DYNCREATE(CRichTermDoc)
+
+// Attributes
+public:
+	bool isTemp;
+	CString tName;
+	//int m_nNewDocType;
+	//void SetDocType(int nDocType, BOOL bNoOptionChange = FALSE);
+	CRichView* GetView();
+	//CLSID GetClassID();
+	//LPCTSTR GetSection();
+
+// Operations
+public:
+	//void SaveState(int nType);
+	//void RestoreState(int nType);
+	virtual CFile* GetFile(LPCTSTR pszPathName, UINT nOpenFlags,
+		CFileException* pException);
+	//virtual BOOL DoSave(LPCTSTR pszPathName, BOOL bReplace = TRUE);
+	//int MapType(int nType);
+	//void ForceDelayed(CFrameWnd* pFrameWnd);
+
+// Overrides
+	virtual CRichEditCntrItem* CreateClientItem(REOBJECT* preo) const;
+	//virtual void OnDeactivateUI(BOOL bUndoable);
+	virtual void Serialize(CArchive& ar);
+	// ClassWizard generated virtual function overrides
+	//{{AFX_VIRTUAL(CRichDoc)
+	public:
+	virtual BOOL OnNewDocument();
+	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
+	virtual BOOL OnSaveDocument(LPCTSTR lpszPathName);
+	virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo);
+	virtual void OnCloseDocument();
+	virtual void ReportSaveLoadException(LPCTSTR lpszPathName, CException* e, BOOL bSaving, UINT nIDPDefault);
+	protected:
+	//virtual COleServerItem* OnGetEmbeddedItem();
+	//}}AFX_VIRTUAL
+
+// Implementation
+public:
+	void SetTermData(CTermData *_termData);
+	CTermData * termData;
+	CDatabase *m_pDB;
+	CFireplusSet *m_fpSet;
+
+	virtual void PreCloseFrame(CFrameWnd* pFrameArg);
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+	virtual void Dump(CDumpContext& dc) const;
+#endif
+
+// Generated message map functions
+protected:
+	//{{AFX_MSG(CRichDoc)
+	afx_msg void OnViewOptions();
+	afx_msg void OnUpdateOleVerbPopup(CCmdUI* pCmdUI);
+	afx_msg void OnFileSendMail();
+	afx_msg void OnUpdateIfEmbedded(CCmdUI* pCmdUI);
+	//}}AFX_MSG
+	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnTermNew();
+	afx_msg void OnTermEdit();
+	afx_msg void OnTermCopy();
+	afx_msg void OnTermExport();
+};
+
+/////////////////////////////////////////////////////////////////////////////

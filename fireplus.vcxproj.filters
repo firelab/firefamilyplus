@@ -1,0 +1,2044 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="UGSource\ExtCheckBox.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGCBType.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGCell.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGCelTyp.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGCnrBtn.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGCTarrw.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGCTbutn.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGCTdtp.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGCtrl.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGDLType.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGDrgDrp.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGDrwHnt.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGDtaSrc.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGEdit.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGEditBase.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\ugformat.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\uggdinfo.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGGrid.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGHint.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\ughscrol.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\ugLstBox.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGMEdit.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGMemMan.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGMultiS.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\ugprint.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\ugptrlst.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\ugsidehd.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\ugtab.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGTopHdg.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\ugvscrol.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UTEdit.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="CAcroAXDocShim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="canada.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CandidatesBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CandidatesDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CandidateSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CandidatesFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CandidatesView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cdtlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClimAnalysis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClimateSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClimateView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClimDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="columnst.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CompactDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CountySet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CumulativeBars.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CumulativeFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CumulativePcnt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomFireSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomInitCreateDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomInitEditDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomInitsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomInitSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dbfopen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DelRecsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AddToTermDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AgencyDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AuxYear.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BargraphProp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchAutoSaveProp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchCreateDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchEditDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchGeneralProp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchManageDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchOptionsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchOutputDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchOutputFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchOutputTabView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchOutputTreeView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchPropSheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchRunsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BatchSavedRunMaintDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="batchset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BestFit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bezier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogBarEx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dibutil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DistinctRunsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DistinctRunReportsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiurnalAnalysis2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiurnalDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiurnalDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiurnalFormView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiurnalFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DiurnalGraphView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DOICauseDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DOICauseSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DOIFireSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DOIUnitSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DPDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DPDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DPFormView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DPFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DPProbView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DPPcntView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DPReportView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EditStationDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventLocatorDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="eventlocatordoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="explorer1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FarSiteDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FDProjPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FFPDailyEventsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ffpDescription.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FFPfxOptsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FFPfxVarsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FFPMergesSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FFPHourlyEventsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FFPOptsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FFPOverlaysSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireAgencySet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FFPTabView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireAnalysisDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireAssocSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireCauseFilterDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireDay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireEditSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireFilterDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireOptionsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fireplus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fireplusDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fireplusSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fireplusView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireQueryPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireQuerySheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireRegionSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FiresDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireSelDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireSelectDataSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FiresFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireShapeFileExportDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireStatDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireStatFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireStatGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireStats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireSubunitSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireSumDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireSummary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireSumSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireSumView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireSumWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FiresView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireUnitSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ForcastGraphsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ForecastDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ForecastOptionsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FriskExportDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneralGraphProp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericFireFieldsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericFireImportDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericFireImportSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericWxFieldsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericWxImportDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericWxImportSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphAutoSaveProp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphFiresPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphPropSheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphSaveDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HourlyEventLocatorDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImportDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImportDoneDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImportWRCCDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LFIengine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LFIGeneralPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LFIHerbPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LFIPropertySheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LFISet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LFIWoodyPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Line.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LineGraphProp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ListingDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LogitDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LogReg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MDIClientWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MergedFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MergeDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NelsonDFM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MergedView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NelsonDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NoWxDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NumSpinCtrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ObsAgySet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ODBCRecordset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OverlayCUG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OverlayDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="P_chisq.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PAnalysisDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PcBgDiaolg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PercentileView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PeriodDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="picture1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PocketCardDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PocketCardDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PocketCardFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PocketCardSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PProbDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PocketCardView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QuickBatchDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QuickBatchGraphSheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QuickFireOptionsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RecCounterDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegionsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportHeaderProp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportDelimiterProp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportOptionsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportPropSheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RerapDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RerapVarDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RichCtrlView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RichDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="richDOC.CPP">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="richfiredoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RichFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="richtermdoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RichView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunClimateOptionsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunDescriptionSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunFireAssocSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunFireOptionsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunMaintenanceManual.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunOptionsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunPocketCardSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunRestoreDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunSave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunSaveViewSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunWXStationSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SeasonBinSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SelStationDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SelSIGStationDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="semtime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SeverityDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shpopen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SIGEditDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SIGSDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SIGSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SIGStationSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SowOptionsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SowThresholdsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SowThresholdsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SowWetFlagOptionsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SplitterFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StatCauseDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StatCauseSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StateSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stationdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StationExportDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StationInSIGSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StnTypeSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SubunitsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TermData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TermDatesDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TermDatesSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TermExportDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TermFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TermGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TermPercentilesSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TermProbabilitiesDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TermsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TermsSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UPDialog2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserBrowseDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserImportDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserVarsCUG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserVarsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserVarSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WeatherDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WeatherFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WeatherView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WeightsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindRoseDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindRoseDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindRoseFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindRoseView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorkingSetDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WthrPrintDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WxExportDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WxSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WxStationSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="YearsPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NFDRS2016DFMSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NFDRS2016WxSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NFDRS2016WxDoc.cpp" />
+    <ClCompile Include="NFDRS2016WxFrame.cpp" />
+    <ClCompile Include="NFDRS2016WxView.cpp" />
+    <ClCompile Include="SnowFlagDlg.cpp" />
+    <ClCompile Include="FillSnowflagDlg.cpp" />
+    <ClCompile Include="DailyObsDialog.cpp" />
+    <ClCompile Include="PowerLaw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Weibull.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTimeZones.cpp" />
+    <ClCompile Include="CFW21ExportDlg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="UGInclude\ExtCheckBox.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGCBType.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGCell.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGCelTyp.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGCnrBtn.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGCTarrw.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGCTbutn.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGCTdtp.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGCtrl.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\ugdefine.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGDLType.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGDrgDrp.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGDrwHnt.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGDtaSrc.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGEdit.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGEditBase.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\ugformat.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\uggdinfo.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGGrid.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGHint.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\ughscrol.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\uglstbox.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGMEdit.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGMemMan.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGMultiS.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\ugprint.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\ugptrlst.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\ugsidehd.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\ugstruct.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\ugtab.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGTopHdg.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\ugvscrol.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="utedit.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="AddToTermDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AgencyDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AuxYear.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BargraphProp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchAutoSaveProp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchCreateDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchEditDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchGeneralProp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchManageDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchOptionsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchOutputDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchOutputFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchOutputTabView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchOutputTreeView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchPropSheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchRunsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchSavedRunMaintDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BatchSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BestFit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bezier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAcroAXDocShim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="canada.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CandidatesBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CandidatesDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CandidateSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CandidatesFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CandidatesView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cdtlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClimAnalysis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClimateSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClimateView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClimDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CNFDRS\CNFDRS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="columnst.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompactDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CountySet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CumulativeBars.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CumulativeFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CumulativePcnt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomFireSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomInitCreateDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomInitEditDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomInitsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomInitSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DelRecsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogBarEx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DIBAPI.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dibutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DistinctRunReportsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DistinctRunsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiurnalAnalysis2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiurnalDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiurnalDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiurnalFormView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiurnalFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DiurnalGraphView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DOICauseDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DOICauseSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DOIFireSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DOIUnitSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DPDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DPDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DPFormView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DPFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DPPcntView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DPProbView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DPReportView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditStationDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventLocatorDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="eventlocatordoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="explorer1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FarSiteDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FDProjPage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFPDailyEventsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ffpDescription.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFPfxOptsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFPfxVarsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFPHourlyEventsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFPMergesSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFPOptsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFPOverlaysSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFPTabView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireAgencySet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireAnalysisDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireAssocSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireCauseFilterDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireEditSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireFilterDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireOptionsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fireplus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fireplusDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fireplusSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fireplusView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireQueryPage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireQuerySheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireRegionSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FiresDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireSelDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireSelectDataSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FiresFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireShapeFileExportDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireStatDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireStatFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireStatGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireStats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireSubunitSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireSumDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireSummary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireSumSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireSumView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireSumWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FiresView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireUnitSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ForcastGraphsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ForecastDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ForecastOptionsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FriskExportDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneralGraphProp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericFireFieldsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericFireImportDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericFireImportSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericWxFieldsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericWxImportDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericWxImportSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphAutosaveProp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphFiresPage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphPropSheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphSaveDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HourlyEventLocatorDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportDoneDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportWRCCDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InitCommonControls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jetoledb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LFIengine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LFIGeneralPage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LFIHerbPage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LFIPropertySheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LFISet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LFIWoodyPage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Line.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LineGraphProp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ListingDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogitDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogReg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MDIClientWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MergedFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MergeDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MergedView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="msjetoledb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NelsonDFM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NelsonDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NoWxDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NumSpinCtrl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObsAgySet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ODBCRecordset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OverlayCUG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OverlayDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="p_chisq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PAnalysisDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PcBgDiaolg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PercentileView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PeriodDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="picture1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PocketCardDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PocketCardDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PocketCardFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PocketCardSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PocketCardView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PProbDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QuickBatchDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QuickBatchGraphSheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QuickFireOptionsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RecCounterDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegionsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReportDelimiterProp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReportHeaderProp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReportOptionsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReportPropSheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReportsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RerapDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RerapVarDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RichCtrlView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RichDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="richDOC.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="richfiredoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RichFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="richtermdoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RichView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunClimateOptionsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunDescriptionSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunFireAssocSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunFireOptionsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunMaintenanceManual.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunOptionsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunPocketCardSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunRestoreDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunSave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunSaveViewSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunWXStationSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SeasonBinSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SelSIGStationDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SelStationDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="semtime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SeverityDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shapefil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SIGEditDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SIGSDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SIGSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SIGStationSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SowOptionsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SowThresholdsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SowThresholdsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SowWetFlagOptionsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SplitterFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StatCauseDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StatCauseSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StateSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Stationdialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StationExportDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StationInSIGSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StnTypeSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SubunitsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TermData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TermDatesDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TermDatesSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TermExportDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TermFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TermGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TermPercentilesSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TermProbabilitiesDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TermsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TermsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UPDialog2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserBrowseDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserImportDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserVarsCUG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserVarsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserVarSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WeatherDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WeatherFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WeatherView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WeightsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindRoseDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindRoseDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindRoseFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindRoseView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorkingSetDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WthrPrintDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WxExportDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WxSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WxStationSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="YearsPage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireDay.h" />
+    <ClInclude Include="NFDRS2016DFMSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NFDRS2016WxSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NFDRS2016WxFrame.h" />
+    <ClInclude Include="NFDRS2016WxView.h" />
+    <ClInclude Include="SnowFlagDlg.h" />
+    <ClInclude Include="FillSnowflagDlg.h" />
+    <ClInclude Include="DailyObsDialog.h" />
+    <ClInclude Include="PowerLaw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTimeZones.h" />
+    <ClInclude Include="CFW21ExportDlg.h" />
+    <ClInclude Include="NFDRS2016WxDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="check.bmp">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="res\bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bitmap2.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bitmap3.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bitmapme.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bmp00001.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bmp00002.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bmp00003.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bmp00004.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bmp00005.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bmp00006.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bmp00007.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bmp00008.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bottom.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bottomd.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bottomf.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\bottomx.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\downarro.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\downf.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\fireplus.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\fireplusDoc.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\greenyellow.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="HourlyEventLocatorDlg.htm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\ico00001.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\ico00002.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\icon1.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\printd.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\printf.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\printu.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\printx.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\quickbat.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\redyellow.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\saved.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\savef.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\saveu.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shapeD.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shapeFF.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shapefile.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shapex.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\smallgreenyellow.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\smallredyellow.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\smallyellow.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="STOPLGHT.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="TermDatesDialog.htm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Toolbar.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\toolbar1.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\top.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\topd.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\topf.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\topx.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\trashd.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\trashf.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\trashu.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\trashx.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\uparrow.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\upd.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\upf.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\varsort.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\weatherv.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\yellow.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\fireplus.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resource.hm" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{35ead163-13d5-4df7-9262-fe2c036ef0be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{183a48bf-f0fc-4f78-9f4e-b092f4986f98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UG Headers">
+      <UniqueIdentifier>{fba1c8de-3c47-4379-baad-9fef80ff2dec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UG Source">
+      <UniqueIdentifier>{189435ad-d461-434e-8b0f-0e19d57cda03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{26f6aa50-a33a-4315-ba89-1c4b619037bb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="fireplus.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\FFP5_32x32.bmp" />
+    <Image Include="res\FFP5_16x16.bmp" />
+    <Image Include="res\FFP5.png" />
+    <Image Include="res\FFP5.bmp" />
+  </ItemGroup>
+</Project>
