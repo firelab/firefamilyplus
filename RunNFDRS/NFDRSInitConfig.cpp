@@ -53,7 +53,7 @@ NFDRSInitConfig::NFDRSInitConfig()
 	m_schema[34] = "isAnnuals = int";
 	m_schema[35] = "isHumid = int";
 	m_schema[36] = "kbdiThreshold = int";
-	m_schema[37] = "latitude = int";
+	m_schema[37] = "latitude = float";
 	m_schema[38] = "liveFuelMoisture = scope";
 	m_schema[39] = "liveFuelMoisture.defaults = scope";
 	m_schema[40] = "liveFuelMoisture.defaults.fuelMoistureMax = int";
@@ -99,9 +99,12 @@ NFDRSInitConfig::NFDRSInitConfig()
 	m_str << "#Sample NFDRS2016 initialization file\n";
 	m_str << "#contains all parameters to initialize an NFSDRS20";
 	m_str << "16 object for computation\n";
+	m_str << "#used by config2cpp as:\n";
+	m_str << "#config2cpp -cfg NFDRSInitSample.txt -class NFDRSI";
+	m_str << "nitConfig -singleton\n";
 	m_str << "#\n";
-	m_str << "#latitude to nearest degree\n";
-	m_str << "latitude = \"47\";\n";
+	m_str << "#latitude decimal degrees\n";
+	m_str << "latitude = \"47.01\";\n";
 	m_str << "#NFDRS2016 fuel model (one of V, W, X, Y, Z)\n";
 	m_str << "fuelModel = \"Y\";\n";
 	m_str << "#standard NFDRS Slope Class (1 = 0.25%, 2 = 26-40%";

@@ -1,4 +1,6 @@
 #pragma once
+#include "NFDRS2016.h"
+
 class CGSIParams
 {
 public:
@@ -63,6 +65,8 @@ public:
 	CNFDRSParams(const CNFDRSParams& rhs);
 	~CNFDRSParams();
 
+	//to initialize an NFDRS2016Calc object
+	void InitNFDRS(NFDR2016Calc* pNFDRS);
 	//getters
 	char getFuelModel() { return m_fuelModel; }
 	int getMaxSC() { return m_maxSC; }

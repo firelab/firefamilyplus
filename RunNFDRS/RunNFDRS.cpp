@@ -88,13 +88,6 @@ int main(int argc, char* argv[])
 		delete cfg;
 		return -1;
 	}
-	//try loading needed NFDRS config
-	/*if (strlen(nfdrsInitFileName) == 0)
-	{
-		printf("An initFile must be specified in the RunNFDRS Configuration file\n");
-		delete cfg;
-		return -2;
-	}*/
 
 	if (strlen(wxFileName) == 0)
 	{
@@ -125,27 +118,8 @@ int main(int argc, char* argv[])
 	}
 	//at this point we should have everything we need
 	NFDR2016Calc thisCalc;
-	CGSIParams gsiParams = params.getGsiParams();
-	CGSIParams herbParams = params.getHerbParams();
-	CGSIParams woodyParams = params.getWoodyParams();
-	thisCalc.Init(params.getLatitude(), params.getFuelModel(), params.getSlopeClass(), params.getAvgAnnualPrecip(),
-		params.getUseLoadTransfer(), params.getUseCure(), params.getIsAnnual(), params.getKbdiThreshold());
-	thisCalc.iSetFuelModel(params.getFuelModel());
-	thisCalc.SetGSIParams(gsiParams.getGsiMax(), gsiParams.getGsiHerbGreenup(), gsiParams.getGsiTminMin(), gsiParams.getGsiTminMax(),
-		gsiParams.getGsiVpdMin(), gsiParams.getGsiVpdMax(),gsiParams.getGsiDaylenMin(), gsiParams.getGsiDaylenMax(),gsiParams.getGsiAveragingPeriod(),
-		gsiParams.getUseVpdAverage(), gsiParams.getNumPrecipDays(), gsiParams.getRunningTotalPrecipMin(), gsiParams.getRunningTotalPrecipMax());
-	thisCalc.SetHerbGSIparams(herbParams.getGsiMax(), herbParams.getGsiHerbGreenup(), herbParams.getGsiTminMin(), herbParams.getGsiTminMax(),
-		herbParams.getGsiVpdMin(), herbParams.getGsiVpdMax(), herbParams.getGsiDaylenMin(), herbParams.getGsiDaylenMax(), herbParams.getGsiAveragingPeriod(),
-		herbParams.getUseVpdAverage(), herbParams.getNumPrecipDays(), herbParams.getRunningTotalPrecipMin(), herbParams.getRunningTotalPrecipMax());
-	thisCalc.SetWoodyGSIparams(woodyParams.getGsiMax(), woodyParams.getGsiHerbGreenup(), woodyParams.getGsiTminMin(), woodyParams.getGsiTminMax(),
-		woodyParams.getGsiVpdMin(), woodyParams.getGsiVpdMax(), woodyParams.getGsiDaylenMin(), woodyParams.getGsiDaylenMax(), woodyParams.getGsiAveragingPeriod(),
-		woodyParams.getUseVpdAverage(), woodyParams.getNumPrecipDays(), woodyParams.getRunningTotalPrecipMin(), woodyParams.getRunningTotalPrecipMax());
-	thisCalc.SetStartKBDI(params.getStartKbdi());
-	if (params.getMaxSC() > 0)
-		thisCalc.SetSCMax(params.getMaxSC());
-	thisCalc.SetMxdHumid(params.getIsHumid());
-
-	//whew, all initialized, I bet we put all that into NFDRS2016... it would look much cleaner from this end
+	//use NFDRSParams to initialize NFDR2016Calc object
+	params.InitNFDRS(&thisCalc);
 
 	//do we have a state file?
 	if (strlen(loadStateFileName) > 0)
