@@ -115,6 +115,7 @@
     <ClCompile Include="NFDR2016CalcState.cpp" />
     <ClCompile Include="nfdrs2016.cpp" />
     <ClCompile Include="station.cpp" />
+    <ClCompile Include="utctime.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="deadfuelmoisture.h" />
@@ -125,6 +126,7 @@
     <ClInclude Include="NFDR2016StateSizes.h" />
     <ClInclude Include="nfdrs2016.h" />
     <ClInclude Include="station.h" />
+    <ClInclude Include="utctime.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

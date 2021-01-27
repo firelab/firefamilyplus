@@ -87,8 +87,8 @@ void LiveFuelMoisture::Update(double TempF, double MaxTempF, double MinTempF, do
 	int gDays = 0, days = 0, pDays = 0;
 	if (lastUpdateTime != 0)
 	{
-		int secs = difftime(thisTime, lastUpdateTime);
-		days = secs / 86400;//86400 seconds per day
+        int secs = thisTime - lastUpdateTime;
+        days = secs / 86400;//86400 seconds per day
 		if (days > 1)//gap, deal with it by removing extra values
 		{
 			gDays = min(days - 1, qGSI.size());
@@ -99,16 +99,6 @@ void LiveFuelMoisture::Update(double TempF, double MaxTempF, double MinTempF, do
 	qGSI.push_back(GSI);
 	while (qGSI.size() > m_LFIdaysAvg)
 		qGSI.pop_front();
-	//now check precip
-	/*if (days > 1)//gap, deal with it by inserting zeroes
-	{
-		pDays = min(days - 1, nPrecipQueueDays);
-		for (int p = 0; p < pDays; p++)
-			qPrecip.push(0.0);
-	}
-	qPrecip.push(Precip24);
-	while (qPrecip.size() > nPrecipQueueDays)
-		qPrecip.pop();*/
 	lastUpdateTime = thisTime;
 }
 
@@ -279,37 +269,10 @@ LiveFuelMoisture::LiveFuelMoisture(double Lat,bool IsHerb, bool IsAnnual)
 
 double LiveFuelMoisture::CalcRunningAvgGSI()
 {
-    //int numValid = 0;
-    //long days_start = 0, days_end = 0;
-    //double gsi = 0.0;
-
-   /* if(iGSI.size() < m_LFIdaysAvg)
-    {
-        days_start = 0.0; days_end = iGSI.size();
-    }
-    else
-    {
-        days_start = iGSI.size() - m_LFIdaysAvg; days_end = iGSI.size();
-    }
-    //cout << days_start << " " << days_end << endl;
-    for(int i = days_start; i < days_end; i++)
-    {
-        if(iGSI[i] >= 0)
-        {
-            numValid++;
-            gsi += iGSI[i];
-        }
-    }*/
-	double val = 0.0, gsi = 0.0;
+ 	double val = 0.0, gsi = 0.0;
 	gsi = std::accumulate(qGSI.begin(), qGSI.end(), val);
 	if(qGSI.size() > 0)
 		gsi /= qGSI.size();
-   // if(numValid > 0)
-   //    gsi /= numValid;
-	//if (gsi - gsi2 != 0.0)
-	//{
-	//	ATLTRACE("gsi = %f, gsi2 = %f\n", gsi, gsi2);
-	//}
     return gsi;
 }
 double LiveFuelMoisture::CalcRunningAvgHerbFM(bool SnowDay)
@@ -601,41 +564,3 @@ bool LiveFuelMoisture::SetState(LFMCalcState state)
 	m_nDaysPrecip = state.m_nDaysPrecip;
 	return true;
 }
-
-
-/*double LiveFuelMoisture::GetXDaysPrecipitation(int nDays)
-{
-	double startVal = 0.0, val = 0.0;
-	if (nDays >= qPrecip.size())
-		val =  std::accumulate(qPrecip._Get_container().begin(), qPrecip._Get_container().end(), startVal);
-	else
-	{
-		//return std::accumulate(qPrecip._Get_container()., qPrecip._Get_container().end(), startVal);
-		int startDay = qPrecip.size() - nDays;
-		for (int d = startDay; d < qPrecip.size(); d++)
-		{
-			val += qPrecip._Get_container().at(d);
-		}
-	}
-	return val;
-}*/
-
-/*double LiveFuelMoisture::GetMaxGSI()
-{
-	return m_MaxGSI;
-}
-
-double LiveFuelMoisture::GetGreenupThreshold()
-{
-	return m_GreenupThreshold;
-}
-
-double LiveFuelMoisture::GetMinLFMVal()
-{
-	return m_MinLFMVal;
-}
-
-double LiveFuelMoisture::GetMaxLFMVal()
-{
-	return m_MaxLFMVal;
-}*/

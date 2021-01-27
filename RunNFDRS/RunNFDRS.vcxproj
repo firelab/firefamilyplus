@@ -166,7 +166,6 @@
     <ClCompile Include="RunNFDRS.cpp" />
     <ClCompile Include="RunNFDRSConfig.cpp" />
     <ClCompile Include="RunNFDRSConfiguration.cpp" />
-    <ClCompile Include="utctime.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CFW21Data.h" />
@@ -183,7 +182,6 @@
     <ClInclude Include="NFDRSInitConfig.h" />
     <ClInclude Include="RunNFDRSConfig.h" />
     <ClInclude Include="RunNFDRSConfiguration.h" />
-    <ClInclude Include="utctime.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="config4cpp\lib\config4cpp.lib" />

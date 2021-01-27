@@ -117,16 +117,16 @@ int main(int argc, char* argv[])
 		}
 	}
 	//at this point we should have everything we need
-	NFDR2016Calc thisCalc;
+	NFDR2016Calc fw21Calc;
 	//use NFDRSParams to initialize NFDR2016Calc object
-	params.InitNFDRS(&thisCalc);
-
+	//params.InitNFDRS(&thisCalc);
+	params.InitNFDRS(&fw21Calc);
 	//do we have a state file?
 	if (strlen(loadStateFileName) > 0)
 	{
 		NFDR2016CalcState state;
 		state.LoadState(loadStateFileName);
-		thisCalc.LoadState(state);
+		fw21Calc.LoadState(state);
 	}
 	CFW21Data FW21data;
 	int status = FW21data.LoadFile(wxFileName, params.getTimeZoneOffsetHours());
@@ -138,7 +138,10 @@ int main(int argc, char* argv[])
 		return -5;
 	}
 	//also need any output files for dumping data
-	FILE *allOut = NULL, *indexOut = NULL, *moistOut = NULL, *wxAllOut = NULL;
+	FILE* allOut = NULL, * indexOut = NULL, * moistOut = NULL, * wxAllOut = NULL;// , * fw21Out = NULL;
+	//fw21Out = fopen("G:\\FFP5Data\\FW21\\Run241513\\241513_output_FW21.csv", "wt");
+	//fprintf(fw21Out, "DateTime, Temp, RH, Precip, WindSpeed, SolarRadiation, SnowFlag, MinTemp, MaxTemp, MinRH, Pcp24, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
+
 	if (allOutputsFileName && strlen(allOutputsFileName) > 0)
 	{
 		bool allExists = fileExists(allOutputsFileName);
@@ -151,6 +154,7 @@ int main(int argc, char* argv[])
 			return -3;
 		}
 		if(!allExists)
+			//fprintf(allOut, "DateTime, Temp, RH, Precip, WindSpeed, SolarRadiation, SnowFlag, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
 			fprintf(allOut, "DateTime, Temp, RH, Precip, WindSpeed, SolarRadiation, SnowFlag, MinTemp, MaxTemp, MinRH, Pcp24, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
 	}
 	if (indexOutputsFileName && strlen(indexOutputsFileName) > 0)
@@ -194,34 +198,34 @@ int main(int argc, char* argv[])
 	time_t startTime = clock();
 	for (size_t r = 0; r < FW21data.GetNumRecs(); r++)
 	{
-		NFDRSRec thisRec = FW21data.GetNFDRSRec(r);
-		thisCalc.Update(thisRec.GetYear(), thisRec.GetMonth(), thisRec.GetDay(), thisRec.GetHour(), thisRec.GetDateTime().tm_yday, thisRec.GetTemp(),
-			thisRec.GetMinTemp(), thisRec.GetMaxTemp(), thisRec.GetRH(), thisRec.GetMinRH(), thisRec.GetPrecip(), thisRec.GetPcp24(),
-			thisRec.GetSolarRadiation(), thisRec.GetWindSpeed(), thisRec.GetSnowFlag(), params.getObsHour());
-		if (cfg->getOutputInterval() == 0 || (cfg->getOutputInterval() == 1 && thisRec.GetHour() == params.getObsHour()))
+		FW21Record fw21Rec = FW21data.GetRec(r);
+
+		fw21Calc.Update(fw21Rec.GetYear(), fw21Rec.GetMonth(), fw21Rec.GetDay(), fw21Rec.GetHour(), fw21Rec.GetTemp(), fw21Rec.GetRH(), fw21Rec.GetPrecip(),
+			fw21Rec.GetSolarRadiation(), fw21Rec.GetWindSpeed(), fw21Rec.GetSnowFlag());
+		if (cfg->getOutputInterval() == 0 || (cfg->getOutputInterval() == 1 && fw21Rec.GetHour() == params.getObsHour()))
 		{
 			//output to open csv files
 			if (allOut)
 			{
-				fprintf(allOut, "%s, %.1f, %.1f, %.3f, %.1f, %.0f, %d, %.1f, %.1f, %.1f, %.3f, "
-					"%.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %d\n", 
-					FormatToISO8061Offset(thisRec.GetDateTime(), params.getTimeZoneOffsetHours()).c_str(),
-					thisRec.GetTemp(), thisRec.GetRH(), thisRec.GetPrecip(), thisRec.GetWindSpeed(), thisRec.GetSolarRadiation(), 
-					thisRec.GetSnowFlag(), thisRec.GetMinTemp(), thisRec.GetMaxTemp(), thisRec.GetMinRH(), thisRec.GetPcp24(),
-					thisCalc.MC1, thisCalc.MC10, thisCalc.MC100, thisCalc.MC1000, thisCalc.MCHERB, thisCalc.MCWOOD,
-					thisCalc.BI, thisCalc.ERC, thisCalc.SC, thisCalc.IC, thisCalc.m_GSI, thisCalc.KBDI);
+				fprintf(allOut, "%s,%.1f,%.1f,%.3f,%.1f,%.0f,%d,%.1f,%.1f,%.1f,%.3f,"
+					"%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.6f,%d\n", 
+					FormatToISO8061Offset(fw21Rec.GetDateTime(), params.getTimeZoneOffsetHours()).c_str(),
+					fw21Rec.GetTemp(), fw21Rec.GetRH(), fw21Rec.GetPrecip(), fw21Rec.GetWindSpeed(), fw21Rec.GetSolarRadiation(),
+					fw21Rec.GetSnowFlag(), fw21Calc.GetMinTemp(), fw21Calc.GetMaxTemp(), fw21Calc.GetMinRH(), fw21Calc.GetPcp24(),
+					fw21Calc.MC1, fw21Calc.MC10, fw21Calc.MC100, fw21Calc.MC1000, fw21Calc.MCHERB, fw21Calc.MCWOOD,
+					fw21Calc.BI, fw21Calc.ERC, fw21Calc.SC, fw21Calc.IC, fw21Calc.m_GSI, fw21Calc.KBDI);
 			}
 			if (indexOut)
 			{
 				fprintf(indexOut, "%s, %.2f, %.2f, %.2f, %.2f, %.2f, %d\n",
-					FormatToISO8061Offset(thisRec.GetDateTime(), params.getTimeZoneOffsetHours()).c_str(),
-					thisCalc.BI, thisCalc.ERC, thisCalc.SC, thisCalc.IC, thisCalc.m_GSI, thisCalc.KBDI);
+					FormatToISO8061Offset(fw21Rec.GetDateTime(), params.getTimeZoneOffsetHours()).c_str(),
+					fw21Calc.BI, fw21Calc.ERC, fw21Calc.SC, fw21Calc.IC, fw21Calc.m_GSI, fw21Calc.KBDI);
 			}
 			if (moistOut)
 			{
 				fprintf(moistOut, "%s, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n",
-					FormatToISO8061Offset(thisRec.GetDateTime(), params.getTimeZoneOffsetHours()).c_str(),
-					thisCalc.MC1, thisCalc.MC10, thisCalc.MC100, thisCalc.MC1000, thisCalc.MCHERB, thisCalc.MCWOOD);
+					FormatToISO8061Offset(fw21Rec.GetDateTime(), params.getTimeZoneOffsetHours()).c_str(),
+					fw21Calc.MC1, fw21Calc.MC10, fw21Calc.MC100, fw21Calc.MC1000, fw21Calc.MCHERB, fw21Calc.MCWOOD);
 			}
 		}
 	}
@@ -230,7 +234,7 @@ int main(int argc, char* argv[])
 	printf("Total milliseconds time for NFDRS: %d\n", total);
 	if (strlen(saveStateFileName) > 0)
 	{
-		bool success = thisCalc.SaveState(saveStateFileName);
+		bool success = fw21Calc.SaveState(saveStateFileName);
 		if (!success)
 			printf("Error saving %s as NFDRS State file\n", saveStateFileName);
 	}

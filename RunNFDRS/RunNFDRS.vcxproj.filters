@@ -51,9 +51,6 @@
     <ClCompile Include="RunNFDRSConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utctime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CNFDRSParams.h">
@@ -96,9 +93,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RunNFDRSConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utctime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

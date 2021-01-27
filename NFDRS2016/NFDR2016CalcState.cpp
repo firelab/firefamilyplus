@@ -47,8 +47,14 @@ NFDR2016CalcState::NFDR2016CalcState(const NFDR2016CalcState& rhs)
 	m_IC = rhs.m_IC;
 	m_GSI = rhs.m_GSI;
 	m_nConsectiveSnowDays = rhs.m_nConsectiveSnowDays;
-	m_lastUpdateTime = rhs.m_lastUpdateTime;
+	//m_lastUpdateTime = rhs.m_lastUpdateTime;
+	m_KBDIThreshold = rhs.m_KBDIThreshold;
 	m_qPrecip = rhs.m_qPrecip;
+	m_qHourlyPrecip = rhs.m_qHourlyPrecip;
+	m_qHourlyTemp = rhs.m_qHourlyTemp;
+	m_qHourlyRH = rhs.m_qHourlyRH;
+	m_lastUtcUpdateTime = rhs.m_lastUtcUpdateTime;
+	m_lastDailyUpdateTime = rhs.m_lastDailyUpdateTime;
 
 }
 
@@ -64,7 +70,9 @@ NFDR2016CalcState::NFDR2016CalcState(NFDR2016Calc *pNFDRS)
 	m_IC = pNFDRS->IC;
 	m_KBDI = pNFDRS->KBDI;
 	m_KBDIThreshold = pNFDRS->KBDIThreshold;
-	m_lastUpdateTime = pNFDRS->lastUpdateTime;
+	//m_lastUpdateTime = pNFDRS->lastUpdateTime;
+	m_lastUtcUpdateTime = pNFDRS->lastUtcUpdateTime;
+	m_lastDailyUpdateTime = pNFDRS->lastDailyUpdateTime;
 	m_Lat = pNFDRS->Lat;
 	m_MC1 = pNFDRS->MC1;
 	m_MC10 = pNFDRS->MC10;
@@ -91,6 +99,20 @@ NFDR2016CalcState::NFDR2016CalcState(NFDR2016Calc *pNFDRS)
 		m_qPrecip.push_back(tVal);
 		qCopy.pop_front();
 	}
+	//hourly deques are always 24 entries
+	std::deque<double> qTempCopy = pNFDRS->qHourlyTemp;
+	std::deque<double> qRHcopy = pNFDRS->qHourlyRH;
+	std::deque<double> qPcpCopy = pNFDRS->qHourlyPrecip;
+	for (int h = 0; h < pNFDRS->nHoursPerDay; h++)
+	{
+		m_qHourlyTemp.push_back(qTempCopy.front());
+		m_qHourlyRH.push_back(qRHcopy.front());
+		m_qHourlyPrecip.push_back(qPcpCopy.front());
+		qTempCopy.pop_front();
+		qRHcopy.pop_front();
+		qPcpCopy.pop_front();
+	}
+	m_KBDIThreshold = pNFDRS->KBDIThreshold;
 	fm1State = pNFDRS->OneHourFM.GetState();
 	fm10State = pNFDRS->TenHourFM.GetState();
 	fm100State = pNFDRS->HundredHourFM.GetState();
@@ -320,12 +342,12 @@ bool NFDR2016CalcState::LoadState(std::string fileName)
 		fclose(in);
 		return false;
 	}
-	nRead = fread(&m_lastUpdateTime, sizeof(m_lastUpdateTime), 1, in);
+	/*nRead = fread(&m_lastUpdateTime, sizeof(m_lastUpdateTime), 1, in);
 	if (nRead != 1)
 	{
 		fclose(in);
 		return false;
-	}
+	}*/
 	int nPcp;
 	nRead = fread(&nPcp, sizeof(nPcp), 1, in);
 	if (nRead != 1)
@@ -344,6 +366,98 @@ bool NFDR2016CalcState::LoadState(std::string fileName)
 		}
 		m_qPrecip.push_back(tVal);
 	}
+	//added 2021/01/26 deques, (Temp, RH, Precip) and UTCTimes
+	for (int h = 0; h < 24; h++)
+	{
+		float tVal;
+		nRead = fread(&tVal, sizeof(tVal), 1, in);
+		if (nRead != 1)
+		{
+			fclose(in);
+			return false;
+		}
+		m_qHourlyTemp.push_back(tVal);
+	}
+	for (int h = 0; h < 24; h++)
+	{
+		float tVal;
+		nRead = fread(&tVal, sizeof(tVal), 1, in);
+		if (nRead != 1)
+		{
+			fclose(in);
+			return false;
+		}
+		m_qHourlyRH.push_back(tVal);
+	}
+	for (int h = 0; h < 24; h++)
+	{
+		float tVal;
+		nRead = fread(&tVal, sizeof(tVal), 1, in);
+		if (nRead != 1)
+		{
+			fclose(in);
+			return false;
+		}
+		m_qHourlyPrecip.push_back(tVal);
+	}
+	nRead = fread(&m_KBDIThreshold, sizeof(m_KBDIThreshold), 1, in);
+	if (nRead != 1)
+	{
+		fclose(in);
+		return false;
+	}
+	int utcYear, utcMonth, utcDay, utcHour;
+	nRead = fread(&utcYear, sizeof(utcYear), 1, in);
+	if (nRead != 1)
+	{
+		fclose(in);
+		return false;
+	}
+	nRead = fread(&utcMonth, sizeof(utcMonth), 1, in);
+	if (nRead != 1)
+	{
+		fclose(in);
+		return false;
+	}
+	nRead = fread(&utcDay, sizeof(utcDay), 1, in);
+	if (nRead != 1)
+	{
+		fclose(in);
+		return false;
+	}
+	nRead = fread(&utcHour, sizeof(utcHour), 1, in);
+	if (nRead != 1)
+	{
+		fclose(in);
+		return false;
+	}
+	m_lastUtcUpdateTime = utctime::UTCTime(utcYear + 1900, utcMonth + 1, utcDay, utcHour, 0, 0);
+	nRead = fread(&utcYear, sizeof(utcYear), 1, in);
+	if (nRead != 1)
+	{
+		fclose(in);
+		return false;
+	}
+	nRead = fread(&utcMonth, sizeof(utcMonth), 1, in);
+	if (nRead != 1)
+	{
+		fclose(in);
+		return false;
+	}
+	nRead = fread(&utcDay, sizeof(utcDay), 1, in);
+	if (nRead != 1)
+	{
+		fclose(in);
+		return false;
+	}
+	nRead = fread(&utcHour, sizeof(utcHour), 1, in);
+	if (nRead != 1)
+	{
+		fclose(in);
+		return false;
+	}
+	m_lastDailyUpdateTime = utctime::UTCTime(utcYear + 1900, utcMonth + 1, utcDay, utcHour, 0, 0);
+
 
 	fclose(in);
 	return true;
@@ -567,12 +681,12 @@ bool NFDR2016CalcState::SaveState(std::string fileName)
 		fclose(out);
 		return false;
 	}
-	nWrite = fwrite(&m_lastUpdateTime, sizeof(m_lastUpdateTime), 1, out);
+	/*nWrite = fwrite(&m_lastUpdateTime, sizeof(m_lastUpdateTime), 1, out);
 	if (nWrite != 1)
 	{
 		fclose(out);
 		return false;
-	}
+	}*/
 	int nPcp = m_qPrecip.size();
 	nWrite = fwrite(&nPcp, sizeof(nPcp), 1, out);
 	if (nWrite != 1)
@@ -585,10 +699,108 @@ bool NFDR2016CalcState::SaveState(std::string fileName)
 		float tVal = m_qPrecip[i];
 		nWrite = fwrite(&tVal, sizeof(float), 1, out);
 		if (nWrite != 1)
+		{
+			fclose(out);
 			return false;
+		}
 	}
-
-
+	//added 2021/01/26 deques and UTCTimes
+	for (int h = 0; h < 24; h++)
+	{
+		float tVal = m_qHourlyTemp[h];
+		nWrite = fwrite(&tVal, sizeof(float), 1, out);
+		if (nWrite != 1)
+		{
+			fclose(out);
+			return false;
+		}
+	}
+	for (int h = 0; h < 24; h++)
+	{
+		float tVal = m_qHourlyRH[h];
+		nWrite = fwrite(&tVal, sizeof(float), 1, out);
+		if (nWrite != 1)
+		{
+			fclose(out);
+			return false;
+		}
+	}
+	for (int h = 0; h < 24; h++)
+	{
+		float tVal = m_qHourlyPrecip[h];
+		nWrite = fwrite(&tVal, sizeof(float), 1, out);
+		if (nWrite != 1)
+		{
+			fclose(out);
+			return false;
+		}
+	}
+	nWrite = fwrite(&m_KBDIThreshold, sizeof(m_KBDIThreshold), 1, out);
+	if (nWrite != 1)
+	{
+		fclose(out);
+		return false;
+	}
+	//	nWrite = fwrite(&m_lastUtcUpdateTime, sizeof(m_lastUtcUpdateTime), 1, out);
+//	if (nWrite != 1)
+//		return false;
+	int utcYear, utcMonth, utcDay, utcHour;
+	utcYear = m_lastUtcUpdateTime.get_tm().tm_year;
+	utcMonth = m_lastUtcUpdateTime.get_tm().tm_mon;
+	utcDay = m_lastUtcUpdateTime.get_tm().tm_mday;
+	utcHour = m_lastUtcUpdateTime.get_tm().tm_hour;
+	nWrite = fwrite(&utcYear, sizeof(utcYear), 1, out);
+	if (nWrite != 1)
+	{
+		fclose(out);
+		return false;
+	}
+	nWrite = fwrite(&utcMonth, sizeof(utcMonth), 1, out);
+	if (nWrite != 1)
+	{
+		fclose(out);
+		return false;
+	}
+	nWrite = fwrite(&utcDay, sizeof(utcDay), 1, out);
+	if (nWrite != 1)
+	{
+		fclose(out);
+		return false;
+	}
+	nWrite = fwrite(&utcHour, sizeof(utcHour), 1, out);
+	if (nWrite != 1)
+	{
+		fclose(out);
+		return false;
+	}
+	utcYear = m_lastDailyUpdateTime.get_tm().tm_year;
+	utcMonth = m_lastDailyUpdateTime.get_tm().tm_mon;
+	utcDay = m_lastDailyUpdateTime.get_tm().tm_mday;
+	utcHour = m_lastDailyUpdateTime.get_tm().tm_hour;
+	nWrite = fwrite(&utcYear, sizeof(utcYear), 1, out);
+	if (nWrite != 1)
+	{
+		fclose(out);
+		return false;
+	}
+	nWrite = fwrite(&utcMonth, sizeof(utcMonth), 1, out);
+	if (nWrite != 1)
+	{
+		fclose(out);
+		return false;
+	}
+	nWrite = fwrite(&utcDay, sizeof(utcDay), 1, out);
+	if (nWrite != 1)
+	{
+		fclose(out);
+		return false;
+	}
+	nWrite = fwrite(&utcHour, sizeof(utcHour), 1, out);
+	if (nWrite != 1)
+	{
+		fclose(out);
+		return false;
+	}
 	fclose(out);
 	return true;
 }

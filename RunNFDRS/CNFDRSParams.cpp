@@ -97,15 +97,15 @@ void CNFDRSParams::InitNFDRS(NFDR2016Calc* pNFDRS)
 		getIsAnnual(), getKbdiThreshold());
 	pNFDRS->iSetFuelModel(getFuelModel());
 	CGSIParams gsi = getGsiParams();
-	pNFDRS->SetGSIParams(gsi.getGsiMax(), gsi.getGsiHerbGreenup(), gsi.getGsiTminMin(), gsi.getGsiDaylenMax(), gsi.getGsiVpdMin(),
+	pNFDRS->SetGSIParams(gsi.getGsiMax(), gsi.getGsiHerbGreenup(), gsi.getGsiTminMin(), gsi.getGsiTminMax(), gsi.getGsiVpdMin(),
 		gsi.getGsiVpdMax(), gsi.getGsiDaylenMin(), gsi.getGsiDaylenMax(), gsi.getGsiAveragingPeriod(),
 		gsi.getUseVpdAverage(), gsi.getNumPrecipDays(), gsi.getRunningTotalPrecipMin(), gsi.getRunningTotalPrecipMax());
 	CGSIParams herb = getHerbParams();
-	pNFDRS->SetHerbGSIparams(herb.getGsiMax(), herb.getGsiHerbGreenup(), herb.getGsiTminMin(), herb.getGsiDaylenMax(), herb.getGsiVpdMin(),
+	pNFDRS->SetHerbGSIparams(herb.getGsiMax(), herb.getGsiHerbGreenup(), herb.getGsiTminMin(), herb.getGsiTminMax(), herb.getGsiVpdMin(),
 		herb.getGsiVpdMax(), herb.getGsiDaylenMin(), herb.getGsiDaylenMax(), herb.getGsiAveragingPeriod(),
 		herb.getUseVpdAverage(), herb.getNumPrecipDays(), herb.getRunningTotalPrecipMin(), herb.getRunningTotalPrecipMax());
 	CGSIParams woody = getWoodyParams();
-	pNFDRS->SetGSIParams(woody.getGsiMax(), woody.getGsiHerbGreenup(), woody.getGsiTminMin(), woody.getGsiDaylenMax(), woody.getGsiVpdMin(),
+	pNFDRS->SetWoodyGSIparams(woody.getGsiMax(), woody.getGsiHerbGreenup(), woody.getGsiTminMin(), woody.getGsiTminMax(), woody.getGsiVpdMin(),
 		woody.getGsiVpdMax(), woody.getGsiDaylenMin(), woody.getGsiDaylenMax(), woody.getGsiAveragingPeriod(),
 		woody.getUseVpdAverage(), woody.getNumPrecipDays(), woody.getRunningTotalPrecipMin(), woody.getRunningTotalPrecipMax());
 	pNFDRS->SetStartKBDI(getStartKbdi());

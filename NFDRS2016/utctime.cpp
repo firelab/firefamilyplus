@@ -134,7 +134,7 @@ std::tm UTCTime::get_tm() const {
     ret_tm.tm_hour = m_hour;
     ret_tm.tm_min = m_minute;
     ret_tm.tm_sec = m_second;
-
+    ret_tm.tm_yday = get_day_of_year(m_year, m_month, m_day);
     return ret_tm;
 }
 
@@ -193,6 +193,29 @@ time_t UTCTime::timestamp() const {
  * Standalone function definitions.
  *
  ********************************************************************/
+
+/*!
+*\brief       Calculates day of year (1- 366)
+* \details     Calculates day of year (1- 366)
+* \param year The year
+* \param month The month, 1 to 12
+* \param day The day, 1 to 31, depending on the month
+* \returns     Julian day of year (1 - 366)
+*/
+ 
+int utctime::get_day_of_year(int year, int month, int day)
+{
+    static const int days_in_month[] = { 31, 28, 31, 30, 31, 30,
+                                        31, 31, 30, 31, 30, 31 };
+
+    int dayOfYear = 0;
+    for (int m = 0; m < month - 1; m++)
+        dayOfYear += days_in_month[m];
+    dayOfYear += day;
+    if (is_leap_year(year) && month > 2)
+        dayOfYear++;
+    return dayOfYear;
+}
 
 
 /*!
@@ -348,7 +371,7 @@ time_t utctime::get_day_diff() {
     datum_day.tm_hour = 12;
     datum_day.tm_mday = 2;
     datum_day.tm_mon = 0;
-    datum_day.tm_year = 30;
+    datum_day.tm_year = 103;
     datum_day.tm_isdst = -1;
 
     const time_t datum_time = mktime(&datum_day);
@@ -383,7 +406,7 @@ time_t utctime::get_hour_diff() {
     datum_day.tm_hour = 12;
     datum_day.tm_mday = 2;
     datum_day.tm_mon = 0;
-    datum_day.tm_year = 30;
+    datum_day.tm_year = 103;
     datum_day.tm_isdst = -1;
 
     const time_t datum_time = mktime(&datum_day);
@@ -519,14 +542,14 @@ int utctime::tm_intraday_secs_diff(const std::tm& first,
  */
 
 bool utctime::is_leap_year(const int year) {
-    bool leap_year;
+    bool leap_year = false;
     if ( year % 4 == 0 &&
          (year % 100 != 0 ||
-          year % 400 == 0) ) {
+          year % 400 == 0) ) //{
         leap_year = true;
-    } else {
-        leap_year = false;
-    }
+    //}// else {
+     //   leap_year = false;
+    //}
     return leap_year;
 }
 

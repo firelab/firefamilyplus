@@ -85,6 +85,7 @@ class invalid_date : public UTCTimeException {
 /*
  *  Standalone functions.
  */
+int get_day_of_year(int year, int month, int day);
 
 bool validate_date(const int year, const int month,
                    const int day, const int hour,

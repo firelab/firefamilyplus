@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "NFDR2016StateSizes.h"
+#include "utctime.h"
 
 class NFDR2016Calc;
 
@@ -45,11 +46,16 @@ public:
 	FP_STORAGE_TYPE m_FuelTemperature;
 	FP_STORAGE_TYPE m_BI, m_ERC, m_SC, m_IC, m_GSI;
 	short m_nConsectiveSnowDays;
-	time_t m_lastUpdateTime;
-
+	//time_t m_lastUpdateTime;
+	utctime::UTCTime m_lastUtcUpdateTime;
+	utctime::UTCTime m_lastDailyUpdateTime;
+	//int m_KBDIThreshold;
 	//precip we can always store as float
 	//as we only read to 3 decimal places
 	//on import (FW13 format)
 	std::vector<float> m_qPrecip;
+	std::vector<float> m_qHourlyPrecip;
+	std::vector<float> m_qHourlyTemp;
+	std::vector<float> m_qHourlyRH;
 };
 

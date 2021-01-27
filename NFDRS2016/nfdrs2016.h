@@ -18,15 +18,16 @@
 #include "deadfuelmoisture.h"
 #include "livefuelmoisture.h"
 #include "station.h"
+#include "utctime.h"
 
-using namespace std;
+/*using namespace std;
 using std::istream;
 using std::ostream;
 using std::setfill;
 using std::setw;
 using std::string;
 using std::vector;
-
+*/
 
 class NFDR2016CalcState;
 /**************************** NFDRDLL.H ***********************************
@@ -139,10 +140,11 @@ class NFDR2016Calc
         NFDR2016Calc(double Lat,char FuelModel,int SlopeClass, double AvgAnnPrecip,bool LT,bool Cure, bool IsAnnual);
         ~NFDR2016Calc();
         // Member functions
-		void Init(double Lat, char FuelModel, int SlopeClass, double AvgAnnPrecip, bool LT, bool Cure, bool isAnnual, int kbdiThreshold);// , double fMaxGSI, double fGSIGreenupThreshold);
+		void Init(double Lat, char FuelModel, int SlopeClass, double AvgAnnPrecip, bool LT, bool Cure, bool isAnnual, int kbdiThreshold, int RegObsHour = 13);
        void Update(Wx);
 	   void Update(int Year, int Month, int Day, int Hour, int Julian, double Temp, double MinTemp, double MaxTemp, double RH, double MinRH, double PPTAmt, double pcp24, double SolarRad, double WS, bool SnowDay, int RegObsHr);
-	   void UpdateDaily(int Year, int Month, int Day, int Julian, double Temp, double MinTemp, double MaxTemp, double RH, double MinRH, double pcp24, double WS, double fMC1, double fMC10, double fMC100, double fMC1000, double fuelTemp, bool SnowDay/* = false*/);
+       void Update(int Year, int Month, int Day, int Hour, double Temp, double RH, double PPTAmt, double SolarRad, double WS, bool SnowDay);
+       void UpdateDaily(int Year, int Month, int Day, int Julian, double Temp, double MinTemp, double MaxTemp, double RH, double MinRH, double pcp24, double WS, double fMC1, double fMC10, double fMC100, double fMC1000, double fuelTemp, bool SnowDay/* = false*/);
         void iSetFuelModel (char cFM);
         int iSetFuelMoistures (double fMC1, double fMC10,double fMC100, double fMC1000, double fMCWood, double fMCHerb, double fuelTempC);
         int iCalcIndexes (int iWS, int iSlopeCls,double* fSC,double* fERC, double* fBI, double* fIC,double fGSI = -999,double fKBDI = -999);
@@ -172,6 +174,11 @@ class NFDR2016Calc
 		bool SaveState(string fileName);
 		bool LoadState(NFDR2016CalcState state);
 		static const int nPrecipQueueDays = 90;
+        static const int nHoursPerDay = 24;
+        double GetMinTemp();
+        double GetMaxTemp();
+        double GetMinRH();
+        double GetPcp24();
 
 		double CTA;
         double Lat;
@@ -210,8 +217,15 @@ class NFDR2016Calc
        // ofstream debug;
 		//time_t lastObsTime;
         //list<double> prcp;
-		time_t lastUpdateTime;
-		std::deque<double> qPrecip;
+        int m_regObsHour;
+		//time_t lastUpdateTime;
+        time_t utcHourDiff;
+        utctime::UTCTime lastUtcUpdateTime;
+        utctime::UTCTime lastDailyUpdateTime;
+        std::deque<double> qPrecip;
+        std::deque<double> qHourlyPrecip;
+        std::deque<double> qHourlyTemp;
+        std::deque<double> qHourlyRH;
 };
 
 
