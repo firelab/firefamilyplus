@@ -17,6 +17,7 @@ CGSIParams::CGSIParams()
 	m_runningTotalPcpMax = 1.5;
 	m_liveFuelMoistureMin = 30.0;
 	m_liveFuelMoistureMax = 250.0;
+	m_useRTPrecip = false;
 }
 
 CGSIParams::CGSIParams(const CGSIParams&rhs)
@@ -36,6 +37,7 @@ CGSIParams::CGSIParams(const CGSIParams&rhs)
 	m_runningTotalPcpMax = rhs.m_runningTotalPcpMax;
 	m_liveFuelMoistureMin = rhs.m_liveFuelMoistureMin;
 	m_liveFuelMoistureMax = rhs.m_liveFuelMoistureMax;
+	m_useRTPrecip = rhs.m_useRTPrecip;
 }
 
 CGSIParams::~CGSIParams()
@@ -99,15 +101,15 @@ void CNFDRSParams::InitNFDRS(NFDR2016Calc* pNFDRS)
 	CGSIParams gsi = getGsiParams();
 	pNFDRS->SetGSIParams(gsi.getGsiMax(), gsi.getGsiHerbGreenup(), gsi.getGsiTminMin(), gsi.getGsiTminMax(), gsi.getGsiVpdMin(),
 		gsi.getGsiVpdMax(), gsi.getGsiDaylenMin(), gsi.getGsiDaylenMax(), gsi.getGsiAveragingPeriod(),
-		gsi.getUseVpdAverage(), gsi.getNumPrecipDays(), gsi.getRunningTotalPrecipMin(), gsi.getRunningTotalPrecipMax());
+		gsi.getUseVpdAverage(), gsi.getNumPrecipDays(), gsi.getRunningTotalPrecipMin(), gsi.getRunningTotalPrecipMax(), gsi.getUseRTPrecip());
 	CGSIParams herb = getHerbParams();
 	pNFDRS->SetHerbGSIparams(herb.getGsiMax(), herb.getGsiHerbGreenup(), herb.getGsiTminMin(), herb.getGsiTminMax(), herb.getGsiVpdMin(),
 		herb.getGsiVpdMax(), herb.getGsiDaylenMin(), herb.getGsiDaylenMax(), herb.getGsiAveragingPeriod(),
-		herb.getUseVpdAverage(), herb.getNumPrecipDays(), herb.getRunningTotalPrecipMin(), herb.getRunningTotalPrecipMax());
+		herb.getUseVpdAverage(), herb.getNumPrecipDays(), herb.getRunningTotalPrecipMin(), herb.getRunningTotalPrecipMax(), herb.getUseRTPrecip());
 	CGSIParams woody = getWoodyParams();
 	pNFDRS->SetWoodyGSIparams(woody.getGsiMax(), woody.getGsiHerbGreenup(), woody.getGsiTminMin(), woody.getGsiTminMax(), woody.getGsiVpdMin(),
 		woody.getGsiVpdMax(), woody.getGsiDaylenMin(), woody.getGsiDaylenMax(), woody.getGsiAveragingPeriod(),
-		woody.getUseVpdAverage(), woody.getNumPrecipDays(), woody.getRunningTotalPrecipMin(), woody.getRunningTotalPrecipMax());
+		woody.getUseVpdAverage(), woody.getNumPrecipDays(), woody.getRunningTotalPrecipMin(), woody.getRunningTotalPrecipMax(), woody.getUseRTPrecip());
 	pNFDRS->SetStartKBDI(getStartKbdi());
 	if (getMaxSC() > 0)
 		pNFDRS->SetSCMax(getMaxSC());

@@ -35,7 +35,9 @@ public:
 	char m_hasExceeded120ThisYear;
 	char m_canIncreaseHerb;
 	FP_STORAGE_TYPE lastHerbFM;
-
+	char m_useRTPrecip;
+	FP_STORAGE_TYPE m_pcpMin;
+	FP_STORAGE_TYPE m_pcpMax;
 
 	std::vector<FP_STORAGE_TYPE> m_qGSI;
 	//char m_qPrecipSize;

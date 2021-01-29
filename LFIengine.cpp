@@ -2,16 +2,8 @@
 //
  
 #include "stdafx.h"
-#include "fireplus.h"
 #include "LFIengine.h"
 #include "LFIset.h"
-#include "wxSet.h"
-#include "FireDay.h"
-#include "perioddoc.h"
-#include "FireSumSet.h"
-#include "SIGStationSet.h"
-#include "ClimateSet.h"
-#include "ClimAnalysis.h"
 
 
 // CLFIengine
@@ -41,6 +33,8 @@ CLFIengine::CLFIengine(CDatabase *pDB, int herbWoodyFlag, CString SIG_Station, b
 	m_WoodyIntercept = 1.0;
 	m_PrcpMin = 0.5;
 	m_PrcpMax = 1.5;
+	m_UseRTPrecip = FALSE;
+	//m_He
 	CLFISet lfiSet(pDB);
 	if (SIG_Station.GetLength() > 6)
 		lfiSet.m_strFilter.Format("[SIG_Station] = '%s'", SIG_Station);
@@ -97,6 +91,9 @@ CLFIengine::CLFIengine(CDatabase *pDB, int herbWoodyFlag, CString SIG_Station, b
 			lfiSet.m_HerbPcpMax = defSet.m_HerbPcpMax;
 			lfiSet.m_WoodyPcpMin = defSet.m_WoodyPcpMin;
 			lfiSet.m_WoodyPcpMax = defSet.m_WoodyPcpMax;
+			lfiSet.m_UseRTPrecip = defSet.m_UseRTPrecip;
+			lfiSet.m_HerbUseRTPrecip = defSet.m_HerbUseRTPrecip;
+			lfiSet.m_WoodyUseRTPrecip = defSet.m_WoodyUseRTPrecip;
 			lfiSet.Update();
 		}
 		defSet.Close();
@@ -128,7 +125,9 @@ CLFIengine::CLFIengine(CDatabase *pDB, int herbWoodyFlag, CString SIG_Station, b
 			if (!lfiSet.IsFieldNull(&lfiSet.m_PcpMin))
 				m_PrcpMin = lfiSet.m_PcpMin;
 			if (!lfiSet.IsFieldNull(&lfiSet.m_PcpMax))
-				m_PrcpMin = lfiSet.m_PcpMax;
+				m_PrcpMax = lfiSet.m_PcpMax;
+			if (!lfiSet.IsFieldNull(&lfiSet.m_UseRTPrecip))
+				m_UseRTPrecip = lfiSet.m_UseRTPrecip;
 		}
 		if(herbWoodyFlag == HerbParams)
 		{
@@ -153,7 +152,9 @@ CLFIengine::CLFIengine(CDatabase *pDB, int herbWoodyFlag, CString SIG_Station, b
 			if (!lfiSet.IsFieldNull(&lfiSet.m_HerbPcpMin))
 				m_PrcpMin = lfiSet.m_HerbPcpMin;
 			if (!lfiSet.IsFieldNull(&lfiSet.m_HerbPcpMax))
-				m_PrcpMin = lfiSet.m_HerbPcpMax;
+				m_PrcpMax = lfiSet.m_HerbPcpMax;
+			if (!lfiSet.IsFieldNull(&lfiSet.m_HerbUseRTPrecip))
+				m_UseRTPrecip = lfiSet.m_HerbUseRTPrecip;
 		}
 		if(herbWoodyFlag == WoodyParams)
 		{
@@ -178,7 +179,9 @@ CLFIengine::CLFIengine(CDatabase *pDB, int herbWoodyFlag, CString SIG_Station, b
 			if (!lfiSet.IsFieldNull(&lfiSet.m_WoodyPcpMin))
 				m_PrcpMin = lfiSet.m_WoodyPcpMin;
 			if (!lfiSet.IsFieldNull(&lfiSet.m_WoodyPcpMax))
-				m_PrcpMin = lfiSet.m_WoodyPcpMax;
+				m_PrcpMax = lfiSet.m_WoodyPcpMax;
+			if (!lfiSet.IsFieldNull(&lfiSet.m_WoodyUseRTPrecip))
+				m_UseRTPrecip = lfiSet.m_WoodyUseRTPrecip;
 		}
 		if(!lfiSet.IsFieldNull(&lfiSet.m_HerbMaxGSI))
 			m_HerbMaxGSI = lfiSet.m_HerbMaxGSI;
@@ -199,10 +202,6 @@ CLFIengine::CLFIengine(CDatabase *pDB, int herbWoodyFlag, CString SIG_Station, b
 	}
 	lfiSet.Close();
 	m_LFIdaysAvg = max(1, m_LFIdaysAvg);
-	m_LFIarray = new double[m_LFIdaysAvg];
-	for(int i = 0; i < m_LFIdaysAvg; i++)
-		m_LFIarray[i] = -1;
-	lastLFIday.SetStatus(COleDateTime::invalid);
 
 	//precalculate slopes and intercepts
 	if(m_HerbGreenup == 1.0)
@@ -228,143 +227,10 @@ CLFIengine::CLFIengine(CDatabase *pDB, int herbWoodyFlag, CString SIG_Station, b
 
 CLFIengine::~CLFIengine()
 {
-	if(m_LFIdaysAvg > 0 && m_LFIarray)
-		delete[] m_LFIarray;
 }
 
 
 // CLFIengine member functions
-double CLFIengine::CalcRunningAvgLFI()
-{
-	int numValid = 0;
-	double lfi = 0.0;
-	for(int i = 0; i < m_LFIdaysAvg; i++)
-	{
-		if(m_LFIarray[i] >= 0)
-		{
-			numValid++;
-			lfi += m_LFIarray[i];
-		}
-	}
-	if(numValid > 0)
-		lfi /= numValid;
-	return lfi;
-}
-
-double CLFIengine::CalcRunningAvgHerbFM()
-{
-	double GSI = CalcRunningAvgLFI() / 100.0;
-	double rescale = GSI / m_HerbMaxGSI;
-	double ret = m_HerbMin;
-	rescale = min(1.0, rescale);
-	rescale = max(0.0, rescale);
-	if(rescale >= m_HerbGreenup)
-	{
-		ret = m_HerbSlope * rescale + m_HerbIntercept;
-		if(!hasGreenedUpThisYear)
-		{
-			hasGreenedUpThisYear = true;
-			canIncreaseHerb = true;
-			//TRACE2("Greenup: %s, HerbFM = %.2f\n", lastLFIday.Format(), ret);
-		}
-	}
-	if(!canIncreaseHerb && lastHerbFM >= 0)
-		ret = min(ret, lastHerbFM);
-	if(!hasExceeded120ThisYear && ret >= 120)
-		hasExceeded120ThisYear = true;
-	if(hasExceeded120ThisYear && ret < 120.0 && herbAnnual)
-	{
-		canIncreaseHerb = false;
-		//TRACE2("HerbFM below 120.0 threshold: %s, HerbFM = %.2f\n", lastLFIday.Format(), ret);
-	}
-	lastHerbFM = ret;
-	return ret;
-}
-
-double CLFIengine::CalcRunningAvgWoodyFM()
-{
-	double GSI = CalcRunningAvgLFI() / 100.0;
-	double rescale = GSI / m_WoodyMaxGSI;
-	rescale = min(1.0, rescale);
-	rescale = max(0.0, rescale);
-	if(rescale >= m_WoodyGreenup)
-	{
-		return m_WoodySlope * rescale + m_WoodyIntercept;
-	}
-	return m_WoodyMin;
-}
-/*double CLFIengine::CalcRunningAvgLFIHerb()
-{
-	int numValid = 0;
-	double herb = 0.0;
-	for(int i = 0; i < m_HerbDaysAvg; i++)
-	{
-		if(m_HerbArray[i] >= 0)
-		{
-			numValid++;
-			herb += m_HerbArray[i];
-		}
-	}
-	if(numValid > 0)
-		herb /= numValid;
-	return herb;
-}
-
-double CLFIengine::CalcRunningAvgLFIWoody()
-{
-	int numValid = 0;
-	double woody = 0.0;
-	for(int i = 0; i < m_WoodyDaysAvg; i++)
-	{
-		if(m_WoodyArray[i] >= 0)
-		{
-			numValid++;
-			woody += m_WoodyArray[i];
-		}
-	}
-	if(numValid > 0)
-		woody /= numValid;
-	return woody;
-}*/
-
-void CLFIengine::AddLFIobs(COleDateTime lfiDay, double val)
-{
-	if(lastLFIday.GetStatus() == COleDateTime::valid)
-	{
-		COleDateTimeSpan span = lfiDay - lastLFIday;
-		int skip = span.GetTotalDays();
-		if(skip > 30)//need to reset
-		{
-			for(int i = 0; i < m_LFIdaysAvg; i++)
-				m_LFIarray[i] = -1;
-		}
-		else
-		{
-			for(int i = m_LFIdaysAvg - skip - 1; i >= 0; i--)
-				m_LFIarray[i + skip] = m_LFIarray[i];
-		}
-		if(lastLFIday.GetYear() != lfiDay.GetYear())
-		{
-			hasGreenedUpThisYear = false;
-			canIncreaseHerb = true;
-			hasExceeded120ThisYear = false;
-		}
-		/*if(!hasGreenedUpThisYear && val >= m_HerbGreenup * 100.0)
-		{
-			hasGreenedUpThisYear = true;
-			canIncreaseHerb = true;
-			TRACE1("Greenup: %s\n", lfiDay.Format());
-		}*/
-			//else if(
-	}
-	else
-	{
-		for(int i = 0; i < m_LFIdaysAvg; i++)
-			m_LFIarray[i] = -1;
-	}
-	m_LFIarray[0] = val;
-	lastLFIday = lfiDay;
-}
 
 bool CLFIengine::IsUsingVPDMax()
 {
@@ -374,88 +240,6 @@ bool CLFIengine::IsUsingVPDMax()
 bool CLFIengine::IsUsingVPDAvg()
 {
 	return m_UseVPDAvg;
-}
-
-double CLFIengine::CalcLFI(double minRH, double maxTempF, double minTempF, double lat, int doy)
-{
-	double LFI = 0.0;
-	double GSI, tMinInd, vpdInd, daylenInd, vpd;
-	tMinInd = GetTminInd(minTempF);
-	vpd = CalcVPD(max(minRH, 5.0), maxTempF);
-	vpdInd = GetVPDInd(vpd);
-	daylenInd = GetDaylInd(CalcDayl(lat, doy));
-	LFI = tMinInd * vpdInd * daylenInd * 100.0;
-	return LFI;
-}
-
-double CLFIengine::CalcLFI_VPDAvg(double RH, double TempF, double maxTempF, double minTempF, double lat, int doy)
-{
-	double LFI = 0.0;
-	double GSI, tMinInd, tDew, vpdInd, daylenInd, vpd;
-	tMinInd = GetTminInd(minTempF);
-	tDew = CalcDPT(TempF, RH);
-	vpd = CalcVPDavg(tDew, (maxTempF + minTempF) / 2);
-	vpdInd = GetVPDInd(vpd);
-	daylenInd = GetDaylInd(CalcDayl(lat, doy));
-	LFI = tMinInd * vpdInd * daylenInd * 100.0;
-	return LFI;
-}
-
-double CLFIengine::GetTminInd(double Tmin)
-{
-	double tmin =  (Tmin - 32.0) * 5.0 / 9.0;
-	if(m_TminMax == m_TminMin)
-		return 0;
-    if( tmin < m_TminMin)
-	{
-		return 0;
-	}
-	else if(tmin > m_TminMax)
-	{
-		return 1;
-	}
-	else
-	{
-		return (tmin - m_TminMin) / (m_TminMax - m_TminMin);
-	}
-}
-
-double CLFIengine::GetVPDInd(double VPD)
-{
-	if(m_VPDMax == m_VPDMin)
-		return 0;
-    if( VPD < m_VPDMin)
-	{
-		return 1;
-	}
-	else if(VPD > m_VPDMax)
-	{
-		return 0;
-	}
-	else
-	{
-		return 1 - (VPD - m_VPDMin) / (m_VPDMax - m_VPDMin);
-
-	}
-}
-
-double CLFIengine::GetDaylInd(double Dayl)
-{
-	if(m_DaylenMin == m_DaylenMax)
-		return 0;
-    if( Dayl < m_DaylenMin)
-	{
-		return 0;
-	}
-	else if(Dayl > m_DaylenMax)
-	{
-		return 1;
-	}
-	else
-	{
-		return (Dayl - m_DaylenMin) / (m_DaylenMax - m_DaylenMin);
-
-	}
 }
 
 double CLFIengine::GetHerbMaxGSI()
@@ -526,4 +310,9 @@ double CLFIengine::GetRTPcpMin()
 double CLFIengine::GetRTPcpMax()
 {
 	return m_PrcpMax;
+}
+
+double CLFIengine::GetUseRTPrecip()
+{
+	return m_UseRTPrecip;
 }

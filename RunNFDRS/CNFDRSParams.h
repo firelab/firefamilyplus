@@ -23,6 +23,7 @@ public:
 	double getRunningTotalPrecipMax() { return m_runningTotalPcpMax; }
 	double getLiveFuelMoistureMin() { return m_liveFuelMoistureMin; }
 	double getLiveFuelMoistureMax() { return m_liveFuelMoistureMax; }
+	bool getUseRTPrecip() { return m_useRTPrecip; }
 	//setters
 	void setGsiMax(double gsiMax) { m_gsiMax = gsiMax; }
 	void setGsiHerbGreenup(double gsiHerbGreenup) { m_gsiHerbGreenup = gsiHerbGreenup; }
@@ -39,6 +40,7 @@ public:
 	void setRunningTotalPrecipMax(double rtPrecipMax) { m_runningTotalPcpMax = rtPrecipMax; }
 	void setLiveFuelMoistureMin(double liveFuelMoistureMin) { m_liveFuelMoistureMin = liveFuelMoistureMin; }
 	void setLiveFuelMoistureMax(double liveFuelMoistureMax) { m_liveFuelMoistureMax = liveFuelMoistureMax; }
+	void setUseRTPrecip(bool useRTPrecip) { m_useRTPrecip = useRTPrecip; }
 private:
 	double m_gsiMax;
 	double m_gsiHerbGreenup;
@@ -55,7 +57,7 @@ private:
 	double m_runningTotalPcpMax;
 	double m_liveFuelMoistureMin;
 	double m_liveFuelMoistureMax;
-
+	bool m_useRTPrecip;
 };
 
 class CNFDRSParams

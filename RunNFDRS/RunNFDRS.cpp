@@ -144,8 +144,8 @@ int main(int argc, char* argv[])
 
 	if (allOutputsFileName && strlen(allOutputsFileName) > 0)
 	{
-		bool allExists = fileExists(allOutputsFileName);
-		allOut = fopen(allOutputsFileName, "at");
+		//bool allExists = fileExists(allOutputsFileName);
+		allOut = fopen(allOutputsFileName, "wt");
 		if (!allOut)
 		{
 			printf("Error opening %s as output.\n", allOutputsFileName);
@@ -153,14 +153,14 @@ int main(int argc, char* argv[])
 			delete cfg;
 			return -3;
 		}
-		if(!allExists)
+		//if(!allExists)
 			//fprintf(allOut, "DateTime, Temp, RH, Precip, WindSpeed, SolarRadiation, SnowFlag, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
-			fprintf(allOut, "DateTime, Temp, RH, Precip, WindSpeed, SolarRadiation, SnowFlag, MinTemp, MaxTemp, MinRH, Pcp24, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
+		fprintf(allOut, "DateTime, Temp, RH, Precip, WindSpeed, SolarRadiation, SnowFlag, MinTemp, MaxTemp, MinRH, Pcp24, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
 	}
 	if (indexOutputsFileName && strlen(indexOutputsFileName) > 0)
 	{
-		bool exists = fileExists(allOutputsFileName);
-		indexOut = fopen(indexOutputsFileName, "at");
+		//bool exists = fileExists(allOutputsFileName);
+		indexOut = fopen(indexOutputsFileName, "wt");
 		if (!indexOut)
 		{
 			
@@ -171,13 +171,13 @@ int main(int argc, char* argv[])
 			delete cfg;
 			return -3;
 		}
-		if (!exists)
-			fprintf(indexOut, "DateTime, BI, ERC, SC, IC, GSI, KBDI\n");
+		//if (!exists)
+		fprintf(indexOut, "DateTime, BI, ERC, SC, IC, GSI, KBDI\n");
 	}
 	if (fuelMoistureOutputsFileName && strlen(fuelMoistureOutputsFileName) > 0)
 	{
-		bool fExists = fileExists(fuelMoistureOutputsFileName);
-		moistOut = fopen(fuelMoistureOutputsFileName, "at");
+		//bool fExists = fileExists(fuelMoistureOutputsFileName);
+		moistOut = fopen(fuelMoistureOutputsFileName, "wt");
 		if (!moistOut)
 		{
 
@@ -190,8 +190,8 @@ int main(int argc, char* argv[])
 			delete cfg;
 			return -3;
 		}
-		if(!fExists)
-			fprintf(moistOut, "DateTime, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM\n");
+		//if(!fExists)
+		fprintf(moistOut, "DateTime, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM\n");
 	}
 
 	//now need to read the wxFile and process the records

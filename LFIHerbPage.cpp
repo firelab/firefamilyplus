@@ -31,6 +31,7 @@ CLFIHerbPage::CLFIHerbPage()
 	minHerb = 30.0;
 	pcpMin = 0.5;
 	pcpMax = 1.5;
+	m_UseRTPrecip = FALSE;
 }
 
 CLFIHerbPage::~CLFIHerbPage()
@@ -70,6 +71,7 @@ void CLFIHerbPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN_PRECIP_MIN2, m_spinPcpMin);
 	DDX_Control(pDX, IDC_EDIT_PRECIP_MAX2, m_editPcpMax);
 	DDX_Control(pDX, IDC_SPIN_PRECIP_MAX2, m_spinPcpMax);
+	DDX_Control(pDX, IDC_CHECK_USE_RTPRECIP, m_btnUseRTPrecip);
 }
 
 
@@ -108,6 +110,7 @@ BEGIN_MESSAGE_MAP(CLFIHerbPage, CPropertyPage)
 	ON_EN_CHANGE(IDC_EDIT_PRECIP_MIN, &CLFIHerbPage::OnEnChangeEditPrecipMin)
 	ON_EN_CHANGE(IDC_EDIT_PRECIP_MAX2, &CLFIHerbPage::OnEnChangeEditPrecipMax)
 	ON_CBN_SELCHANGE(IDC_COMBO_VPD_USAGE, &CLFIHerbPage::OnCbnSelchangeComboVpdUsage)
+	ON_BN_CLICKED(IDC_CHECK_USE_RTPRECIP, &CLFIHerbPage::OnBnClickedCheckUseRtprecip)
 END_MESSAGE_MAP()
 
 
@@ -148,6 +151,8 @@ BOOL CLFIHerbPage::OnInitDialog()
 			pcpMin = pLfiSet->m_HerbPcpMin;
 		if (!pLfiSet->IsFieldNull(&pLfiSet->m_HerbPcpMax))
 			pcpMax = pLfiSet->m_HerbPcpMax;
+		if (!pLfiSet->IsFieldNull(&pLfiSet->m_HerbUseRTPrecip))
+			m_UseRTPrecip = pLfiSet->m_HerbUseRTPrecip;
 
 		m_spinTminMin.SetDecimalPlaces (1);
 		m_spinTminMin.SetTrimTrailingZeros (FALSE);
@@ -234,6 +239,8 @@ BOOL CLFIHerbPage::OnInitDialog()
 			m_comboVPD.SetCurSel(1);
 		else
 			m_comboVPD.SetCurSel(0);
+		m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
+		EnableRTPrecipFields();
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -265,6 +272,7 @@ BOOL CLFIHerbPage::OnApply()
 		pLfiSet->m_HerbPcpDays = m_spinPcpDays.GetPos();
 		pLfiSet->m_HerbPcpMin = m_spinPcpMin.GetPos();
 		pLfiSet->m_HerbPcpMax = m_spinPcpMax.GetPos();
+		pLfiSet->m_HerbUseRTPrecip = m_UseRTPrecip;
 		pLfiSet->Update();
 	}
 	return CPropertyPage::OnApply();
@@ -443,6 +451,7 @@ void CLFIHerbPage::OnBnClickedButtonDefaults()
 	daysPcp = 30;
 	pcpMin = 0.5;
 	pcpMax = 1.5;
+	m_UseRTPrecip = FALSE;
 
 	m_spinTminMin.SetPos(tminMin);
 	m_spinTminMax.SetPos(tminMax);
@@ -450,8 +459,6 @@ void CLFIHerbPage::OnBnClickedButtonDefaults()
 	m_spinVPDMax.SetPos(vpdMax);
 	m_spinDaylenMin.SetPos(daylenMin);
 	m_spinDaylenMax.SetPos(daylenMax);
-	//((CButton *)GetDlgItem(IDC_RADIO_VPD_MAX))->SetCheck(!m_UseVPDavg);
-	//((CButton *)GetDlgItem(IDC_RADIO_VPD_AVG))->SetCheck(m_UseVPDavg);
 	m_comboVPD.SetCurSel(m_UseVPDavg ? 1 : 0);
 	m_spinDaysAvg.SetPos(daysAvg);
 
@@ -463,6 +470,8 @@ void CLFIHerbPage::OnBnClickedButtonDefaults()
 	m_spinPcpDays.SetPos(daysPcp);
 	m_spinPcpMin.SetPos(pcpMin);
 	m_spinPcpMax.SetPos(pcpMax);
+	m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
+	EnableRTPrecipFields();
 
 	SetModified();
 }
@@ -489,6 +498,7 @@ void CLFIHerbPage::OnBnClickedButtonStoredDefaults()
 		daysPcp = defSet.m_HerbPcpDays;
 		pcpMin = defSet.m_HerbPcpMin;
 		pcpMax = defSet.m_HerbPcpMax;
+		m_UseRTPrecip = defSet.m_HerbUseRTPrecip;
 	}
 	defSet.Close();
 	m_spinTminMin.SetPos(tminMin);
@@ -508,7 +518,8 @@ void CLFIHerbPage::OnBnClickedButtonStoredDefaults()
 	m_spinPcpDays.SetPos(daysPcp);
 	m_spinPcpMin.SetPos(pcpMin);
 	m_spinPcpMax.SetPos(pcpMax);
-
+	m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
+	EnableRTPrecipFields();
 
 	SetModified();
 }
@@ -539,6 +550,7 @@ void CLFIHerbPage::OnBnClickedButtonSaveDefaults()
 	defSet.m_HerbPcpDays = m_spinPcpDays.GetPos();
 	defSet.m_HerbPcpMin = m_spinPcpMin.GetPos();
 	defSet.m_HerbPcpMax = m_spinPcpMax.GetPos();
+	defSet.m_HerbUseRTPrecip = m_UseRTPrecip;
 	defSet.Update();
 	defSet.Close();
 	//SetModified();
@@ -575,4 +587,23 @@ void CLFIHerbPage::OnEnChangeEditPrecipMax()
 void CLFIHerbPage::OnCbnSelchangeComboVpdUsage()
 {
 	SetModified();
+}
+
+
+void CLFIHerbPage::OnBnClickedCheckUseRtprecip()
+{
+	m_UseRTPrecip = m_btnUseRTPrecip.GetCheck();
+	SetModified();
+	EnableRTPrecipFields();
+}
+
+void CLFIHerbPage::EnableRTPrecipFields()
+{
+	const BOOL check = m_btnUseRTPrecip.GetCheck();
+	m_editPcpMin.EnableWindow(check);
+	m_editPcpMax.EnableWindow(check);
+	m_spinPcpMin.EnableWindow(check);
+	m_spinPcpMax.EnableWindow(check);
+	m_editPcpDays.EnableWindow(check);
+	m_spinPcpDays.EnableWindow(check);
 }

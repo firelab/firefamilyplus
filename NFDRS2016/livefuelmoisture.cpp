@@ -167,6 +167,15 @@ bool LiveFuelMoisture::GetUseVPDAvg()
 	return m_UseVPDAvg;
 }
 
+void LiveFuelMoisture::SetUseRTPrecip(bool set)
+{
+    m_useRTPrecip = set;
+}
+bool LiveFuelMoisture::GetUseRTPrecip()
+{
+    return m_useRTPrecip;
+}
+
 bool LiveFuelMoisture::GetIsAnnual()
 {
 	return m_IsAnnual;
@@ -246,6 +255,7 @@ LiveFuelMoisture::LiveFuelMoisture()
 	m_UseVPDAvg = false;
 	lastUpdateTime = 0;
 	m_nDaysPrecip = 30;
+    m_useRTPrecip = false;
 }
 
 LiveFuelMoisture::LiveFuelMoisture(double Lat,bool IsHerb, bool IsAnnual)
@@ -265,6 +275,7 @@ LiveFuelMoisture::LiveFuelMoisture(double Lat,bool IsHerb, bool IsAnnual)
 
 	lastUpdateTime = 0;
 	m_nDaysPrecip = 30;
+    m_useRTPrecip = false;
 }
 
 double LiveFuelMoisture::CalcRunningAvgGSI()
@@ -335,8 +346,10 @@ double LiveFuelMoisture::CalcGSI(double minRH, double maxTempF, double minTempF,
     vpdInd = GetVPDInd(CalcVPD(max(minRH, 5.0), maxTempF));
     daylenInd = GetDaylInd(CalcDayl(lat, doy));
     prcpInd = GetPrcpInd(RTPrcp);
-    GSI = tMinInd * vpdInd * daylenInd * prcpInd;
-
+    if(m_useRTPrecip)
+        GSI = tMinInd * vpdInd * daylenInd * prcpInd;
+    else
+        GSI = tMinInd * vpdInd * daylenInd;
     // cout << tMinInd << " " << CalcVPD(max(minRH, 5.0), maxTempF) << " " <<  vpdInd << " " << daylenInd << endl;
     return GSI;
 }
@@ -352,7 +365,10 @@ double LiveFuelMoisture::CalcGSI_VPDAvg(double RH, double TempF, double maxTempF
     vpdInd = GetVPDInd(vpd);
     daylenInd = GetDaylInd(CalcDayl(lat, doy));
     prcpInd = GetPrcpInd(RTPrcp);
-	GSI = tMinInd * vpdInd * daylenInd * prcpInd;// *100.0;
+    if (m_useRTPrecip)
+        GSI = tMinInd * vpdInd * daylenInd * prcpInd;// *100.0;
+    else
+        GSI = tMinInd * vpdInd * daylenInd;
     return GSI;
 }
 
@@ -528,7 +544,10 @@ LFMCalcState LiveFuelMoisture::GetState()
 	ret.m_VPDMin = m_VPDMin;
 	ret.m_lastUpdateTime = lastUpdateTime;
 	ret.m_nDaysPrecip = m_nDaysPrecip;
-	return ret;
+    ret.m_useRTPrecip = m_useRTPrecip;
+    ret.m_pcpMin = m_RTPrcpMin;
+    ret.m_pcpMax = m_RTPrcpMax;
+    return ret;
 }
 
 bool LiveFuelMoisture::SetState(LFMCalcState state)
@@ -562,5 +581,8 @@ bool LiveFuelMoisture::SetState(LFMCalcState state)
 	m_VPDMin = state.m_VPDMin;
 	lastUpdateTime = state.m_lastUpdateTime;
 	m_nDaysPrecip = state.m_nDaysPrecip;
+    m_useRTPrecip = state.m_useRTPrecip;
+    m_RTPrcpMin = state.m_pcpMin;
+    m_RTPrcpMax = state.m_pcpMax;
 	return true;
 }

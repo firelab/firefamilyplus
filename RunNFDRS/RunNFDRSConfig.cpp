@@ -16,7 +16,7 @@ RunNFDRSConfig::RunNFDRSConfig()
 	m_schema[3] = "initFile = string";
 	m_schema[4] = "loadFromStateFile = string";
 	m_schema[5] = "outputInterval = int";
-	m_schema[6] = "saveToSateFile = string";
+	m_schema[6] = "saveToStateFile = string";
 	m_schema[7] = "wxFile = string";
 	m_schema[8] = 0;
 
@@ -37,7 +37,7 @@ RunNFDRSConfig::RunNFDRSConfig()
 	m_str << "loadFromStateFile = \"/someSavedState.nfdrs\";\n";
 	m_str << "#saveToStateFile will save the state when calculat";
 	m_str << "ion is complete to the indicated file\n";
-	m_str << "saveToSateFile = \"/newSavedState.nfdrs\";\n";
+	m_str << "saveToStateFile = \"/newSavedState.nfdrs\";\n";
 	m_str << "# output files (csv) can be designated, otherwise ";
 	m_str << "nothing is output \n";
 	m_str << "# if they exist, they are appended to by the progr";
@@ -50,11 +50,11 @@ RunNFDRSConfig::RunNFDRSConfig()
 	m_str << "d indexes\n";
 	m_str << "allOutputsFile = \"/NFDRSoutput.csv\";\n";
 	m_str << "#indexes only\n";
-	m_str << "indexOutputFile = \"\";\n";
+	m_str << "indexOutputFile = \"/NFDRSIndexes.csv\";\n";
 	m_str << "#fuel moistures\n";
 	m_str << "fuelMosituresOutputFile = \"/NFDRSMoistures.csv\";\n";
 	m_str << "#outputInterval 0 = hourly (each record), 1 = dail";
-	m_str << "y (at ObdHour)\n";
+	m_str << "y (at ObsHour from NFDRSInit file)\n";
 	m_str << "outputInterval = \"0\";";
 }
 

@@ -153,13 +153,13 @@ class NFDR2016Calc
 
 		void SetGSIParams(double MaxGSI, double GreenupThreshold, double TminMin = -2.0, double TminMax = 5.0, double VPDMin = 900, 
 			double VPDMax = 4100, double DaylMin = 36000, double DaylMax = 39600, unsigned int MAPeriod = 21U, bool UseVPDAvg = false, 
-			unsigned int nPrecipDays = 30, double rtPrecipMin = 0.5, double rtPrecipMax = 1.5);
+			unsigned int nPrecipDays = 30, double rtPrecipMin = 0.5, double rtPrecipMax = 1.5, bool UseRTPrecip = false);
 		void SetHerbGSIparams(double MaxGSI, double GreenupThreshold, double TminMin = -2.0, double TminMax = 5.0, double VPDMin = 900, 
 			double VPDMax = 4100, double DaylMin = 36000, double DaylMax = 39600, unsigned int MAPeriod = 21U, bool UseVPDAvg = false, 
-			unsigned int nPrecipDays = 30, double rtPrecipMin = 0.5, double rtPrecipMax = 1.5);
+			unsigned int nPrecipDays = 30, double rtPrecipMin = 0.5, double rtPrecipMax = 1.5, bool UseRTPrecip = false);
 		void SetWoodyGSIparams(double MaxGSI, double GreenupThreshold, double TminMin = -2.0, double TminMax = 5.0, double VPDMin = 900, 
 			double VPDMax = 4100, double DaylMin = 36000, double DaylMax = 39600, unsigned int MAPeriod = 21U, bool UseVPDAvg = false, 
-			unsigned int nPrecipDays = 30, double rtPrecipMin = 0.5, double rtPrecipMax = 1.5);
+			unsigned int nPrecipDays = 30, double rtPrecipMin = 0.5, double rtPrecipMax = 1.5, bool UseRTPrecip = false);
 
 		void SetStartKBDI(int sKBDI);
 		int GetStartKBDI();

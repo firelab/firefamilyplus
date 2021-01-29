@@ -10,7 +10,7 @@ wxFile = "/someWx.fw21";
 #loadFromState will load the state file and begin any calculations from the saved state
 loadFromStateFile = "/someSavedState.nfdrs";
 #saveToStateFile will save the state when calculation is complete to the indicated file
-saveToSateFile = "/newSavedState.nfdrs";
+saveToStateFile = "/newSavedState.nfdrs";
 # output files (csv) can be designated, otherwise nothing is output 
 # if they exist, they are appended to by the program
 # output files include a date/time and selected outputs
@@ -18,7 +18,7 @@ saveToSateFile = "/newSavedState.nfdrs";
 #all outputs available, includes fuel moistures and indexes
 allOutputsFile = "/NFDRSoutput.csv";
 #indexes only
-indexOutputFile = "";
+indexOutputFile = "/NFDRSIndexes.csv";
 #fuel moistures
 fuelMosituresOutputFile = "/NFDRSMoistures.csv";
 #outputInterval 0 = hourly (each record), 1 = daily (at ObsHour from NFDRSInit file)

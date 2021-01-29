@@ -48,6 +48,7 @@ liveFuelMoisture.defaults {
 	gsiNumPrecipDays = "30";
 	gsiRTPrecipMin = "0.5";
 	gsiRTPrecipMax = "1.5";
+	gsiUseRTPrecip = "0";
 	fuelMoistureMax = "100";
 	fuelMoistureMin = "0";
 }

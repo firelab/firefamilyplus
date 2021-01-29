@@ -31,6 +31,7 @@ CLFIWoodyPage::CLFIWoodyPage()
 	minWoody = 50.0;
 	pcpMin = 0.5;
 	pcpMax = 1.5;
+	m_UseRTPrecip = FALSE;
 }
 
 CLFIWoodyPage::~CLFIWoodyPage()
@@ -70,6 +71,7 @@ void CLFIWoodyPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN_PRECIP_MIN2, m_spinPcpMin);
 	DDX_Control(pDX, IDC_EDIT_PRECIP_MAX2, m_editPcpMax);
 	DDX_Control(pDX, IDC_SPIN_PRECIP_MAX2, m_spinPcpMax);
+	DDX_Control(pDX, IDC_CHECK_USE_RTPRECIP, m_btnUseRTPrecip);
 }
 
 
@@ -108,6 +110,7 @@ BEGIN_MESSAGE_MAP(CLFIWoodyPage, CPropertyPage)
 	ON_EN_CHANGE(IDC_EDIT_PRECIP_MIN, &CLFIWoodyPage::OnEnChangeEditPrecipMin)
 	ON_EN_CHANGE(IDC_EDIT_PRECIP_MAX2, &CLFIWoodyPage::OnEnChangeEditPrecipMax)
 	ON_CBN_SELCHANGE(IDC_COMBO_VPD_USAGE, &CLFIWoodyPage::OnCbnSelchangeComboVpdUsage)
+	ON_BN_CLICKED(IDC_CHECK_USE_RTPRECIP, &CLFIWoodyPage::OnBnClickedCheckUseRtprecip)
 END_MESSAGE_MAP()
 
 
@@ -148,6 +151,8 @@ BOOL CLFIWoodyPage::OnInitDialog()
 			pcpMin = pLfiSet->m_WoodyPcpMin;
 		if (!pLfiSet->IsFieldNull(&pLfiSet->m_WoodyPcpMax))
 			pcpMax = pLfiSet->m_WoodyPcpMax;
+		if (!pLfiSet->IsFieldNull(&pLfiSet->m_WoodyUseRTPrecip))
+			m_UseRTPrecip = pLfiSet->m_WoodyUseRTPrecip;
 
 		m_spinTminMin.SetDecimalPlaces (1);
 		m_spinTminMin.SetTrimTrailingZeros (FALSE);
@@ -231,6 +236,8 @@ BOOL CLFIWoodyPage::OnInitDialog()
 			m_comboVPD.SetCurSel(1);
 		else
 			m_comboVPD.SetCurSel(0);
+		m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
+		EnableRTPrecipFields();
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -262,6 +269,7 @@ BOOL CLFIWoodyPage::OnApply()
 		pLfiSet->m_WoodyPcpDays = m_spinPcpDays.GetPos();
 		pLfiSet->m_WoodyPcpMin = m_spinPcpMin.GetPos();
 		pLfiSet->m_WoodyPcpMax = m_spinPcpMax.GetPos();
+		pLfiSet->m_WoodyUseRTPrecip = m_UseRTPrecip;
 		pLfiSet->Update();
 	}
 	return CPropertyPage::OnApply();
@@ -428,6 +436,7 @@ void CLFIWoodyPage::OnBnClickedButtonDefaults()
 	daysPcp = 30;
 	pcpMin = 0.5;
 	pcpMax = 1.5;
+	m_UseRTPrecip = FALSE;
 
 	m_spinTminMin.SetPos(tminMin);
 	m_spinTminMax.SetPos(tminMax);
@@ -447,6 +456,9 @@ void CLFIWoodyPage::OnBnClickedButtonDefaults()
 	m_spinPcpDays.SetPos(daysPcp);
 	m_spinPcpMin.SetPos(pcpMin);
 	m_spinPcpMax.SetPos(pcpMax);
+	m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
+	EnableRTPrecipFields();
+
 	SetModified();
 }
 
@@ -472,6 +484,7 @@ void CLFIWoodyPage::OnBnClickedButtonStoredDefaults()
 		daysPcp = defSet.m_WoodyPcpDays;
 		pcpMin = defSet.m_WoodyPcpMin;
 		pcpMax = defSet.m_WoodyPcpMax;
+		m_UseRTPrecip = defSet.m_WoodyUseRTPrecip;
 	}
 	defSet.Close();
 	m_spinTminMin.SetPos(tminMin);
@@ -491,6 +504,9 @@ void CLFIWoodyPage::OnBnClickedButtonStoredDefaults()
 	m_spinPcpDays.SetPos(daysPcp);
 	m_spinPcpMin.SetPos(pcpMin);
 	m_spinPcpMax.SetPos(pcpMax);
+	m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
+	EnableRTPrecipFields();
+
 	SetModified();
 }
 
@@ -520,9 +536,10 @@ void CLFIWoodyPage::OnBnClickedButtonSaveDefaults()
 	defSet.m_WoodyPcpDays = m_spinPcpDays.GetPos();
 	defSet.m_WoodyPcpMin = m_spinPcpMin.GetPos();
 	defSet.m_WoodyPcpMax = m_spinPcpMax.GetPos();
+	defSet.m_WoodyUseRTPrecip = m_UseRTPrecip;
 	defSet.Update();
 	defSet.Close();
-	SetModified();
+	//SetModified();
 }
 
 void CLFIWoodyPage::OnDeltaposSpinPrecipMin(NMHDR *pNMHDR, LRESULT *pResult)
@@ -556,4 +573,23 @@ void CLFIWoodyPage::OnEnChangeEditPrecipMax()
 void CLFIWoodyPage::OnCbnSelchangeComboVpdUsage()
 {
 	SetModified();
+}
+
+
+void CLFIWoodyPage::OnBnClickedCheckUseRtprecip()
+{
+	m_UseRTPrecip = m_btnUseRTPrecip.GetCheck();
+	SetModified();
+	EnableRTPrecipFields();
+}
+
+void CLFIWoodyPage::EnableRTPrecipFields()
+{
+	const BOOL check = m_btnUseRTPrecip.GetCheck();
+	m_editPcpMin.EnableWindow(check);
+	m_editPcpMax.EnableWindow(check);
+	m_spinPcpMin.EnableWindow(check);
+	m_spinPcpMax.EnableWindow(check);
+	m_editPcpDays.EnableWindow(check);
+	m_spinPcpDays.EnableWindow(check);
 }

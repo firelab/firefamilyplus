@@ -25,9 +25,9 @@ public:
 	double GetRH() { return m_RH; }
 	double GetPrecip() { return m_pcp; }
 	double GetWindSpeed() { return m_windSpeed; }
-	int GetWindAzimuth() { return m_windAzimuth; }
-	double GetSolarRadiation() { return m_solarRadiation; }
-	int GetSnowFlag() { return m_snowFlag; }
+	int GetWindAzimuth() { return m_windAzimuth;	}
+	double GetSolarRadiation() { return( m_solarRadiation != dNODATA) ? m_solarRadiation : 0; }
+	int GetSnowFlag() { return (m_snowFlag != dNODATA) ? m_snowFlag : 0; }
 	double GetGustSpeed() { return m_gustSpeed; }
 	int GetGustAzimuth() { return m_gustAzimuth; }
 
@@ -42,7 +42,7 @@ public:
 	void SetSnowFlag(int snowDay) { m_snowFlag = snowDay; }
 	void SetGustSpeed(double gs) { m_gustSpeed = gs; }
 	void SetGustAzimuth(int azi) { m_gustAzimuth = azi; }
-
+	 
 private:
 	tm m_dateTime;
 	double m_temp;

@@ -100,6 +100,7 @@ void NFDRSConfiguration::parse(
 		gsiParams.setRunningTotalPrecipMax(cfg->lookupFloat(cfgScope, "gsi_opts.gsiRTPrecipMax"));
 		gsiParams.setRunningTotalPrecipMin(cfg->lookupFloat(cfgScope, "gsi_opts.gsiRTPrecipMin"));
 		gsiParams.setUseVpdAverage(cfg->lookupInt(cfgScope, "gsi_opts.gsiUseVpdAvg"));
+		gsiParams.setUseRTPrecip(cfg->lookupInt(cfgScope, "gsi_opts.gsiUseRTPrecip"));
 		m_nfdrsParams.setGsiParams(gsiParams);
 		CGSIParams herbParams;
 		herbParams.setGsiAveragingPeriod(cfg->lookupInt(cfgScope, "herb_opts.gsiAveragingDays"));
@@ -117,6 +118,7 @@ void NFDRSConfiguration::parse(
 		herbParams.setRunningTotalPrecipMax(cfg->lookupFloat(cfgScope, "herb_opts.gsiRTPrecipMax"));
 		herbParams.setRunningTotalPrecipMin(cfg->lookupFloat(cfgScope, "herb_opts.gsiRTPrecipMin"));
 		herbParams.setUseVpdAverage(cfg->lookupInt(cfgScope, "herb_opts.gsiUseVpdAvg"));
+		herbParams.setUseRTPrecip(cfg->lookupInt(cfgScope, "herb_opts.gsiUseRTPrecip"));
 		m_nfdrsParams.setHerbParams(herbParams);
 		CGSIParams woodyParams;
 		woodyParams.setGsiAveragingPeriod(cfg->lookupInt(cfgScope, "woody_opts.gsiAveragingDays"));
@@ -134,6 +136,7 @@ void NFDRSConfiguration::parse(
 		woodyParams.setRunningTotalPrecipMax(cfg->lookupFloat(cfgScope, "woody_opts.gsiRTPrecipMax"));
 		woodyParams.setRunningTotalPrecipMin(cfg->lookupFloat(cfgScope, "woody_opts.gsiRTPrecipMin"));
 		woodyParams.setUseVpdAverage(cfg->lookupInt(cfgScope, "woody_opts.gsiUseVpdAvg"));
+		woodyParams.setUseRTPrecip(cfg->lookupInt(cfgScope, "woody_opts.gsiUseRTPrecip"));
 		m_nfdrsParams.setWoodyParams(woodyParams);
 		//let's try dump to see what we get!
 		//saveAs("Dummyfile.cfg");

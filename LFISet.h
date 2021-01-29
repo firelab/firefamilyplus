@@ -32,7 +32,7 @@ public:
 	BOOL m_UseVPDAvg;
 	double m_PcpMin;
 	double m_PcpMax;
-
+	BOOL m_UseRTPrecip;
 	long m_HerbDaysAvg;
 	double m_HerbMaxGSI;
 	double m_HerbGreenup;
@@ -48,6 +48,7 @@ public:
 	BOOL m_HerbUseVPDAvg;
 	double m_HerbPcpMin;
 	double m_HerbPcpMax;
+	BOOL m_HerbUseRTPrecip;
 	long m_WoodyDaysAvg;
 	double m_WoodyMaxGSI;
 	double m_WoodyGreenup;
@@ -63,6 +64,7 @@ public:
 	BOOL m_WoodyUseVPDAvg;
 	double m_WoodyPcpMin;
 	double m_WoodyPcpMax;
+	BOOL m_WoodyUseRTPrecip;
 
 // Overrides
 	// Wizard generated virtual function overrides

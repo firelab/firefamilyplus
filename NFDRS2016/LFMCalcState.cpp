@@ -31,6 +31,9 @@ LFMCalcState::LFMCalcState()
 	lastHerbFM = 0;
 	m_lastUpdateTime = 0;
 	m_nDaysPrecip = 0;
+	m_useRTPrecip = 0;
+	m_pcpMin = 0.5;
+	m_pcpMax = 1.5;
 }
 
 LFMCalcState::LFMCalcState(const LFMCalcState& rhs)
@@ -63,6 +66,9 @@ LFMCalcState::LFMCalcState(const LFMCalcState& rhs)
 	m_qGSI = rhs.m_qGSI;
 	m_lastUpdateTime = rhs.m_lastUpdateTime;
 	m_nDaysPrecip = rhs.m_nDaysPrecip;
+	m_useRTPrecip = rhs.m_useRTPrecip;
+	m_pcpMin = rhs.m_pcpMin;
+	m_pcpMax = rhs.m_pcpMax;
 }
 
 LFMCalcState::~LFMCalcState()
@@ -152,6 +158,15 @@ bool LFMCalcState::ReadState(FILE *in)
 	nRead = fread(&m_nDaysPrecip, sizeof(m_nDaysPrecip), 1, in);
 	if (nRead != 1)
 		return false;
+	nRead = fread(&m_useRTPrecip, sizeof(m_useRTPrecip), 1, in);
+	if (nRead != 1)
+		return false;
+	nRead = fread(&m_pcpMin, sizeof(m_pcpMin), 1, in);
+	if (nRead != 1)
+		return false;
+	nRead = fread(&m_pcpMax, sizeof(m_pcpMax), 1, in);
+	if (nRead != 1)
+		return false;
 
 	return true;
 }
@@ -238,5 +253,16 @@ bool LFMCalcState::SaveState(FILE *out)
 	nWrite = fwrite(&m_nDaysPrecip, sizeof(m_nDaysPrecip), 1, out);
 	if (nWrite != 1)
 		return false;
+
+	nWrite = fwrite(&m_useRTPrecip, sizeof(m_useRTPrecip), 1, out);
+	if (nWrite != 1)
+		return false;
+	nWrite = fwrite(&m_pcpMin, sizeof(m_pcpMin), 1, out);
+	if (nWrite != 1)
+		return false;
+	nWrite = fwrite(&m_pcpMax, sizeof(m_pcpMax), 1, out);
+	if (nWrite != 1)
+		return false;
+
 	return true;
 }

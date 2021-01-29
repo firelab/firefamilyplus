@@ -25,6 +25,7 @@ CLFIGeneralPage::CLFIGeneralPage()
 	daysPcp = 30;
 	pcpMin = 0.5;
 	pcpMax = 1.5;
+	m_UseRTPrecip = FALSE;
 }
 
 CLFIGeneralPage::~CLFIGeneralPage()
@@ -55,6 +56,7 @@ void CLFIGeneralPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN_PRECIP_MIN, m_spinPcpMin);
 	DDX_Control(pDX, IDC_EDIT_PRECIP_MAX, m_editPcpMax);
 	DDX_Control(pDX, IDC_SPIN_PRECIP_MAX, m_spinPcpMax);
+	DDX_Control(pDX, IDC_CHECK_USE_RTPRECIP, m_btnUseRTPrecip);
 }
 
 
@@ -85,6 +87,7 @@ BEGIN_MESSAGE_MAP(CLFIGeneralPage, CPropertyPage)
 	ON_EN_CHANGE(IDC_EDIT_PRECIP_MIN, &CLFIGeneralPage::OnEnChangeEditPrecipMin)
 	ON_EN_CHANGE(IDC_EDIT_PRECIP_MAX, &CLFIGeneralPage::OnEnChangeEditPrecipMax)
 	ON_CBN_SELCHANGE(IDC_COMBO_VPD_USAGE, &CLFIGeneralPage::OnCbnSelchangeComboVpdUsage)
+	ON_BN_CLICKED(IDC_CHECK_USE_RTPRECIP, &CLFIGeneralPage::OnBnClickedCheckUseRtprecip)
 END_MESSAGE_MAP()
 
 
@@ -118,7 +121,8 @@ BOOL CLFIGeneralPage::OnInitDialog()
 			pcpMin = pLfiSet->m_PcpMin;
 		if (!pLfiSet->IsFieldNull(&pLfiSet->m_PcpMax))
 			pcpMax = pLfiSet->m_PcpMax;
-
+		if (!pLfiSet->IsFieldNull(&pLfiSet->m_UseRTPrecip))
+			m_UseRTPrecip = pLfiSet->m_UseRTPrecip;
 		m_spinTminMin.SetDecimalPlaces (1);
 		m_spinTminMin.SetTrimTrailingZeros (FALSE);
 		m_spinTminMin.SetRangeAndDelta (-50.0, 200.0, 0.1);
@@ -180,6 +184,9 @@ BOOL CLFIGeneralPage::OnInitDialog()
 
 		m_spinPcpDays.SetRange(1, 90);
 		m_spinPcpDays.SetPos(daysPcp);
+
+		m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
+		EnableRTPrecipFields();
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -211,6 +218,7 @@ BOOL CLFIGeneralPage::OnApply()
 			pLfiSet->m_UseVPDAvg = TRUE;
 		else
 			pLfiSet->m_UseVPDAvg = FALSE;
+		pLfiSet->m_UseRTPrecip = m_UseRTPrecip;
 		/*	lfiSet.m_MaxGSI = m_spinMaxGSI.GetPos();
 		lfiSet.m_Greenup = m_spinGreenup.GetPos();
 		lfiSet.m_MaxHerb = m_spinMaxHerb.GetPos();
@@ -331,19 +339,20 @@ void CLFIGeneralPage::OnBnClickedButtonDefaults()
 	daysPcp = 30;
 	pcpMin = 0.5;
 	pcpMax = 1.5;
+	m_UseRTPrecip = FALSE;
 	m_spinTminMin.SetPos(tminMin);
 	m_spinTminMax.SetPos(tminMax);
 	m_spinVPDMin.SetPos(vpdMin);
 	m_spinVPDMax.SetPos(vpdMax);
 	m_spinDaylenMin.SetPos(daylenMin);
 	m_spinDaylenMax.SetPos(daylenMax);
-	//((CButton *)GetDlgItem(IDC_RADIO_VPD_MAX))->SetCheck(!m_UseVPDavg);
-	//((CButton *)GetDlgItem(IDC_RADIO_VPD_AVG))->SetCheck(m_UseVPDavg);
 	m_comboVPD.SetCurSel(m_UseVPDavg ? 1 : 0);
 	m_spinDaysAvg.SetPos(daysAvg);
 	m_spinPcpDays.SetPos(daysPcp);
 	m_spinPcpMin.SetPos(pcpMin);
 	m_spinPcpMax.SetPos(pcpMax);
+	m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
+	EnableRTPrecipFields();
 	SetModified();
 }
 
@@ -365,6 +374,7 @@ void CLFIGeneralPage::OnBnClickedButtonStoredDefaults()
 		daysPcp = defSet.m_PcpDays;
 		pcpMin = defSet.m_PcpMin;
 		pcpMax = defSet.m_PcpMax;
+		m_UseRTPrecip = defSet.m_UseRTPrecip;
 	}
 	defSet.Close();
 	m_spinTminMin.SetPos(tminMin);
@@ -380,6 +390,8 @@ void CLFIGeneralPage::OnBnClickedButtonStoredDefaults()
 	m_spinPcpDays.SetPos(daysPcp);
 	m_spinPcpMin.SetPos(pcpMin);
 	m_spinPcpMax.SetPos(pcpMax);
+	m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
+	EnableRTPrecipFields();
 	SetModified();
 }
 
@@ -404,6 +416,7 @@ void CLFIGeneralPage::OnBnClickedButtonSaveDefaults()
 	defSet.m_PcpDays = m_spinPcpDays.GetPos();
 	defSet.m_PcpMin = m_spinPcpMin.GetPos();
 	defSet.m_PcpMax = m_spinPcpMax.GetPos();
+	defSet.m_UseRTPrecip = m_UseRTPrecip;
 	defSet.Update();
 	defSet.Close();
 	SetModified();
@@ -442,4 +455,22 @@ void CLFIGeneralPage::OnEnChangeEditPrecipMax()
 void CLFIGeneralPage::OnCbnSelchangeComboVpdUsage()
 {
 	SetModified();
+}
+
+
+void CLFIGeneralPage::OnBnClickedCheckUseRtprecip()
+{
+	m_UseRTPrecip = m_btnUseRTPrecip.GetCheck();
+	SetModified();
+	EnableRTPrecipFields();
+}
+
+void CLFIGeneralPage::EnableRTPrecipFields()
+{
+	m_editPcpMin.EnableWindow(m_UseRTPrecip);
+	m_editPcpMax.EnableWindow(m_UseRTPrecip);
+	m_spinPcpMin.EnableWindow(m_UseRTPrecip);
+	m_spinPcpMax.EnableWindow(m_UseRTPrecip);
+	m_editPcpDays.EnableWindow(m_UseRTPrecip);
+	m_spinPcpDays.EnableWindow(m_UseRTPrecip);
 }

@@ -7,6 +7,7 @@
 using namespace std;
 using namespace utctime;
 
+
 tm CFW21Data::ParseISO8061(const string input)
 {
 	tm thisTime = { 0 };
@@ -191,6 +192,7 @@ int CFW21Data::LoadFile(const char *fw21FileName, int tzOffsetHours/* = 0*/)
 	gsIdx = getColIndex(vFieldNames[8], vFields);
 	gdirIdx = getColIndex(vFieldNames[9], vFields);
 
+	string strDate, strTemp, strRH, strPcp, strWindSpeed, strWDir, strSolRad, strSnow, strGustSpeed, strGustDir;
 	//basic check for required fields
 	if (dtIdx < 0 || tmpIdx < 0 || rhIdx < 0 || pcpIdx < 0 || wsIdx < 0 || wdirIdx < 0 || srIdx < 0 || snowIdx < 0)
 	{
@@ -216,41 +218,133 @@ int CFW21Data::LoadFile(const char *fw21FileName, int tzOffsetHours/* = 0*/)
 	}
 	//ok, ready to parse the data...
 	bool firstRec = false;
+	int lineNo = 2;
 	while (stream.good())
 	{
 		stream.getline(buf, bufSize);
+		lineNo++;
 		line = buf;
 		vFields = csv_read_row(line, ',');
 		if (vFields.size() < 8)
+		{
+			printf("Warning, line %d has less than 8 fields, skipping record\n", lineNo);
 			continue;
+		}
 		FW21Record thisRec;
-		string dStr = vFields[dtIdx];
+		strDate = vFields[dtIdx];
 		if (firstRec)
 		{
 			//need to check for Zulu time
-			if (dStr.find('Z') != string::npos)
+			if (strDate.find('Z') != string::npos)
 				m_bTimeIsZulu = true;
 			firstRec = false;
 		}
-		tm recTime = ParseISO8061(dStr);
+		tm recTime = ParseISO8061(strDate);
 		thisRec.SetDateTime(recTime);
-		thisRec.SetTemp(atof(vFields[tmpIdx].c_str()));
-		thisRec.SetRH(max(atof(vFields[rhIdx].c_str()), 1.0));
-		thisRec.SetPrecip(atof(vFields[pcpIdx].c_str()));
-		thisRec.SetWindSpeed(atof(vFields[wsIdx].c_str()));
-		thisRec.SetWindAzimuth(atoi(vFields[wdirIdx].c_str()));
-		thisRec.SetSolarRadiation(atof(vFields[srIdx].c_str()));
-		thisRec.SetSnowFlag(atoi(vFields[snowIdx].c_str()));
-		if(gsIdx >= 0)
-			thisRec.SetGustSpeed(atof(vFields[gsIdx].c_str()));
-		if(gdirIdx >= 0)
-			thisRec.SetGustAzimuth(atoi(vFields[gdirIdx].c_str()));
+		strTemp = vFields[tmpIdx];
+		trim(strTemp);
+		if (!strTemp.empty())
+			thisRec.SetTemp(atof(strTemp.c_str()));
+		strRH = vFields[rhIdx];
+		trim(strRH);
+		if (!strRH.empty())
+			thisRec.SetRH(max(atof(strRH.c_str()), 1.0));
+		strPcp = vFields[pcpIdx];
+		trim(strPcp);
+		if (!strPcp.empty())
+			thisRec.SetPrecip(atof(strPcp.c_str()));
+		strWindSpeed = vFields[wsIdx];
+		trim(strWindSpeed);
+		if (!strWindSpeed.empty())
+			thisRec.SetWindSpeed(atof(strWindSpeed.c_str()));
+		strWDir = vFields[wdirIdx];
+		trim(strWDir);
+		if(!strWDir.empty())
+			thisRec.SetWindAzimuth(atoi(strWDir.c_str()));
+		strSolRad = vFields[srIdx];
+		trim(strSolRad);
+		if (!strSolRad.empty())
+			thisRec.SetSolarRadiation(atof(strSolRad.c_str()));
+		strSnow = vFields[snowIdx];
+		trim(strSnow);
+		if (!strSnow.empty())
+			thisRec.SetSnowFlag(atoi(strSnow.c_str()));
+		else // assume not snow covered
+			thisRec.SetSnowFlag(0);
+		if (gsIdx >= 0)
+		{
+			strGustSpeed = vFields[gsIdx];
+			trim(strGustSpeed);
+			if (!strGustSpeed.empty())
+				thisRec.SetGustSpeed(atof(strGustSpeed.c_str()));
+		}
+		if (gdirIdx >= 0)
+		{
+			strGustDir = vFields[gdirIdx];
+			trim(strGustDir);
+			if (!strGustDir.empty())
+				thisRec.SetGustAzimuth(atoi(strGustDir.c_str()));
+		}
+		bool goodRec = true;
+		//first, check for blanks on key fields
+		if (strDate.length() <= 0)
+		{
+			printf("Error: DateTime is blank, line %d\n", lineNo);
+			continue;
+		}
+		if (strTemp.length() <= 0)
+		{
+			printf("Error: Temperature(F) is blank, line %d, DateTime: %s\n", lineNo, strDate.c_str());
+			continue;
+		}
+		if (strRH.length() <= 0)
+		{
+			printf("Error: RelativeHumidity(%%) is blank, line %d, DateTime: %s\n", lineNo, strDate.c_str());
+			continue;
+		}
+		if (strPcp.length() <= 0)
+		{
+			printf("Error: Precipitation(in) is blank, line %d, DateTime: %s\n", lineNo, strDate.c_str());
+			continue;
+		}
+		if (strSolRad.length() <= 0)
+		{
+			printf("Error: SolarRadiation(W/m2) is blank, line %d, DateTime: %s\n", lineNo, strDate.c_str());
+			continue;
+		}
+		//now some range checks
+		if (thisRec.GetTemp() < -76.0 || thisRec.GetTemp() > 140.0)
+		{
+			printf("Error: Bad Temperature(F) line %d, %.1f, DateTime: %s\n", lineNo, thisRec.GetTemp(), strDate.c_str());
+			continue;
+		}
+		if (thisRec.GetRH() <= 0.0 || thisRec.GetRH() > 100.0)
+		{
+			printf("Error: Bad RelativeHumidity(%%) line %d, %.1f, DateTime: %s\n", lineNo, thisRec.GetRH(), strDate.c_str());
+			continue;
+		}
+		if (thisRec.GetPrecip() < 0.0 || thisRec.GetPrecip() > 20.0)
+		{
+			printf("Error: Bad Precipitation(in) line %d, %.1f, DateTime: %s\n", lineNo, thisRec.GetPrecip(), strDate.c_str());
+			continue;
+		}
+		if (thisRec.GetSolarRadiation() < 0.0 || thisRec.GetSolarRadiation() > 2000.0)
+		{
+			printf("Error: Bad SolarRadiation(W/m2) line %d, %.1f, DateTime: %s\n", lineNo, thisRec.GetSolarRadiation(), strDate.c_str());
+			continue;
+		}
+		//non-fatal warnings
+		if (thisRec.GetWindSpeed() < 0.0 || thisRec.GetWindSpeed() > 99.0)
+		{
+			printf("Warning: Bad WindSpeed(mph) line %d, %.1f, DateTime: %s\n", lineNo, thisRec.GetWindSpeed(), strDate.c_str());
+		}
+		if (thisRec.GetWindAzimuth() < 0 || thisRec.GetWindAzimuth() > 360)
+		{
+			printf("Warning: Bad WindAzimuth(degrees) line %d, %d, DateTime: %s\n", lineNo, thisRec.GetWindAzimuth(), strDate.c_str());
+		}
 
-		//sanity checks?
-		if(thisRec.GetTemp() > -76 && thisRec.GetTemp() < 140 
-			&& thisRec.GetRH() > 0 && thisRec.GetRH() <= 100
-			&& thisRec.GetSolarRadiation() >= 0 && thisRec.GetSolarRadiation() <= 2000)
-			m_recs.push_back(thisRec);
+		//if we got here record is acceptable
+		m_recs.push_back(thisRec);
 	}
 	stream.close();
 	return 0;

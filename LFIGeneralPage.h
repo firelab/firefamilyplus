@@ -43,7 +43,7 @@ protected:
 	bool m_UseVPDavg;
 	double pcpMin;
 	double pcpMax;
-
+	BOOL m_UseRTPrecip;
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
@@ -82,4 +82,7 @@ public:
 	CNumSpinCtrl m_spinPcpMin;
 	CEdit m_editPcpMax;
 	CNumSpinCtrl m_spinPcpMax;
+	CButton m_btnUseRTPrecip;
+	afx_msg void OnBnClickedCheckUseRtprecip();
+	void EnableRTPrecipFields();
 };

@@ -78,7 +78,7 @@ void RunNFDRSConfiguration::parse(
 		m_initFile = cfg->lookupString(cfgScope, "initFile");
 		m_wxFile = cfg->lookupString(cfgScope, "wxFile");
 		m_loadStateFile = cfg->lookupString(cfgScope, "loadFromStateFile");
-		m_saveStateFile = cfg->lookupString(cfgScope, "saveToSateFile");
+		m_saveStateFile = cfg->lookupString(cfgScope, "saveToStateFile");
 		m_allOutputsFile = cfg->lookupString(cfgScope, "allOutputsFile");
 		m_indexOutputFile = cfg->lookupString(cfgScope, "indexOutputFile");
 		m_fuelMoisturesOutputsFile = cfg->lookupString(cfgScope, "fuelMosituresOutputFile");

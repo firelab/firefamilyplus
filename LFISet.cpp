@@ -23,6 +23,7 @@ CLFISet::CLFISet(CDatabase* pdb)
 	m_DaylenMax = 39600.0;
 	m_PcpDays = 30;
 	m_UseVPDAvg = TRUE;
+	m_UseRTPrecip = FALSE;
 	m_HerbDaysAvg = 21;
 	m_HerbMaxGSI = 1.0;
 	m_HerbGreenup = 0.5;
@@ -36,6 +37,7 @@ CLFISet::CLFISet(CDatabase* pdb)
 	m_HerbDaylenMax = 39600.0;
 	m_HerbPcpDays = 30;
 	m_HerbUseVPDAvg = TRUE;
+	m_HerbUseRTPrecip = FALSE;
 	m_WoodyDaysAvg = 21;
 	m_WoodyMaxGSI = 1.0;
 	m_WoodyGreenup = 0.5;
@@ -49,13 +51,14 @@ CLFISet::CLFISet(CDatabase* pdb)
 	m_WoodyDaylenMax = 39600.0;
 	m_WoodyPcpDays = 30;
 	m_WoodyUseVPDAvg = TRUE;
+	m_WoodyUseRTPrecip = FALSE;
 	m_PcpMin = 0.5;
 	m_PcpMax = 1.5;
 	m_HerbPcpMin = 0.5;
 	m_HerbPcpMax = 1.5;
 	m_WoodyPcpMin = 0.5;
 	m_WoodyPcpMax = 1.5;
-	m_nFields = 42;
+	m_nFields = 45;
 	m_nDefaultType = dynaset;
 }
 //#error Security Issue: The connection string may contain a password
@@ -91,6 +94,7 @@ void CLFISet::DoFieldExchange(CFieldExchange* pFX)
 	RFX_Long(pFX, _T("[PcpDays]"), m_PcpDays);
 	RFX_Double(pFX, _T("[PcpMin]"), m_PcpMin);
 	RFX_Double(pFX, _T("[PcpMax]"), m_PcpMax);
+	RFX_Bool(pFX, _T("[UseRTPrecip]"), m_UseRTPrecip);
 	//Herb moisture fields
 	RFX_Bool(pFX, _T("[HerbUseVPDAvg]"), m_HerbUseVPDAvg);
 	RFX_Long (pFX, _T("[HerbDaysAvg]"), m_HerbDaysAvg);
@@ -107,6 +111,7 @@ void CLFISet::DoFieldExchange(CFieldExchange* pFX)
 	RFX_Long(pFX, _T("[HerbPcpDays]"), m_HerbPcpDays);
 	RFX_Double(pFX, _T("[HerbPcpMin]"), m_HerbPcpMin);
 	RFX_Double(pFX, _T("[HerbPcpMax]"), m_HerbPcpMax);
+	RFX_Bool(pFX, _T("[UseHerbRTPrecip]"), m_HerbUseRTPrecip);
 	//Herb moisture fields
 	RFX_Long (pFX, _T("[WoodyDaysAvg]"), m_WoodyDaysAvg);
 	RFX_Bool(pFX, _T("[WoodyUseVPDAvg]"), m_WoodyUseVPDAvg);
@@ -123,7 +128,7 @@ void CLFISet::DoFieldExchange(CFieldExchange* pFX)
 	RFX_Long(pFX, _T("[WoodyPcpDays]"), m_WoodyPcpDays);
 	RFX_Double(pFX, _T("[WoodyPcpMin]"), m_WoodyPcpMin);
 	RFX_Double(pFX, _T("[WoodyPcpMax]"), m_WoodyPcpMax);
-
+	RFX_Bool(pFX, _T("[UseWoodyRTPrecip]"), m_WoodyUseRTPrecip);
 }
 /////////////////////////////////////////////////////////////////////////////
 // CRunsSet diagnostics

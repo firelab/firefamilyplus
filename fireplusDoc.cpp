@@ -180,16 +180,16 @@ void CFireplusDoc::Dump(CDumpContext& dc) const
 BOOL CFireplusDoc::OnOpenDocument(LPCTSTR lpszPathName)
 {
 	// first check for read only files, and if so try to give write permission
-	if(access(lpszPathName, 0) != 0)
+	if(_access(lpszPathName, 0) != 0)
 	{
 		CString msg;
 		msg.Format("Error: File does not exist:\n%s", lpszPathName);
 		AfxMessageBox(msg);
 		return FALSE;
 	}
-	if(access(lpszPathName, 2) != 0) //no write permission
+	if(_access(lpszPathName, 2) != 0) //no write permission
 	{//try to change attributes
-		if(chmod(lpszPathName, _S_IWRITE) == -1)
+		if(_chmod(lpszPathName, _S_IWRITE) == -1)
 		{//couldn't do it
 			CString msg;
 			msg.Format("Error: Could not gain write access to the file:\n%s", lpszPathName);
@@ -267,7 +267,7 @@ BOOL CFireplusDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	theApp.SetUserDir(tmpDB->GetDatabaseName());
 	//chdir(theApp.workDir);
 	theApp.dbDir = docDir;
-	chdir(theApp.dbDir);
+	_chdir(theApp.dbDir);
 	m_pDB = tmpDB;
 	// added for batch - integrated with existing code
 	bool hasUserVars = false;
@@ -1498,7 +1498,7 @@ BOOL CFireplusDoc::OnOpenDocument(LPCTSTR lpszPathName)
 				 CString master_path;
 				master_path.Format("%s\\ffplus5.ffp",theApp.workDir);
 
-			 if(access(master_path, 0) != 0)
+			 if(_access(master_path, 0) != 0)
 				{
 					CString msg;
 					msg.Format("Error: Master Database does not exist:\n%s", master_path);
@@ -1936,7 +1936,7 @@ int CFireplusDoc::CreateRefDOIUnitsTable()
    CString master_path;
    master_path.Format("%s\\ffplus5.ffp",theApp.workDir);
 
-   if(access(master_path, 0) != 0)
+   if(_access(master_path, 0) != 0)
 	{
 		CString msg;
 		msg.Format("Error: Master Database does not exist:\n%s", master_path);
@@ -2342,7 +2342,7 @@ int CFireplusDoc::CreateRefDOICauseTable()
    CString master_path;
    master_path.Format("%s\\ffplus5.ffp",theApp.workDir);
 
-   if(access(master_path, 0) != 0)
+   if(_access(master_path, 0) != 0)
 	{
 		CString msg;
 		msg.Format("Error: Master Database does not exist:\n%s", master_path);
@@ -2485,7 +2485,10 @@ void CFireplusDoc::CheckLFITable()
 		hasHerbPcpMin = false,
 		hasHerbPcpMax = false,
 		hasWoodyPcpMin = false,
-		hasWoodyPcpMax = false;
+		hasWoodyPcpMax = false,
+		hasUseRTPrecip = false,
+		hasHerbUseRTPrecip = false,
+		hasWoodyUseRTPrecip = false;
 
 	try
 	{
@@ -2561,6 +2564,12 @@ void CFireplusDoc::CheckLFITable()
 				hasWoodyPcpMin = true;
 			if (columns.m_strColumnName.CompareNoCase("WoodyPcpMax") == 0)
 				hasWoodyPcpMax = true;
+			if (columns.m_strColumnName.CompareNoCase("UseRTPrecip") == 0)
+				hasUseRTPrecip = true;
+			if (columns.m_strColumnName.CompareNoCase("UseHerbRTPrecip") == 0)
+				hasHerbUseRTPrecip = true;
+			if (columns.m_strColumnName.CompareNoCase("UseWoodyRTPrecip") == 0)
+				hasWoodyUseRTPrecip = true;
 
 
 			if(columns.m_strColumnName.CompareNoCase("SIG_Station") == 0)
@@ -3013,6 +3022,49 @@ void CFireplusDoc::CheckLFITable()
 			e->Delete();
 		}
 	}
+	//1/28/2021 addition, UseRTPrecip for all three types
+	if (!hasUseRTPrecip)
+	{
+
+		try
+		{
+			CString strSql;
+			strSql = "ALTER TABLE [ffpLFI] ADD [UseRTPrecip] YESNO";
+			m_pDB->ExecuteSQL(strSql);
+		}
+		catch (CDBException* e)
+		{
+			e->Delete();
+		}
+	}
+	if (!hasHerbUseRTPrecip)
+	{
+
+		try
+		{
+			CString strSql;
+			strSql = "ALTER TABLE [ffpLFI] ADD [UseHerbRTPrecip] YESNO";
+			m_pDB->ExecuteSQL(strSql);
+		}
+		catch (CDBException* e)
+		{
+			e->Delete();
+		}
+	}
+	if (!hasWoodyUseRTPrecip)
+	{
+
+		try
+		{
+			CString strSql;
+			strSql = "ALTER TABLE [ffpLFI] ADD [UseWoodyRTPrecip] YESNO";
+			m_pDB->ExecuteSQL(strSql);
+		}
+		catch (CDBException* e)
+		{
+			e->Delete();
+		}
+	}
 
 	if(!hasSigStation)
 	{
@@ -3141,12 +3193,6 @@ void CFireplusDoc::CheckLFITable()
 		CLFISet lfiSet(m_pDB);
 		if (!lfiSet.IsOpen())
 			lfiSet.Open();
-		/*if (lfiSet.IsEOF())//need a record
-		{
-			lfiSet.AddNew();
-		}
-		else
-			lfiSet.Edit();*/
 		while (!lfiSet.IsEOF())
 		{
 			lfiSet.Edit();
@@ -3156,6 +3202,22 @@ void CFireplusDoc::CheckLFITable()
 			lfiSet.m_HerbPcpMax = 1.5;
 			lfiSet.m_WoodyPcpMin = 0.5;
 			lfiSet.m_WoodyPcpMax = 1.5;
+			lfiSet.Update();
+			lfiSet.MoveNext();
+		}
+		lfiSet.Close();
+	}
+	if (!hasUseRTPrecip)
+	{
+		CLFISet lfiSet(m_pDB);
+		if (!lfiSet.IsOpen())
+			lfiSet.Open();
+		while (!lfiSet.IsEOF())
+		{
+			lfiSet.Edit();
+			lfiSet.m_UseRTPrecip = FALSE;
+			lfiSet.m_HerbUseRTPrecip = FALSE;
+			lfiSet.m_WoodyUseRTPrecip = FALSE;
 			lfiSet.Update();
 			lfiSet.MoveNext();
 		}
@@ -4749,7 +4811,7 @@ void CFireplusDoc::CheckPaths()
 	// maintain current dir
 	char dirBuf[255];
 	_getcwd(dirBuf,255);
-	if (chdir(savePath) != 0)
+	if (_chdir(savePath) != 0)
 	{
 	   // problem with saveDir
 	   CString strMsg;
@@ -4772,7 +4834,7 @@ void CFireplusDoc::CheckPaths()
 		rOpts.Close();
 	}
 
-    chdir(dirBuf);
+    _chdir(dirBuf);
 }
 
 // added for batch2
@@ -5439,7 +5501,7 @@ bool CFireplusDoc::NewCheckClimateOptionsTable()
 	CString master_path;
 	master_path.Format("%s\\ffplus5.ffp", theApp.workDir);
 
-	if (access(master_path, 0) != 0)
+	if (_access(master_path, 0) != 0)
 	{
 		CString msg;
 		msg.Format("Error: Master Database does not exist:\n%s", master_path);
@@ -6012,7 +6074,7 @@ void CFireplusDoc::CheckClimateOptionsTable()
 		climSet.m_VarID = 40;
 		climSet.m_Variable_Name = "Growing Season Index";
 		climSet.m_ShortName = "GSI";
-		climSet.m_BinSize = 0.1;
+		climSet.m_BinSize = 0.1f;
 		climSet.m_OptionType = 0;
 		climSet.m_Stats_Graph = climSet.m_Stats_Table = climSet.m_Daily_Freqs = climSet.m_Data_Count
 			= climSet.m_Period_Mins = climSet.m_Period_Maxs = FALSE;
@@ -7571,7 +7633,7 @@ void CFireplusDoc::CheckWxStationTable()
        CString master_path;
         master_path.Format("%s\\ffplus5.ffp",theApp.workDir);
 
-        if(access(master_path, 0) != 0)
+        if(_access(master_path, 0) != 0)
 	    {
 		     CString msg;
 		     msg.Format("Error: Master Database does not exist:\n%s", master_path);

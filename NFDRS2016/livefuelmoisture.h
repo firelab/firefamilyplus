@@ -37,7 +37,6 @@ class LiveFuelMoisture
         LiveFuelMoisture(double Lat,bool IsHerb, bool IsAnnual);
         void Initialize(double Lat,bool IsHerb, bool IsAnnual);
         void SetLimits(double,double,double,double, double, double, double, double);
-       // void Update(double minRH, double MaxTempF, double MinTempF,double Jday, double Precip24, time_t thisTime);
 		void Update(double TempF, double MaxTempF, double MinTempF, double RH, double minRH, int Jday, double RTPrcp, time_t thisTime);
         void SetMAPeriod(unsigned int MAPeriod);
         void SetLFMParameters(double MaxGSI,double GreenupThreshold,double MinLFMVal, double MaxLFMVal);
@@ -72,15 +71,15 @@ class LiveFuelMoisture
 		bool GetIsAnnual();
 		LFMCalcState GetState();
 		bool SetState(LFMCalcState state);
-		//double GetXDaysPrecipitation(int nDays);
-		//static const int nPrecipQueueDays = 90;
+
+        void SetUseRTPrecip(bool set);
+        bool GetUseRTPrecip();
     private:
 		bool m_UseVPDAvg;
         bool m_IsHerb;
         bool m_IsAnnual;
         int m_LFIdaysAvg;
         double m_Lat;
-        //vector<double> iGSI;
 		deque<double> qGSI;
         double m_TminMin;
         double m_TminMax;
@@ -90,6 +89,7 @@ class LiveFuelMoisture
         double m_DaylenMax;
         double m_RTPrcpMin;
         double m_RTPrcpMax;
+        bool m_useRTPrecip;
 
         //added for live fuel moistues
         double m_MaxGSI;
@@ -98,25 +98,11 @@ class LiveFuelMoisture
         double m_MinLFMVal;
         double m_Slope;
         double m_Intercept;
-        //double m_HerbMaxGSI;
-       // double m_HerbGreenup;
-       // double m_HerbMax;
-        //double m_HerbMin;
-        //double m_WoodyMaxGSI;
-        //double m_WoodyGreenup;
-        //double m_WoodyMax;
-       // double m_WoodyMin;
-        //double m_HerbSlope;
-        //double m_HerbIntercept;
-        //double m_WoodySlope;
-       // double m_WoodyIntercept;
-        //bool herbAnnual;
         bool hasGreenedUpThisYear;
         bool hasExceeded120ThisYear;
         bool canIncreaseHerb;
         double lastHerbFM;
 		int m_nDaysPrecip;
-		//queue<double> qPrecip;
 		time_t lastUpdateTime;
 };
 

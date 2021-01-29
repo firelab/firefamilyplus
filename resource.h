@@ -239,6 +239,7 @@
 #define IDC_CHECK_FIRE_DAY              1021
 #define IDC_CHECK_HUMID_V               1021
 #define IDC_CHECK_GUSTS                 1021
+#define IDC_CHECK_USE_RTPRECIP          1021
 #define IDC_CHECK2                      1022
 #define IDC_E                           1022
 #define IDC_PAGENUMS                    1022
@@ -986,6 +987,7 @@
 #define IDC_EDIT_MAXHERBFM              1547
 #define IDC_EDIT_STARTYEAR              1548
 #define IDC_SPIN_MAXHERBFM              1548
+#define IDC_SPIN_PRECIP_MAX3            1548
 #define IDC_SPIN_STARTYEAR              1549
 #define IDC_EDIT_MINHERBFM              1549
 #define IDC_EDIT_ENDYEAR                1550

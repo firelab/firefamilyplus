@@ -11,19 +11,8 @@ public:
 	CLFIengine(CDatabase *pDB, int herbWoodyFlag = 0, CString SIG_Station = "######", bool _herbAnnual = false); //herbWoody = HerbParams for HerbFM parameter loading, WoodyParams for WoodyFM parameter loading
 
 	virtual ~CLFIengine();
-	double CalcRunningAvgLFI();
-	double CalcRunningAvgHerbFM();
-	double CalcRunningAvgWoodyFM();
-	//double CalcRunningAvgLFIHerb();
-	//double CalcRunningAvgLFIWoody();
-	void AddLFIobs(COleDateTime lfiDay, double val);
 	bool IsUsingVPDMax();
 	bool IsUsingVPDAvg();
-	double CalcLFI(double minRH, double minTempF, double currT, double lat, int doy);
-	double CalcLFI_VPDAvg(double RH, double TempF, double maxTempF, double minTempF, double lat, int doy);
-	double GetTminInd(double Tmin);
-	double GetVPDInd(double VPD);
-	double GetDaylInd(double Dayl);
 	double GetHerbMaxGSI();
 	double GetHerbGreenup();
 	double GetWoodyMaxGSI();
@@ -39,6 +28,7 @@ public:
 	int GetNumPrecipDays();
 	double GetRTPcpMin();
 	double GetRTPcpMax();
+	double GetUseRTPrecip();
 private:
 	CDatabase *m_pDB;
 	int m_LFIdaysAvg;
@@ -48,9 +38,7 @@ private:
 	double m_VPDMax;
 	double m_DaylenMin;
 	double m_DaylenMax;
-	double *m_LFIarray;
 	BOOL m_UseVPDAvg;
-	COleDateTime lastLFIday;
 	//added for live fuel moistues
 	double m_HerbMaxGSI;
 	double m_HerbGreenup;
@@ -72,10 +60,7 @@ private:
 	int m_PcpDays;
 	double m_PrcpMin;
 	double m_PrcpMax;
-	//double m_HerbPrcpMin;
-	//double m_HerbPrcpMax;
-	//double m_WoodyPrcpMin;
-	//double m_WoodyPrcpMax;
+	BOOL m_UseRTPrecip;
 };
 
 

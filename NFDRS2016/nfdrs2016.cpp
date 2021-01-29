@@ -1288,33 +1288,39 @@ double NFDR2016Calc::Cure(double fGSI, double fGreenupThreshold, double fGSIMax)
    return (1);
 }*/
 void NFDR2016Calc::SetGSIParams(double MaxGSI, double GreenupThreshold, double TminMin /*= -2.0*/, double TminMax /*= 5.0*/, double VPDMin /*= 900 */, double VPDMax /*= 4100 */,
-	double DaylMin /*= 36000*/, double DaylMax /*= 39600*/, unsigned int MAPeriod/* = 21U*/, bool UseVPDAvg, unsigned int nPrecipDays/* = 30*/, double rtPrecipMin /*= 0.5*/, double rtPrecipMax /*= 1.5*/)
+	double DaylMin /*= 36000*/, double DaylMax /*= 39600*/, unsigned int MAPeriod/* = 21U*/, bool UseVPDAvg, unsigned int nPrecipDays/* = 30*/, double rtPrecipMin /*= 0.5*/, 
+    double rtPrecipMax /*= 1.5*/, bool UseRTPrecip /* = false*/)
 {
 	GsiFM.SetLimits(TminMin, TminMax, VPDMin, VPDMax, DaylMin, DaylMax, rtPrecipMin, rtPrecipMax);
 	GsiFM.SetMAPeriod(MAPeriod);
 	GsiFM.SetUseVPDAvg(UseVPDAvg);
 	GsiFM.SetLFMParameters(MaxGSI, GreenupThreshold, 30, 250);
 	GsiFM.SetNumPrecipDays(nPrecipDays);
+    GsiFM.SetUseRTPrecip(UseRTPrecip);
 }
 
 void NFDR2016Calc::SetHerbGSIparams(double MaxGSI, double GreenupThreshold, double TminMin /*= -2.0*/, double TminMax /*= 5.0*/ , double VPDMin /*= 900 */ , double VPDMax /*= 4100 */ ,
-	double DaylMin /*= 36000*/, double DaylMax /*= 39600*/, unsigned int MAPeriod/* = 21U*/, bool UseVPDAvg, unsigned int nPrecipDays/* = 30*/, double rtPrecipMin /*= 0.5*/, double rtPrecipMax /*= 1.5*/)
+	double DaylMin /*= 36000*/, double DaylMax /*= 39600*/, unsigned int MAPeriod/* = 21U*/, bool UseVPDAvg, unsigned int nPrecipDays/* = 30*/, double rtPrecipMin /*= 0.5*/, 
+    double rtPrecipMax /*= 1.5*/, bool UseRTPrecip /* = false*/)
 {
 	HerbFM.SetLimits(TminMin, TminMax, VPDMin, VPDMax, DaylMin, DaylMax, rtPrecipMin, rtPrecipMax);
 	HerbFM.SetMAPeriod(MAPeriod);
 	HerbFM.SetUseVPDAvg(UseVPDAvg);
 	HerbFM.SetLFMParameters(MaxGSI, GreenupThreshold, 30, 250);
 	HerbFM.SetNumPrecipDays(nPrecipDays);
+    HerbFM.SetUseRTPrecip(UseRTPrecip);
 }
 
 void NFDR2016Calc::SetWoodyGSIparams(double MaxGSI, double GreenupThreshold, double TminMin /*= -2.0*/ , double TminMax /*= 5.0*/ , double VPDMin /*= 900 */ , double VPDMax /*= 4100 */ ,
-	double DaylMin /*= 36000*/, double DaylMax /*= 39600*/, unsigned int MAPeriod /* = 21U*/, bool UseVPDAvg, unsigned int nPrecipDays/* = 30*/, double rtPrecipMin /*= 0.5*/, double rtPrecipMax /*= 1.5*/)
+	double DaylMin /*= 36000*/, double DaylMax /*= 39600*/, unsigned int MAPeriod /* = 21U*/, bool UseVPDAvg, unsigned int nPrecipDays/* = 30*/, double rtPrecipMin /*= 0.5*/, 
+    double rtPrecipMax /*= 1.5*/, bool UseRTPrecip /* = false*/)
 {
 	WoodyFM.SetLimits(TminMin, TminMax, VPDMin, VPDMax, DaylMin, DaylMax, rtPrecipMin, rtPrecipMax);
 	WoodyFM.SetMAPeriod(MAPeriod);
 	WoodyFM.SetUseVPDAvg(UseVPDAvg);
 	WoodyFM.SetLFMParameters(MaxGSI, GreenupThreshold, 60, 200);
-	HerbFM.SetNumPrecipDays(nPrecipDays);
+	WoodyFM.SetNumPrecipDays(nPrecipDays);
+    WoodyFM.SetUseRTPrecip(UseRTPrecip);
 }
 
 
