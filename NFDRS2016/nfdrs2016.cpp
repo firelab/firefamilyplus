@@ -893,10 +893,10 @@ int NFDR2016Calc::iCalcIndexes (int iWS, int iSlopeCls,double* fSC,double* fERC,
         WTOTD = WTOTD + W1000;
         DroughtUnit = WDROUGHT / (800.0 - KBDIThreshold);
 
-        W1 = W1 + (W1 / WTOTD) * (tmpKBDI - 100) * DroughtUnit;
-        W10 = W10 + (W10 / WTOTD) * (tmpKBDI - 100) * DroughtUnit;
-        W100 = W100 + (W100 / WTOTD) * (tmpKBDI - 100) * DroughtUnit;
-        W1000 = W1000 + (W1000 / WTOTD) * (tmpKBDI - 100) * DroughtUnit;
+        W1 = W1 + (W1 / WTOTD) * (tmpKBDI - KBDIThreshold) * DroughtUnit;
+        W10 = W10 + (W10 / WTOTD) * (tmpKBDI - KBDIThreshold) * DroughtUnit;
+        W100 = W100 + (W100 / WTOTD) * (tmpKBDI - KBDIThreshold) * DroughtUnit;
+        W1000 = W1000 + (W1000 / WTOTD) * (tmpKBDI - KBDIThreshold) * DroughtUnit;
         WTOT = W1 + W10 + W100 + W1000 + WTOTL;
         fDEPTH = (WTOT - W1000) / PackingRatio;
     }

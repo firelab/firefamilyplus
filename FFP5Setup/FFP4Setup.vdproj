@@ -51,12 +51,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_7EB386DB1EB04981AC9B99DCF1D6B3C6"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_805745D80EE7402EB86BF0FA96D12CCA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -70,6 +64,12 @@
         "Entry"
         {
         "MsmKey" = "8:_975A8B95576747C08B06BF57817882BF"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9BC7D31EBFF74F90BE7416400C4F1780"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -487,15 +487,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FireFamily Plus 5"
-        "ProductCode" = "8:{C0207B85-7A63-491C-8EB8-746446F55069}"
-        "PackageCode" = "8:{5158CA34-E3E3-42C2-88B4-38851615951A}"
+        "ProductCode" = "8:{AD929804-F10A-403F-A733-3DDF5B054938}"
+        "PackageCode" = "8:{17437849-FCB5-4E90-885C-4A4CFE253CC7}"
         "UpgradeCode" = "8:{F8587583-3FC5-468D-ADCE-121EDD2AF2A6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:5.0.25"
+        "ProductVersion" = "8:5.0.27"
         "Manufacturer" = "8:USFS"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1004,11 +1004,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_7EB386DB1EB04981AC9B99DCF1D6B3C6"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_9BC7D31EBFF74F90BE7416400C4F1780"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:FALSE"
-            "SourcePath" = "8:..\\Microsoft_VC140_OpenMP_x86.msm"
+            "SourcePath" = "8:C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Redist\\MSVC\\v142\\MergeModules\\Microsoft_VC142_OpenMP_x86.msm"
                 "Properties"
                 {
                 }
@@ -1023,7 +1023,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_3B10B58D1DD1488783BE0703BB62AFC3"
             {
-            "SourcePath" = "8:..\\x64\\Release\\CNFDRS.dll"
+            "SourcePath" = "8:..\\Release\\CNFDRS.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
@@ -1051,7 +1051,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_4C622A8A8B1C484FB8DBF533659F3333"
             {
-            "SourcePath" = "8:..\\x64\\Release\\fireplus.exe"
+            "SourcePath" = "8:..\\Release\\fireplus.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
