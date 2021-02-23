@@ -11,7 +11,7 @@
 RunNFDRSConfig::RunNFDRSConfig()
 {
 	m_schema[0] = "allOutputsFile = string";
-	m_schema[1] = "fuelMosituresOutputFile = string";
+	m_schema[1] = "fuelMoisturesOutputFile = string";
 	m_schema[2] = "indexOutputFile = string";
 	m_schema[3] = "initFile = string";
 	m_schema[4] = "loadFromStateFile = string";
@@ -52,7 +52,7 @@ RunNFDRSConfig::RunNFDRSConfig()
 	m_str << "#indexes only\n";
 	m_str << "indexOutputFile = \"/NFDRSIndexes.csv\";\n";
 	m_str << "#fuel moistures\n";
-	m_str << "fuelMosituresOutputFile = \"/NFDRSMoistures.csv\";\n";
+	m_str << "fuelMoisturesOutputFile = \"/NFDRSMoistures.csv\";\n";
 	m_str << "#outputInterval 0 = hourly (each record), 1 = dail";
 	m_str << "y (at ObsHour from NFDRSInit file)\n";
 	m_str << "outputInterval = \"0\";";

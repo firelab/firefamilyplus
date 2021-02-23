@@ -81,7 +81,7 @@ void RunNFDRSConfiguration::parse(
 		m_saveStateFile = cfg->lookupString(cfgScope, "saveToStateFile");
 		m_allOutputsFile = cfg->lookupString(cfgScope, "allOutputsFile");
 		m_indexOutputFile = cfg->lookupString(cfgScope, "indexOutputFile");
-		m_fuelMoisturesOutputsFile = cfg->lookupString(cfgScope, "fuelMosituresOutputFile");
+		m_fuelMoisturesOutputsFile = cfg->lookupString(cfgScope, "fuelMoisturesOutputFile");
 		m_outputInterval = cfg->lookupInt(cfgScope, "outputInterval");
 	}
 	catch (const ConfigurationException & ex) {

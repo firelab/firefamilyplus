@@ -20,6 +20,6 @@ allOutputsFile = "/NFDRSoutput.csv";
 #indexes only
 indexOutputFile = "/NFDRSIndexes.csv";
 #fuel moistures
-fuelMosituresOutputFile = "/NFDRSMoistures.csv";
+fuelMoisturesOutputFile = "/NFDRSMoistures.csv";
 #outputInterval 0 = hourly (each record), 1 = daily (at ObsHour from NFDRSInit file)
 outputInterval = "0";
