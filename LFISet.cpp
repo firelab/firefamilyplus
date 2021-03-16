@@ -42,7 +42,7 @@ CLFISet::CLFISet(CDatabase* pdb)
 	m_WoodyMaxGSI = 1.0;
 	m_WoodyGreenup = 0.5;
 	m_WoodyMax = 200.0;
-	m_WoodyMin = 50.0;
+	m_WoodyMin = 60.0;
 	m_WoodyTMinMin = -2.0;
 	m_WoodyTMinMax = 5.0;
 	m_WoodyVPDMin = 900.0;

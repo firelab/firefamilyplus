@@ -309,7 +309,7 @@ void CWorkingSetDialog::PopulateMetaTable()
 	m_grid.SetNumberRows(0);
 		//set up string arrays for combobox columns...
 	char temp[64], station[64];
-	strcpy(station, m_pClim->m_sigStaID);
+	strcpy_s(station, m_pClim->m_sigStaID);
 	if(strncmp(station, "SIG", 3) == 0)//is a SIG
 	{
 			CStationInSIGSet sSet(m_pClim->m_pDB);
@@ -348,7 +348,7 @@ void CWorkingSetDialog::PopulateMetaTable()
 					m_grid.GetCell(2, row, &cell);
 					if(ssSet.IsFieldNull(&ssSet.m_NFDRSFM))
 					{
-						strcpy(temp, " ");
+						strcpy_s(temp, " ");
 					}
 					else
 						sprintf(temp, "%c - ", ssSet.m_NFDRSFM[0]);
@@ -476,7 +476,7 @@ void CWorkingSetDialog::PopulateMetaTable()
 				m_grid.QuickSetText(1, row, ssSet.m_Name);
 				m_grid.GetCell(2, row, &cell);
 				if(ssSet.IsFieldNull(&ssSet.m_NFDRSFM))
-					strcpy(temp, " ");
+					strcpy_s(temp, " ");
 				else
 					sprintf(temp, "%c - ", ssSet.m_NFDRSFM[0]);
 				if(temp[0] != ' ')
@@ -594,7 +594,7 @@ void CWorkingSetDialog::SaveMetaTable()
 			{
 				CString tmp;
 				tmp = m_grid.QuickGetText(0, rc);
-				strcpy(station, tmp);
+				strcpy_s(station, tmp);
 				sprintf(temp, "[StationID] = '%6.6s'", station);
 				ssSet.m_strFilter = _T(temp);
 				ssSet.Requery();
@@ -603,7 +603,7 @@ void CWorkingSetDialog::SaveMetaTable()
 					ssSet.Edit();
 					ssSet.m_Name = m_grid.QuickGetText(1, rc);//m_Grid.GetCell(rc, 1)->GetText();
 					tmp = m_grid.QuickGetText(2, rc);//m_Grid.GetCell(rc, 2)->GetText();
-					strcpy(temp, tmp);
+					strcpy_s(temp, tmp);
 					temp[1] = 0;
 					if(strncmp(ssSet.m_NFDRSFM, temp, 1) != 0)
 						fxParamChange = true;
@@ -813,7 +813,7 @@ bool CWorkingSetDialog::SetYears(CString fmStr/* = ""*/)
 	//if (itemLoc != CB_ERR)
 	//{
 		CWaitCursor wait;
-		strcpy(station, m_pClim->m_sigStaID);
+		strcpy_s(station, m_pClim->m_sigStaID);
 		//m_ctlSIG_Station.GetLBText(itemLoc, station);
 		if (strncmp(station, "SIG", 3) == 0)//is a SIG
 		{

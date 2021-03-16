@@ -161,7 +161,7 @@ void CRichDoc::OnCloseDocument()
 {
 	char temp[256];
 	bool itemp = isTemp;
-	strcpy(temp, tName);
+	strcpy_s(temp, tName);
 	CRichEditDoc::OnCloseDocument();
 	if(itemp)
 		unlink(temp);

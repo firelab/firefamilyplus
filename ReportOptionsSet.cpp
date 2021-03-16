@@ -143,7 +143,7 @@ void	CReportOptionsSet::listSIGStation(CString *stream, CString sig, CFireplusSe
 
 	if (sig.GetLength() > 6){   // SIG
 		char sig[64];
-		strcpy(sig, fpSet->m_SIG_Station);
+		strcpy_s(sig, fpSet->m_SIG_Station);
 		CString temp;
 		CSowOptionsSet sowOptsSet(fpSet->m_pDatabase);
 		sowOptsSet.Open();

@@ -6587,7 +6587,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 					temp[1] = '0';
 				unitID = GetFireUnit(&units, agencyID, regID, temp);
 				if(unitID == 0)
-					strcpy(newUnitStr, temp);
+					strcpy_s(newUnitStr, temp);
 				//if(unitID == 0)
 				//{
 				//		fprintf(errLog, "\tRecord Number %ld, %s(Forest): '%s'\n", fplLineNo, errStrings[3], temp);
@@ -7618,12 +7618,12 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				if(staHeader.Compare(buf) == 0)
 				{
 					buf[staHeader.GetLength()] = '-';
-					strcpy(currSta, buf);
+					strcpy_s(currSta, buf);
 					if(strcmp(currSta, lastSta) != 0)
 					{
 						catStart = ftell(stream);
 						errors += ImportStation(stream, logFile);
-						strcpy(lastSta, currSta);
+						strcpy_s(lastSta, currSta);
 						nStations++;
 					}
 				}
@@ -8067,7 +8067,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				char strFM[6];
 				stripCRLF(buf);
 				trim(buf);
-				strcpy(temp, buf);
+				strcpy_s(temp, buf);
 				char seps[] = " \t", *p;
 				p = strtok(buf, seps);//this is the '1'
 				p = strtok(NULL, seps);//this is the fuel model
@@ -8099,7 +8099,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				//temp[1] = 0;
 				staSet.m_NFDRSFM = strFM;
 				int pLoc;
-				strcpy(temp, &buf[10]);
+				strcpy_s(temp, &buf[10]);
 				char date1[16] = "";
 				p = strtok(temp, seps);
 				if(strlen(p) < 6)//no dates given.....
@@ -8113,12 +8113,12 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				}
 				else
 				{
-					strcpy(date1, p);
+					strcpy_s(date1, p);
 					p = strtok(NULL, seps);
 				}
 				if(strlen(p) >= 6) //2 dates given, use second one
 				{
-					strcpy(date1, p);
+					strcpy_s(date1, p);
 					p = strtok(NULL, seps);
 				}
 				if(strlen(date1) > 0 && !isNFDRS2016)//has valid greenup date
@@ -9967,7 +9967,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		}
 		if(!goodRec)
 			return 0;
-		strcpy(buf, temp);//unitid
+		strcpy_s(buf, 159, temp);//unitid
 
 		return 1;
 	}
@@ -10078,7 +10078,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		}
 		//strncpy(temp, &buf[1], 5);
 		//				temp[5] = 0;
-		strcpy(temp, strUnit);
+		strcpy_s(temp, strUnit);
 		unitID = GetFireUnit(&units, 5, regID, temp);
 		if(unitID == 0)
 		{

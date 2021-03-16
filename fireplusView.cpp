@@ -146,11 +146,11 @@ void SaveNFDRS2016MetaData(CDatabase *pDB, FFPViewCUG *grid, int row)
 	char fm[64], station[8], temp[64];
 	CString tmp;
 	tmp = grid->QuickGetText(2, row);
-	strcpy(fm, tmp);
+	strcpy_s(fm, tmp);
 	if (strlen(fm) > 0 && isNFDRS2016(fm[0]))
 	{
 		tmp = grid->QuickGetText(0, row);
-		strcpy(station, tmp);
+		strcpy_s(station, tmp);
 		sprintf(temp, "[StationID] = '%6.6s'", station);
 		CSIGStationSet ssSet(pDB);
 		ssSet.m_strFilter = _T(temp);
@@ -202,11 +202,11 @@ void LoadNFDRS2016MetaData(CDatabase *pDB, FFPViewCUG *grid, int row)
 	char fm[64], station[8], temp[64];
 	CString tmp;
 	tmp = grid->QuickGetText(2, row);
-	strcpy(fm, tmp);
+	strcpy_s(fm, tmp);
 	if (strlen(fm) > 0 && isNFDRS2016(fm[0]))
 	{
 		tmp = grid->QuickGetText(0, row);
-		strcpy(station, tmp);
+		strcpy_s(station, tmp);
 		sprintf(temp, "[StationID] = '%6.6s'", station);
 		CSIGStationSet ssSet(pDB);
 		ssSet.m_strFilter = _T(temp);
@@ -1038,7 +1038,7 @@ void CFireplusView::OnFileSave()
 	if(str[0] == 'S' && str[1] == 'I' && str[2] == 'G')//SIG
 	{
 		//char sig[32];
-		//strcpy(sig, str);
+		//strcpy_s(sig, str);
 		m_pSet->m_SIG_Station = str;
 	}
 	else //single station, only save stationID
@@ -1179,7 +1179,7 @@ void CFireplusView::OnSelchangeSigstation()
 					m_grid.GetCell(2, row, &cell);
 					if(ssSet.IsFieldNull(&ssSet.m_NFDRSFM))
 					{
-						strcpy(temp, " ");
+						strcpy_s(temp, " ");
 					}
 					else
 						sprintf(temp, "%c - ", ssSet.m_NFDRSFM[0]);
@@ -1318,7 +1318,7 @@ void CFireplusView::OnSelchangeSigstation()
 				m_grid.QuickSetText(1, row, ssSet.m_Name);
 				m_grid.GetCell(2, row, &cell);
 				if(ssSet.IsFieldNull(&ssSet.m_NFDRSFM))
-					strcpy(temp, " ");
+					strcpy_s(temp, " ");
 				else
 					sprintf(temp, "%c - ", ssSet.m_NFDRSFM[0]);
 				if(temp[0] != ' ')
@@ -1486,7 +1486,7 @@ void CFireplusView::InitSigstation()
 					m_grid.GetCell(2, row, &cell);
 					if(ssSet.IsFieldNull(&ssSet.m_NFDRSFM))
 					{
-						strcpy(temp, " ");
+						strcpy_s(temp, " ");
 					}
 					else
 						sprintf(temp, "%c - ", ssSet.m_NFDRSFM[0]);
@@ -1620,7 +1620,7 @@ void CFireplusView::InitSigstation()
 				m_grid.QuickSetText(1, row, ssSet.m_Name);
 				m_grid.GetCell(2, row, &cell);
 				if(ssSet.IsFieldNull(&ssSet.m_NFDRSFM))
-					strcpy(temp, " ");
+					strcpy_s(temp, " ");
 				else
 					sprintf(temp, "%c - ", ssSet.m_NFDRSFM[0]);
 				if(temp[0] != ' ')
@@ -1771,7 +1771,7 @@ void CFireplusView::SaveMetaTable()
 				tmp = m_grid.QuickGetText(0, rc);
 				//CDTData RowData = m_metaTable.GetRowSet().GetItem(rc).GetValue();
 				//RowData.GetItem(station, 0);
-				strcpy(station, tmp);
+				strcpy_s(station, tmp);
 				sprintf(temp, "[StationID] = '%6.6s'", station);
 				ssSet.m_strFilter = _T(temp);
 				ssSet.Requery();
@@ -1782,7 +1782,7 @@ void CFireplusView::SaveMetaTable()
 					//ssSet.m_Name = tmp
 					//RowData.GetItem(ssSet.m_Name, 1);
 					tmp = m_grid.QuickGetText(2, rc);//m_Grid.GetCell(rc, 2)->GetText();
-					strcpy(temp, tmp);
+					strcpy_s(temp, tmp);
 					//RowData.GetItem(temp, 2);
 					temp[1] = 0;
 					if(strncmp(ssSet.m_NFDRSFM, temp, 1) != 0)
@@ -1998,11 +1998,11 @@ void  CFireplusView::ConfigCheckBoxes()
 	char fm[64], station[8], temp[64];
 	CString tmp;
 	tmp = m_grid.QuickGetText(2, row);
-	strcpy(fm, tmp);
+	strcpy_s(fm, tmp);
 	if (strlen(fm) > 0 && isNFDRS2016(fm[0]))
 	{
 		tmp = m_grid.QuickGetText(0, row);
-		strcpy(station, tmp);
+		strcpy_s(station, tmp);
 		sprintf(temp, "[StationID] = '%s'", station);
 		CSIGStationSet ssSet(GetDocument()->m_pDB);
 		ssSet.m_strFilter = _T(temp);
@@ -2054,11 +2054,11 @@ void CFireplusView::LoadNFDRS2016MetaData(int row)
 	char fm[64], station[8], temp[64];
 	CString tmp;
 	tmp = m_grid.QuickGetText(2, row);
-	strcpy(fm, tmp);
+	strcpy_s(fm, tmp);
 	if (strlen(fm) > 0 && isNFDRS2016(fm[0]))
 	{
 		tmp = m_grid.QuickGetText(0, row);
-		strcpy(station, tmp);
+		strcpy_s(station, tmp);
 		sprintf(temp, "[StationID] = '%s'", station);
 		CSIGStationSet ssSet(GetDocument()->m_pDB);
 		ssSet.m_strFilter = _T(temp);
@@ -2556,7 +2556,7 @@ bool CFireplusView::FieldsOK()
 		}
 		str = m_grid.QuickGetText(2, rc);//m_Grid.GetCell(rc, 2)->GetText();
 		//RowData.GetItem(temp, 2);
-		strcpy(temp, str);
+		strcpy_s(temp, str);
 		temp[1] = 0;
 		if(temp[0] < 'A' || temp[0] > 'Z')
 		{
@@ -2842,7 +2842,7 @@ void CFireplusView::OnDataWeatherobservations(int obsType)
 	{
 		CString tmp;
 		char sig[128];
-		strcpy(sig, m_pSet->m_SIG_Station);
+		strcpy_s(sig, m_pSet->m_SIG_Station);
 		CStationInSIGSet sSet(m_pSet->m_pDatabase);
 		temp.Format("[SIG] = '%-20.20s'", &sig[6]);
 		sSet.m_strFilter = _T(temp);
@@ -2932,7 +2932,7 @@ void CFireplusView::OnDataWeatherobservations(int obsType)
 	{
 		CString tmp;
 		char sig[128];
-		strcpy(sig, m_pSet->m_SIG_Station);
+		strcpy_s(sig, m_pSet->m_SIG_Station);
 		CStationInSIGSet sSet(m_pSet->m_pDatabase);
 		temp.Format("[SIG] = '%-20.20s'", &sig[6]);
 		sSet.m_strFilter = _T(temp);
@@ -3448,7 +3448,7 @@ void CFireplusView::OnDataUservariablesViewobservations()
 	{
 		CString tmp;
 		char sig[128];
-		strcpy(sig, m_pSet->m_SIG_Station);
+		strcpy_s(sig, m_pSet->m_SIG_Station);
 		CStationInSIGSet sSet(m_pSet->m_pDatabase);
 		temp.Format("[SIG] = '%-20.20s'", &sig[6]);
 		sSet.m_strFilter = _T(temp);

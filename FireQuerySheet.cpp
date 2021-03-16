@@ -51,7 +51,7 @@ CFireQuerySheet::CFireQuerySheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSel
 	if(_staStr.GetLength() > 6)//is a SIG
 	{
 		char temp[64];
-		strcpy(temp, _staStr);
+		strcpy_s(temp, _staStr);
 		staStr.Format("%s", &temp[6]);
 	}
 	else

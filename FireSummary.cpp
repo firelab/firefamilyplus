@@ -28,7 +28,7 @@ extern int compare( const void *arg1, const void *arg2 );
 void StripName(CString src, CString *dest)
 {//code is included prior to name, strip name to dest
 	char temp[64];
-	strcpy(temp, src);
+	strcpy_s(temp, src);
 	int i;
 	for(i = 0; i < (int)strlen(temp); i++)
 	{
@@ -104,7 +104,7 @@ int CFireSummary::ProcessFires(CDatabase *pDB, CString queryID, CString baseQuer
 	int firesToday = 0;
 	CFireAssocSet assocSet(pDB);
 	char tStr[64];
-	strcpy(tStr, queryID);
+	strcpy_s(tStr, queryID);
 	assocSet.m_strFilter.Format("[SIG/Station] = '%s'", strlen(tStr) > 6 ? &tStr[6] : tStr);
 	assocSet.Open();
 	if(assocSet.IsEOF() || assocSet.IsBOF())

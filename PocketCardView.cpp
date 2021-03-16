@@ -1252,7 +1252,7 @@ void CPocketCardView::DrawToDCRegion(CDC * pDC, CRect rect)
 	tStr.Format("(%s)", m_pAnalysis->m_pocketOpts.dbName);
 	tSize = pDC->GetTextExtent(tStr);
 	char strPath[MAX_PATH];
-	strcpy(strPath, m_pAnalysis->m_pocketOpts.dbName);
+	strcpy_s(strPath, m_pAnalysis->m_pocketOpts.dbName);
 	PathCompactPath(pDC->GetSafeHdc(), strPath, r4.right - l - 8);
 	tStr.Format("(%s)", strPath);
 	pDC->TextOut(l, t, tStr);
@@ -1444,7 +1444,7 @@ int CPocketCardView::SaveToFile(CString _saveNameStr, CRect *_outRect)
 		DrawToDCRegion(&memhdc, rect);
 		SelectObject(memhdc.m_hDC, Old);
 		char fName[256];
-		strcpy(fName, _saveNameStr);
+		strcpy_s(fName, _saveNameStr);
 		SaveBitmapFile(memhdc.m_hDC, picture, fName); 
 	//	SelectObject(memhdc.m_hDC, Old);
 		//ReleaseDC(whdc);

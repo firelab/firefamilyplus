@@ -104,7 +104,7 @@ void CDiurnalFormView::OnInitialUpdate()
 	CDiurnalFrame *frame = (CDiurnalFrame *)GetParent()->GetParent();
 	//varID = frame->varID;
 	//CString temp, header;
-	strcpy(buf, "FireFamily Plus Diurnal Report\r\n");
+	strcpy_s(buf, "FireFamily Plus Diurnal Report\r\n");
 	tFile.Write(buf, strlen(buf));
 	sprintf(buf, "%s\r\n", frame->varName);
 	//temp.Format("%s\r\nVariable: %s\r\n\r\n", pDoc->stationName,
@@ -126,19 +126,19 @@ void CDiurnalFormView::OnInitialUpdate()
 			pDoc->start.GetYear(),
 			pDoc->end.GetYear());
 	tFile.Write(buf, strlen(buf));
-	strcpy(buf, "\r\n");
+	strcpy_s(buf, "\r\n");
 	tFile.Write(buf, strlen(buf));
 	if(frame->varID == 23)
-		strcpy(buf, 
+		strcpy_s(buf, 
 			"               Mode Values by Hour of Day by Date\r\n                           Hour\r\n");
 	else
-		strcpy(buf, 
+		strcpy_s(buf, 
 			"                Avg Values by Hour of Day by Date\r\n                           Hour\r\n");
 	tFile.Write(buf, strlen(buf));
-	strcpy(buf, 
+	strcpy_s(buf, 
 		"Date    0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15    16    17    18    19    20    21    22    23\r\n");
 	tFile.Write(buf, strlen(buf));
-	strcpy(buf, 
+	strcpy_s(buf, 
 		"-----------------------------------------------------------------------------------------------------------------------------------------------------\r\n");
 	tFile.Write(buf, strlen(buf));
 	COleDateTime rptStart, rptEnd, rdate;
@@ -167,7 +167,7 @@ void CDiurnalFormView::OnInitialUpdate()
 				sprintf(buf, "      ");
 			tFile.Write(buf, strlen(buf));
 		}
-		strcpy(buf, "\r\n");
+		strcpy_s(buf, "\r\n");
 		tFile.Write(buf, strlen(buf));
 		rdate += span;
 	}
@@ -189,10 +189,10 @@ void CDiurnalFormView::OnInitialUpdate()
 				}
 					//temp.Format("%6.2f", pDoc->da->days[frame->varID][i].hours[h].Mean());
 				else
-					strcpy(buf, "      ");
+					strcpy_s(buf, "      ");
 				tFile.Write(buf, strlen(buf));
 			}
-			strcpy(buf, "\r\n");
+			strcpy_s(buf, "\r\n");
 			tFile.Write(buf, strlen(buf));
 			rdate += span;
 		}

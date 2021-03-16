@@ -170,7 +170,7 @@ void CEventLocatorDoc::OnCloseDocument()
 	char temp[256];
 	bool itemp = isTemp;
 	CString pStr = GetPathName();
-	strcpy(temp, tName);
+	strcpy_s(temp, tName);
 	CRichEditDoc::OnCloseDocument();
 	if(itemp || (!itemp && strcmpi(temp, pStr) != 0))
 		unlink(temp);

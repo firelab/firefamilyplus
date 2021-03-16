@@ -1661,7 +1661,7 @@ void CGraphView::SaveGraph(CString _outName, CRect *_outRect)
 	CRect rect(0, 0, _outRect->Width(), _outRect->Height());
 	DrawToDCRegion(&memhdc, rect);
 	char fName[256];
-	strcpy(fName, _outName);
+	strcpy_s(fName, _outName);
 	SaveBitmapFile(memhdc.m_hDC, picture, fName);
 	SelectObject(memhdc.m_hDC, Old);
 	//ReleaseDC(whdc);
@@ -1691,7 +1691,7 @@ void CGraphView::SaveGraph(void)
 			CRect rect(0, 0, sgd.width, sgd.height);
 			DrawToDCRegion(&memhdc, rect);
 			char fName[256];
-			strcpy(fName, fd.GetPathName());
+			strcpy_s(fName, fd.GetPathName());
 			SaveBitmapFile(memhdc.m_hDC, picture, fName);
 			SelectObject(memhdc.m_hDC, Old);
 			ReleaseDC(whdc);

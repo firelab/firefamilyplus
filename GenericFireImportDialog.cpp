@@ -460,12 +460,12 @@ BOOL CGenericFireImportDialog::OnInitDialog()
 	CDialog::OnInitDialog();
 	CString importBtnStr;
 	char fNameTmp[MAX_PATH];
-	strcpy(fNameTmp, fileName);
+	strcpy_s(fNameTmp, fileName);
 	for(int i = strlen(fNameTmp) - 1; i > 0; i--)
 	{
 		if(fNameTmp[i] == '\\')
 		{
-			strcpy(fNameTmp, &fNameTmp[i]);
+			strcpy_s(fNameTmp, &fNameTmp[i]);
 			break;
 		}
 	}

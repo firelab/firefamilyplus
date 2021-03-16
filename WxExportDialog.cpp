@@ -462,81 +462,81 @@ int CWxExportDialog::ExportFWX()
 		if(temp[0] == 'O')
 		{
 			//nfdrs observation, write it to file in fwx format
-			strcpy(buf, records->m_StationID);
+			strcpy_s(buf, records->m_StationID);
 			sprintf(temp, "%02d%02d%02d", records->m_ObsDate.GetYear() % 100,
 				records->m_ObsDate.GetMonth(), records->m_ObsDate.GetDay());
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_SOW))
 				sprintf(temp, "%d", records->m_SOW);
 			else
-				strcpy(temp, " ");
+				strcpy_s(temp, " ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_Temp))
 				sprintf(temp, "%3d", records->m_Temp);
 			else
-				strcpy(temp, "   ");
+				strcpy_s(temp, "   ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_RH))
 				sprintf(temp, "%3d", max(records->m_RH, 1));
 			else
-				strcpy(temp, "   ");
+				strcpy_s(temp, "   ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_GreenHerb))
 				sprintf(temp, "%3d", records->m_GreenHerb);
 			else
-				strcpy(temp, "   ");
+				strcpy_s(temp, "   ");
 			strcat(buf, temp);
 			strcat(buf, "     "); //veg condition and human risk
 			if(!records->IsFieldNull(&records->m_WDir))
 				sprintf(temp, "%d", records->m_WDir);
 			else
-				strcpy(temp, " ");
+				strcpy_s(temp, " ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_WS))
 				sprintf(temp, "%3d", records->m_WS);
 			else
-				strcpy(temp, "   ");
+				strcpy_s(temp, "   ");
 			strcat(buf, temp);
 			strcat(buf, " ");
 			if(!records->IsFieldNull(&records->m_OMC10))
 				sprintf(temp, "%3.0f", records->m_OMC10);
 			else
-				strcpy(temp, "   ");
+				strcpy_s(temp, "   ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_GreenShrub))
 				sprintf(temp, "%3d", records->m_GreenShrub);
 			else
-				strcpy(temp, "   ");
+				strcpy_s(temp, "   ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_TmpMax))
 				sprintf(temp, "%3d", records->m_TmpMax);
 			else
-				strcpy(temp, "   ");
+				strcpy_s(temp, "   ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_TmpMin))
 				sprintf(temp, "%3d", records->m_TmpMin);
 			else
-				strcpy(temp, "   ");
+				strcpy_s(temp, "   ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_RHMax))
 				sprintf(temp, "%3d", records->m_RHMax);
 			else
-				strcpy(temp, "   ");
+				strcpy_s(temp, "   ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_RHMin))
 				sprintf(temp, "%3d", max(records->m_RHMin, 1));
 			else
-				strcpy(temp, "   ");
+				strcpy_s(temp, "   ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_Season))
 				sprintf(temp, "%d", records->m_Season);
 			else
-				strcpy(temp, " ");
+				strcpy_s(temp, " ");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_PPTDUR))
 				sprintf(temp, "%2d", records->m_PPTDUR);
 			else
-				strcpy(temp, " 0");
+				strcpy_s(temp, " 0");
 			strcat(buf, temp);
 			if(!records->IsFieldNull(&records->m_PPTAMT))
 			{
@@ -547,7 +547,7 @@ int CWxExportDialog::ExportFWX()
 					sprintf(temp, "%04.0f", amt * 100.0);
 			}
 			else
-				strcpy(temp, "0000");
+				strcpy_s(temp, "0000");
 			strcat(buf, temp);
 			strcat(buf, "  12                   ");
 			fprintf(out, "%s\n", buf);
@@ -761,7 +761,7 @@ int CWxExportDialog::ExportFW13()
 	records->MoveFirst();
 	while(!records->IsEOF())
 	{
-		strcpy(buf, "W13");
+		strcpy_s(buf, "W13");
 		strcat(buf, records->m_StationID);
 		sprintf(temp, "%d%02d%02d%02d%02d", records->m_ObsDate.GetYear(), records->m_ObsDate.GetMonth(),
 			records->m_ObsDate.GetDay(), records->m_ObsDate.GetHour(), records->m_ObsDate.GetMinute());
@@ -772,17 +772,17 @@ int CWxExportDialog::ExportFW13()
 		if(!records->IsFieldNull(&records->m_SOW))
 			sprintf(temp, "%1d", records->m_SOW);
 		else
-			strcpy(temp, " ");
+			strcpy_s(temp, " ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_Temp))
 			sprintf(temp, "%3d", records->m_Temp);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_RH))
 			sprintf(temp, "%3d", max(records->m_RH, 1));
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_WAzimuth))
 			sprintf(temp, "%3d", records->m_WAzimuth);
@@ -799,37 +799,37 @@ int CWxExportDialog::ExportFW13()
 			sprintf(temp, "%3d", tdir);
 		}
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_WS))
 			sprintf(temp, "%3d", records->m_WS);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_OMC10))
 			sprintf(temp, "%2.0f", records->m_OMC10);
 		else
-			strcpy(temp, "  ");
+			strcpy_s(temp, "  ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_TmpMax))
 			sprintf(temp, "%3d", records->m_TmpMax);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_TmpMin))
 			sprintf(temp, "%3d", records->m_TmpMin);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_RHMax))
 			sprintf(temp, "%3d", records->m_RHMax);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_RHMin))
 			sprintf(temp, "%3d", max(records->m_RHMin, 1));
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		//cols 49-50, pcp duration
 		if (fw13PrecipType == 1)//24hr precip
@@ -837,12 +837,12 @@ int CWxExportDialog::ExportFW13()
 			if (!records->IsFieldNull(&records->m_PPTDUR))
 				sprintf(temp, "%2d", records->m_PPTDUR);
 			else
-				strcpy(temp, " 0");
+				strcpy_s(temp, " 0");
 			strcat(buf, temp);
 			if (!records->IsFieldNull(&records->m_PPTAMT))
 				sprintf(temp, "%5.0f", records->m_PPTAMT * 1000.0);
 			else
-				strcpy(temp, "    0");
+				strcpy_s(temp, "    0");
 			strcat(buf, temp);
 		}
 		else //hourly, put 0 or 1
@@ -850,17 +850,17 @@ int CWxExportDialog::ExportFW13()
 			if (!records->IsFieldNull(&records->m_HourlyPrecip))
 			{
 				if(records->m_HourlyPrecip > 0.0)
-					strcpy(temp, " 1");
+					strcpy_s(temp, " 1");
 				else
-					strcpy(temp, " 0");
+					strcpy_s(temp, " 0");
 			}
 			else
-				strcpy(temp, " 0");
+				strcpy_s(temp, " 0");
 			strcat(buf, temp);
 			if (!records->IsFieldNull(&records->m_HourlyPrecip))
 				sprintf(temp, "%5.0f", records->m_HourlyPrecip * 1000.0);
 			else
-				strcpy(temp, "    0");
+				strcpy_s(temp, "    0");
 			strcat(buf, temp);
 		}
 		if(!records->IsFieldNull(&records->m_WetFlag))
@@ -875,12 +875,12 @@ int CWxExportDialog::ExportFW13()
 		if(!records->IsFieldNull(&records->m_GreenHerb))
 			sprintf(temp, "%2d", records->m_GreenHerb);
 		else
-			strcpy(temp, "  ");
+			strcpy_s(temp, "  ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_GreenShrub))
 			sprintf(temp, "%2d", records->m_GreenShrub);
 		else
-			strcpy(temp, "  ");
+			strcpy_s(temp, "  ");
 		strcat(buf, temp);
 		strcat(buf, "2");//col 61, measurement types(RH, U.S. units)
 		if (fw13PrecipType == 0)
@@ -891,13 +891,13 @@ int CWxExportDialog::ExportFW13()
 		if(!records->IsFieldNull(&records->m_Season)) // 63
 			sprintf(temp, "%1d", records->m_Season);
 		else
-			strcpy(temp, " ");
+			strcpy_s(temp, " ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_SolarRadiation))  //64-67
 		{
 			sprintf(temp, "%4d", records->m_SolarRadiation);
 		//else
-		//	strcpy(temp, "    ");
+		//	strcpy_s(temp, "    ");
 			strcat(buf, temp);
 		//strcat(buf, "    ");//solar radiation is blank
 		}
@@ -907,13 +907,13 @@ int CWxExportDialog::ExportFW13()
 		if(!records->IsFieldNull(&records->m_GustDir))
 			sprintf(temp, "%3d", records->m_GustDir);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 
 		if(!records->IsFieldNull(&records->m_GustSpd))
 			sprintf(temp, "%3d", records->m_GustSpd);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 
 		if(!records->IsFieldNull(&records->m_SnowFlag))
@@ -967,7 +967,7 @@ int CWxExportDialog::ExportFW9()
 	records->MoveFirst();
 	while(!records->IsEOF())
 	{
-		strcpy(buf, "W98");
+		strcpy_s(buf, "W98");
 		strcat(buf, records->m_StationID);
 		sprintf(temp, "%d%02d%02d%02d%02d", records->m_ObsDate.GetYear(), records->m_ObsDate.GetMonth(),
 			records->m_ObsDate.GetDay(), records->m_ObsDate.GetHour(), records->m_ObsDate.GetMinute());
@@ -978,17 +978,17 @@ int CWxExportDialog::ExportFW9()
 		if(!records->IsFieldNull(&records->m_SOW))
 			sprintf(temp, "%1d", records->m_SOW);
 		else
-			strcpy(temp, " ");
+			strcpy_s(temp, " ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_Temp))
 			sprintf(temp, "%3d", records->m_Temp);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_RH))
 			sprintf(temp, "%3d", max(records->m_RH, 1));
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_WAzimuth))
 			sprintf(temp, "%3d", records->m_WAzimuth);
@@ -1005,47 +1005,47 @@ int CWxExportDialog::ExportFW9()
 			sprintf(temp, "%3d", tdir);
 		}
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_WS))
 			sprintf(temp, "%3d", records->m_WS);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_OMC10))
 			sprintf(temp, "%2.0f", records->m_OMC10);
 		else
-			strcpy(temp, "  ");
+			strcpy_s(temp, "  ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_TmpMax))
 			sprintf(temp, "%3d", records->m_TmpMax);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_TmpMin))
 			sprintf(temp, "%3d", records->m_TmpMin);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_RHMax))
 			sprintf(temp, "%3d", records->m_RHMax);
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_RHMin))
 			sprintf(temp, "%3d", max(records->m_RHMin, 1));
 		else
-			strcpy(temp, "   ");
+			strcpy_s(temp, "   ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_PPTDUR))
 			sprintf(temp, "%2d", records->m_PPTDUR);
 		else
-			strcpy(temp, " 0");
+			strcpy_s(temp, " 0");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_PPTAMT))
 			sprintf(temp, "%5.0f", records->m_PPTAMT * 1000.0);
 		else
-			strcpy(temp, "    0");
+			strcpy_s(temp, "    0");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_WetFlag))
 		{
@@ -1059,25 +1059,25 @@ int CWxExportDialog::ExportFW9()
 		if(!records->IsFieldNull(&records->m_GreenHerb))
 			sprintf(temp, "%2d", records->m_GreenHerb);
 		else
-			strcpy(temp, "  ");
+			strcpy_s(temp, "  ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_GreenShrub))
 			sprintf(temp, "%2d", records->m_GreenShrub);
 		else
-			strcpy(temp, "  ");
+			strcpy_s(temp, "  ");
 		strcat(buf, temp);
 		strcat(buf, "21");//cols 61 & 62, measurement types(RH, U.S. units)
 		//grrr westfork sample doesnt even have this column(season), line return
 		if(!records->IsFieldNull(&records->m_Season)) // 63
 			sprintf(temp, "%1d", records->m_Season);
 		else
-			strcpy(temp, " ");
+			strcpy_s(temp, " ");
 		strcat(buf, temp);
 		if(!records->IsFieldNull(&records->m_SolarRadiation))  //64-67
 		{
 			sprintf(temp, "%4d", records->m_SolarRadiation);
 		//else
-		//	strcpy(temp, "    ");
+		//	strcpy_s(temp, "    ");
 			strcat(buf, temp);
 		//strcat(buf, "    ");//solar radiation is blank
 		}

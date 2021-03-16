@@ -454,7 +454,7 @@ int CRunSave::SaveWxStation(int runID,  CFireplusSet *fpSet )
 		staSet.Open();
 		CStationInSIGSet sigSet(fpSet->m_pDatabase);
 		char tmpStr[64];
-		strcpy(tmpStr, fpSet->m_SIG_Station);
+		strcpy_s(tmpStr, fpSet->m_SIG_Station);
 		sigSet.m_strFilter.Format("[SIG] = '%s'", &tmpStr[6]);
 		sigSet.Open();
 		while(!sigSet.IsEOF())

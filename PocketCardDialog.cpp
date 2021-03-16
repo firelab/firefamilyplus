@@ -112,7 +112,7 @@ int PocketCardCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param
 			if(staStr.GetLength() > 6)//is a SIG
 			{
 				char temp[64];
-				strcpy(temp, staStr);
+				strcpy_s(temp, staStr);
 				staStr.Format("%s", &temp[6]);
 			}
 			associations.m_strFilter.Format("[SIG/Station] = '%s'", staStr);

@@ -3151,7 +3151,7 @@ void CFireplusDoc::CheckLFITable()
 		//woody moistures
 		lfiSet.m_WoodyDaysAvg = 21;
 		lfiSet.m_WoodyMax = 200.0;
-		lfiSet.m_WoodyMin = 50.0;
+		lfiSet.m_WoodyMin = 60.0;
 		lfiSet.m_WoodyMaxGSI = 1.0;
 		lfiSet.m_WoodyGreenup = 0.5;
 		lfiSet.m_WoodyTMinMin = -2.0;

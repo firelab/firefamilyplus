@@ -135,7 +135,7 @@ void CRawClim::AllocData()
 		int nStns = 0;
 		CStationInSIGSet sigSet(m_pDB);
 		char tmpStr[64];
-		strcpy(tmpStr, m_sigStaID);
+		strcpy_s(tmpStr, m_sigStaID);
 		sigSet.m_strFilter.Format("[SIG] = '%s'", &tmpStr[6]);
 		sigSet.Open();
 		while(!sigSet.IsEOF())
@@ -377,10 +377,10 @@ void CRawClim::AllocData()
 				lfi.GetDaylenMin(), lfi.GetDaylenMax(), lfi.GetMAPeriod(), lfi.IsUsingVPDAvg(), lfi.GetNumPrecipDays(), lfi.GetRTPcpMin(), lfi.GetRTPcpMax(), lfi.GetUseRTPrecip());
 			theApp.m_NFDRS2016.SetHerbGSIparams(lfiHerb.GetHerbMaxGSI(), lfiHerb.GetHerbGreenup(), lfiHerb.GetTminMin(), lfiHerb.GetTminMax(), lfiHerb.GetVPDMin(), 
 				lfiHerb.GetVPDMax(), lfiHerb.GetDaylenMin(), lfiHerb.GetDaylenMax(), lfiHerb.GetMAPeriod(), lfiHerb.IsUsingVPDAvg(), lfiHerb.GetNumPrecipDays(), 
-				lfiHerb.GetRTPcpMin(), lfiHerb.GetRTPcpMax(), lfiHerb.GetUseRTPrecip());
+				lfiHerb.GetRTPcpMin(), lfiHerb.GetRTPcpMax(), lfiHerb.GetUseRTPrecip(), lfiHerb.GetHerbMin(), lfiHerb.GetHerbMax());
 			theApp.m_NFDRS2016.SetWoodyGSIparams(lfiWoody.GetWoodyMaxGSI(), lfiWoody.GetWoodyGreenup(), lfiWoody.GetTminMin(), lfiWoody.GetTminMax(), 
 				lfiWoody.GetVPDMin(), lfiWoody.GetVPDMax(), lfiWoody.GetDaylenMin(), lfiWoody.GetDaylenMax(), lfiWoody.GetMAPeriod(), lfiWoody.IsUsingVPDAvg(), 
-				lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip());
+				lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip(), lfiWoody.GetWoodyMin(), lfiWoody.GetWoodyMax());
 			theApp.m_NFDRS2016.SetStartKBDI(staSet.m_StartKBDI);
 			theApp.m_NFDRS2016.SetSCMax(staSet.GetSCM(staSet.m_NFDRSFM[0]));
 			theApp.m_NFDRS2016.SetMxdHumid(staSet.GetMxHumid(staSet.m_NFDRSFM[0]));
@@ -442,7 +442,7 @@ void CRawClim::AllocData()
 				}
 				if (count % 100 == 0)
 				{
-					sprintf(prgBuf, "Processing Record: %d", count);
+					sprintf_s(prgBuf, "Processing Record: %d", count);
 					pCUPDUPData->SetProgress(prgBuf);
 				}
 				if (init)
@@ -1654,7 +1654,7 @@ void CBatchOutput::RunBatch()
 					mkdir(tmp);
 					chdir(tmp);
 				}
-//				strcpy(tmp, dtStr);
+//				strcpy_s(tmp, dtStr);
 //				if(chdir(tmp) != 0)
 //				{
 //					mkdir(tmp);

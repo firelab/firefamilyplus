@@ -219,7 +219,7 @@ char *GetTempFileName()
 	char buffer[_MAX_PATH], temp[32];
 	// Get the current working directory:
 	chdir(theApp.dbDir);//theApp.workDir);
-	strcpy(buffer, theApp.dbDir);
+	strcpy_s(buffer, theApp.dbDir);
 	CFileFind finder;
 	int i = 0;
 	sprintf(temp, "FFP%05d.txt", i);
@@ -496,7 +496,7 @@ int CClimAnalysis::Analyze(int *_varIDs, int _nVarIDs, CFireplusSet *_fpSet, boo
 		if(fpSet->m_SIG_Station.GetLength() > 6)//SIG
 		{
 			char sig[64];
-			strcpy(sig, fpSet->m_SIG_Station);
+			strcpy_s(sig, fpSet->m_SIG_Station);
 			CString temp;
 			CStationInSIGSet sSet(pDB);
 			temp.Format("[SIG] = '%-20.20s'", &sig[6]);
@@ -1722,10 +1722,10 @@ int CClimAnalysis::AnalyzeStation(CString stationStr, bool isFPA /* = false*/, C
 					lfi.GetDaylenMin(), lfi.GetDaylenMax(), lfi.GetMAPeriod(), lfi.IsUsingVPDAvg(), lfi.GetNumPrecipDays(), lfi.GetRTPcpMin(), lfi.GetRTPcpMax(), lfi.GetUseRTPrecip());
 				theApp.m_NFDRS2016.SetHerbGSIparams(lfiHerb.GetHerbMaxGSI(), lfiHerb.GetHerbGreenup(), lfiHerb.GetTminMin(), lfiHerb.GetTminMax(), 
 					lfiHerb.GetVPDMin(), lfiHerb.GetVPDMax(), lfiHerb.GetDaylenMin(), lfiHerb.GetDaylenMax(), lfiHerb.GetMAPeriod(), lfiHerb.IsUsingVPDAvg(), 
-					lfiHerb.GetNumPrecipDays(), lfiHerb.GetRTPcpMin(), lfiHerb.GetRTPcpMax(), lfiHerb.GetUseRTPrecip());
+					lfiHerb.GetNumPrecipDays(), lfiHerb.GetRTPcpMin(), lfiHerb.GetRTPcpMax(), lfiHerb.GetUseRTPrecip(), lfiHerb.GetHerbMin(), lfiHerb.GetHerbMax());
 				theApp.m_NFDRS2016.SetWoodyGSIparams(lfiWoody.GetWoodyMaxGSI(), lfiWoody.GetWoodyGreenup(), lfiWoody.GetTminMin(), lfiWoody.GetTminMax(), 
 					lfiWoody.GetVPDMin(), lfiWoody.GetVPDMax(), lfiWoody.GetDaylenMin(), lfiWoody.GetDaylenMax(), lfiWoody.GetMAPeriod(), lfiWoody.IsUsingVPDAvg(), 
-					lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip());
+					lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip(), lfiWoody.GetWoodyMin(), lfiWoody.GetWoodyMax());
 				theApp.m_NFDRS2016.SetStartKBDI(staSet.m_StartKBDI);
 				theApp.m_NFDRS2016.SetSCMax(staSet.GetSCM(staSet.m_NFDRSFM[0]));
 				theApp.m_NFDRS2016.SetMxdHumid(staSet.GetMxHumid(staSet.m_NFDRSFM[0]));
@@ -2370,7 +2370,7 @@ int CClimAnalysis::AnalyzeSIG(const CString query, bool isFPA /* = false*/)
 	CSIGStationSet staSet(pDB);
 	staSet.m_strFilter.Format("[StationID] = '%6.6s'", fpSet->m_SIG_Station);
 	staSet.Open();
-	strcpy(sig, fpSet->m_SIG_Station);
+	strcpy_s(sig, fpSet->m_SIG_Station);
 	CStationInSIGSet sSet(pDB);
 	temp.Format("[SIG] = '%-20.20s'", &sig[6]);
 	sSet.m_strFilter = _T(temp);
@@ -5868,7 +5868,7 @@ void CClimAnalysis::AddSIGDescription(FILE *stream)
 		CStationInSIGSet stas(pDB);
 		CString query;
 		char sig[64];
-		strcpy(sig, fpSet->m_SIG_Station);
+		strcpy_s(sig, fpSet->m_SIG_Station);
 		query.Format("[SIG] = '%-20.20s'", &sig[6]);
 		stas.m_strFilter = _T(query);
 		stas.Open();
@@ -6626,7 +6626,7 @@ int CClimAnalysis::AnalyzeBatchItem(CWnd *_caller, int *_varIDs, int _nVarIDs, C
 		if(fpSet->m_SIG_Station.GetLength() > 6)//SIG
 		{
 			char sig[64];
-			strcpy(sig, fpSet->m_SIG_Station);
+			strcpy_s(sig, fpSet->m_SIG_Station);
 			CString temp;
 			CStationInSIGSet sSet(pDB);
 			temp.Format("[SIG] = '%-20.20s'", &sig[6]);
@@ -7067,7 +7067,7 @@ int CClimAnalysis::AnalyzeBatchSIG(const CString query, bool isFPA)
 	char sig[32];
 	int ret = 0;
 	CString temp, staQuery;
-	strcpy(sig, fpSet->m_SIG_Station);
+	strcpy_s(sig, fpSet->m_SIG_Station);
 	CStationInSIGSet sSet(pDB);
 	temp.Format("[SIG] = '%-20.20s'", &sig[6]);
 	sSet.m_strFilter = _T(temp);
@@ -7531,10 +7531,10 @@ int CClimAnalysis::AnalyzeBatchStation(CString stationStr, bool isFPA, CString s
 				lfi.GetDaylenMin(), lfi.GetDaylenMax(), lfi.GetMAPeriod(), lfi.IsUsingVPDAvg(), lfi.GetNumPrecipDays(), lfi.GetRTPcpMin(), lfi.GetRTPcpMax(), lfi.GetUseRTPrecip());
 			theApp.m_NFDRS2016.SetHerbGSIparams(lfiHerb.GetHerbMaxGSI(), lfiHerb.GetHerbGreenup(), lfiHerb.GetTminMin(), lfiHerb.GetTminMax(), 
 				lfiHerb.GetVPDMin(), lfiHerb.GetVPDMax(), lfiHerb.GetDaylenMin(), lfiHerb.GetDaylenMax(), lfiHerb.GetMAPeriod(), lfiHerb.IsUsingVPDAvg(), 
-				lfiHerb.GetNumPrecipDays(), lfiHerb.GetRTPcpMin(), lfiHerb.GetRTPcpMax(), lfiHerb.GetUseRTPrecip());
+				lfiHerb.GetNumPrecipDays(), lfiHerb.GetRTPcpMin(), lfiHerb.GetRTPcpMax(), lfiHerb.GetUseRTPrecip(), lfiHerb.GetHerbMin(), lfiHerb.GetHerbMax());
 			theApp.m_NFDRS2016.SetWoodyGSIparams(lfiWoody.GetWoodyMaxGSI(), lfiWoody.GetWoodyGreenup(), lfiWoody.GetTminMin(), lfiWoody.GetTminMax(), 
 				lfiWoody.GetVPDMin(), lfiWoody.GetVPDMax(), lfiWoody.GetDaylenMin(), lfiWoody.GetDaylenMax(), lfiWoody.GetMAPeriod(), lfiWoody.IsUsingVPDAvg(), 
-				lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip());
+				lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip(), lfiWoody.GetWoodyMin(), lfiHerb.GetWoodyMax());
 			theApp.m_NFDRS2016.SetStartKBDI(staSet.m_StartKBDI);
 			theApp.m_NFDRS2016.SetSCMax(staSet.GetSCM(staSet.m_NFDRSFM[0]));
 			theApp.m_NFDRS2016.SetMxdHumid(staSet.GetMxHumid(staSet.m_NFDRSFM[0]));
@@ -9212,7 +9212,7 @@ CString CClimAnalysis::FlamMapExport(bool createDoc /*= true*/, int calmVal /*= 
 		CStationInSIGSet sigSet(fpSet->m_pDatabase);
 		CString temp;
 		char sig[64];
-		strcpy(sig, fpSet->m_SIG_Station);
+		strcpy_s(sig, fpSet->m_SIG_Station);
 		temp.Format("[SIG] = '%-20.20s'", &sig[6]);
 		sigSet.m_strFilter = _T(temp);
 		sigSet.Open();
@@ -9416,40 +9416,40 @@ CString CClimAnalysis::FlamMapExport(bool createDoc /*= true*/, int calmVal /*= 
 			switch (m)
 			{
 			case 0:
-				strcpy(monthStr, "January");
+				strcpy_s(monthStr, "January");
 				break;
 			case 1:
-				strcpy(monthStr, "February");
+				strcpy_s(monthStr, "February");
 				break;
 			case 2:
-				strcpy(monthStr, "March");
+				strcpy_s(monthStr, "March");
 				break;
 			case 3:
-				strcpy(monthStr, "April");
+				strcpy_s(monthStr, "April");
 				break;
 			case 4:
-				strcpy(monthStr, "May");
+				strcpy_s(monthStr, "May");
 				break;
 			case 5:
-				strcpy(monthStr, "June");
+				strcpy_s(monthStr, "June");
 				break;
 			case 6:
-				strcpy(monthStr, "July");
+				strcpy_s(monthStr, "July");
 				break;
 			case 7:
-				strcpy(monthStr, "August");
+				strcpy_s(monthStr, "August");
 				break;
 			case 8:
-				strcpy(monthStr, "September");
+				strcpy_s(monthStr, "September");
 				break;
 			case 9:
-				strcpy(monthStr, "October");
+				strcpy_s(monthStr, "October");
 				break;
 			case 10:
-				strcpy(monthStr, "November");
+				strcpy_s(monthStr, "November");
 				break;
 			case 11:
-				strcpy(monthStr, "December");
+				strcpy_s(monthStr, "December");
 				break;
 			}
 			fprintf(stream, "%s:\n", monthStr);
@@ -9524,7 +9524,7 @@ CString CClimAnalysis::FlamMapExport(bool createDoc /*= true*/, int calmVal /*= 
 		CStationInSIGSet sigSet(fpSet->m_pDatabase);
 		CString temp;
 		char sig[64];
-		strcpy(sig, fpSet->m_SIG_Station);
+		strcpy_s(sig, fpSet->m_SIG_Station);
 		temp.Format("[SIG] = '%-20.20s'", &sig[6]);
 		sigSet.m_strFilter = _T(temp);
 		sigSet.Open();
@@ -9799,40 +9799,40 @@ CString CClimAnalysis::FlamMapExport(bool createDoc /*= true*/, int calmVal /*= 
 			switch(m)
 			{
 				case 0:
-					strcpy(monthStr, "January");
+					strcpy_s(monthStr, "January");
 					break;
 				case 1:
-					strcpy(monthStr, "February");
+					strcpy_s(monthStr, "February");
 					break;
 				case 2:
-					strcpy(monthStr, "March");
+					strcpy_s(monthStr, "March");
 					break;
 				case 3:
-					strcpy(monthStr, "April");
+					strcpy_s(monthStr, "April");
 					break;
 				case 4:
-					strcpy(monthStr, "May");
+					strcpy_s(monthStr, "May");
 					break;
 				case 5:
-					strcpy(monthStr, "June");
+					strcpy_s(monthStr, "June");
 					break;
 				case 6:
-					strcpy(monthStr, "July");
+					strcpy_s(monthStr, "July");
 					break;
 				case 7:
-					strcpy(monthStr, "August");
+					strcpy_s(monthStr, "August");
 					break;
 				case 8:
-					strcpy(monthStr, "September");
+					strcpy_s(monthStr, "September");
 					break;
 				case 9:
-					strcpy(monthStr, "October");
+					strcpy_s(monthStr, "October");
 					break;
 				case 10:
-					strcpy(monthStr, "November");
+					strcpy_s(monthStr, "November");
 					break;
 				case 11:
-					strcpy(monthStr, "December");
+					strcpy_s(monthStr, "December");
 					break;
 			}
 			fprintf(stream, "%s:\n", monthStr);
@@ -9935,7 +9935,7 @@ CString CClimAnalysis::FlamMapExport(bool createDoc /*= true*/, int calmVal /*= 
                   CString str2;//,stream;
 	              if (fpSet->m_SIG_Station.GetLength() > 6){   // SIG
 		             char sig[64];
-		             strcpy(sig, fpSet->m_SIG_Station);
+		             strcpy_s(sig, fpSet->m_SIG_Station);
 		             CString temp;
 		             CStationInSIGSet sSet(fpSet->m_pDatabase);
 
@@ -10272,7 +10272,7 @@ void CClimAnalysis::AnalyzeQuick(CRawClim *pClim, bool _inverted/* = false*/)
 	if (pClim->m_sigStaID.GetLength() > 6)//sig
 	{
 		char sig[64];
-		strcpy(sig, fpSet->m_SIG_Station);
+		strcpy_s(sig, fpSet->m_SIG_Station);
 		CString temp;
 		CStationInSIGSet sSet(pDB);
 		temp.Format("[SIG] = '%-20.20s'", &sig[6]);
@@ -10902,7 +10902,7 @@ void CClimAnalysis::LoadRunPocketOptions(CRunPocketCardSet *pocketSet)
 	if(m_pocketOpts.m_Bitmap.GetLength() > 0)
 	{
 		char bmStr[256];
-		strcpy(bmStr, m_pocketOpts.m_Bitmap);
+		strcpy_s(bmStr, m_pocketOpts.m_Bitmap);
 		m_pocketOpts.areaDIB = LoadDIB(bmStr);//ReadDIBFile(bmpFile);
 		if(m_pocketOpts.areaDIB)
 		{
@@ -10922,7 +10922,7 @@ void CClimAnalysis::LoadRunPocketOptions(CRunPocketCardSet *pocketSet)
 			{
 				CStationInSIGSet sigSet(pDB);
 				char tmpStr[64];
-				strcpy(tmpStr, fpSet->m_SIG_Station);
+				strcpy_s(tmpStr, fpSet->m_SIG_Station);
 				sigSet.m_strFilter.Format("[SIG] = '%s'", &tmpStr[6]);
 				sigSet.Open();
 				if(!sigSet.IsBOF())
@@ -11111,7 +11111,7 @@ void CClimAnalysis::LoadPocketOptions(CPocketCardSet *pocketSet, int _varID)
 	if(m_pocketOpts.m_Bitmap.GetLength() > 0)
 	{
 		char bmStr[256];
-		strcpy(bmStr, m_pocketOpts.m_Bitmap);
+		strcpy_s(bmStr, m_pocketOpts.m_Bitmap);
 		m_pocketOpts.areaDIB = LoadDIB(bmStr);//ReadDIBFile(bmpFile);
 		if(m_pocketOpts.areaDIB)
 		{
@@ -11133,7 +11133,7 @@ void CClimAnalysis::LoadPocketOptions(CPocketCardSet *pocketSet, int _varID)
 			{
 				CStationInSIGSet sigSet(pDB);
 				char tmpStr[64];
-				strcpy(tmpStr, fpSet->m_SIG_Station);
+				strcpy_s(tmpStr, fpSet->m_SIG_Station);
 				sigSet.m_strFilter.Format("[SIG] = '%s'", &tmpStr[6]);
 				sigSet.Open();
 				if(!sigSet.IsBOF())

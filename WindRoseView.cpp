@@ -675,7 +675,7 @@ void CWindRoseView::OnFileSaveAs()
 		DrawToDCRegion(&memhdc, rect);
 		SelectObject(memhdc.m_hDC, Old);
 		char fName[256];
-		strcpy(fName, fd.GetPathName());
+		strcpy_s(fName, fd.GetPathName());
 		SaveBitmapFile(memhdc.m_hDC, picture, fName); 
 	//	SelectObject(memhdc.m_hDC, Old);
 		ReleaseDC(whdc);

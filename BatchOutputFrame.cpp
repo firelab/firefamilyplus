@@ -792,7 +792,7 @@ void CBatchOutputFrame::OnFileSave()
 				CRect rect(0, 0, 640, 480);
 				pView->DrawToDCRegion(&memhdc, rect);
 				char fName[256];
-				strcpy(fName, fd.GetPathName());
+				strcpy_s(fName, fd.GetPathName());
 				SaveBitmapFile(memhdc.m_hDC, picture, fName); 
 				SelectObject(memhdc.m_hDC, Old);
 				ReleaseDC(whdc);
@@ -824,7 +824,7 @@ void CBatchOutputFrame::OnFileSave()
 				CRect rect(0, 0, 640, 480);
 				pView->DrawToDCRegion(&memhdc, rect);
 				char fName[256];
-				strcpy(fName, fd.GetPathName());
+				strcpy_s(fName, fd.GetPathName());
 				SaveBitmapFile(memhdc.m_hDC, picture, fName); 
 				SelectObject(memhdc.m_hDC, Old);
 				ReleaseDC(whdc);
@@ -854,7 +854,7 @@ void CBatchOutputFrame::OnFileSave()
 				CRect rect(0, 0, 640, 480);
 				pView->DrawToDCRegion(&memhdc, rect);
 				char fName[256];
-				strcpy(fName, fd.GetPathName());
+				strcpy_s(fName, fd.GetPathName());
 				SaveBitmapFile(memhdc.m_hDC, picture, fName); 
 				SelectObject(memhdc.m_hDC, Old);
 				ReleaseDC(whdc);
@@ -1136,7 +1136,7 @@ void CBatchOutputFrame::OnDataAddtocandidateslist()
 		{//SIG...just pick first station
 			CStationInSIGSet staSigSet(m_pDoc->m_pDB);
 			char sig[64];
-			strcpy(sig, m_pDoc->activeClim->m_sigStaID);
+			strcpy_s(sig, m_pDoc->activeClim->m_sigStaID);
 			staSigSet.m_strFilter.Format("[SIG] = '%-20.20s'", &sig[6]);
 			staSigSet.Open();
 			if(!staSigSet.IsEOF())
@@ -1236,7 +1236,7 @@ void CBatchOutputFrame::OnDataEditsig()
 	if(m_pDoc->activeClim->m_sigStaID.GetLength() > 6)//it's a SIG
 	{
 		char tmpStr[64];
-		strcpy(tmpStr, m_pDoc->activeClim->m_sigStaID);
+		strcpy_s(tmpStr, m_pDoc->activeClim->m_sigStaID);
 		CSIGSet sigSet(m_pDoc->activeClim->m_pDB);
 		sigSet.m_strFilter.Format("[SIG] = '%s'", &tmpStr[6]);
 		sigSet.Open();

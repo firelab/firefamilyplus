@@ -26,7 +26,7 @@ CLFIengine::CLFIengine(CDatabase *pDB, int herbWoodyFlag, CString SIG_Station, b
 	m_WoodyMaxGSI = 1.0;
 	m_WoodyGreenup = 0.5;
 	m_WoodyMax = 200.0;
-	m_WoodyMin = 50.0;
+	m_WoodyMin = 60.0;
 	m_HerbSlope = 1.0;
 	m_HerbIntercept = 1.0;
 	m_WoodySlope = 1.0;
@@ -316,3 +316,24 @@ double CLFIengine::GetUseRTPrecip()
 {
 	return m_UseRTPrecip;
 }
+
+double CLFIengine::GetHerbMin()
+{
+	return m_HerbMin;
+}
+
+double CLFIengine::GetHerbMax()
+{
+	return m_HerbMax;
+}
+
+double CLFIengine::GetWoodyMin()
+{
+	return m_WoodyMin;
+}
+
+double CLFIengine::GetWoodyMax()
+{
+	return m_WoodyMax;
+}
+

@@ -334,7 +334,7 @@ void CClimateView::OnInitialUpdate()
 	if (m_pSet->IsOpen())
 	{
 		char strTitle[256];
-		strcpy(strTitle, m_pSet->m_pDatabase->GetDatabaseName());
+		strcpy_s(strTitle, m_pSet->m_pDatabase->GetDatabaseName());
 		int loc;
 		for(loc = strlen(strTitle); loc > 0; loc--)
 		{
@@ -344,7 +344,7 @@ void CClimateView::OnInitialUpdate()
 				break;
 			}
 		}
-		strcpy(strTitle, &strTitle[loc]);
+		strcpy_s(strTitle, &strTitle[loc]);
 		strcat(strTitle, " Climatology Options");
 		GetDocument()->SetTitle(strTitle);
 	}

@@ -29,6 +29,10 @@ public:
 	double GetRTPcpMin();
 	double GetRTPcpMax();
 	double GetUseRTPrecip();
+	double GetHerbMin();
+	double GetHerbMax();
+	double GetWoodyMin();
+	double GetWoodyMax();
 private:
 	CDatabase *m_pDB;
 	int m_LFIdaysAvg;

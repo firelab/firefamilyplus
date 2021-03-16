@@ -468,25 +468,25 @@ void CUserImportDialog::OnImportbutton()
 	//open database and prepare to append records.
 	char delim[8] = "";
 	if(m_comma)
-		strcpy(delim, ",");
+		strcpy_s(delim, ",");
 	if(m_space)
 	{
 		if(strlen(delim) <= 0)
-			strcpy(delim, " ");
+			strcpy_s(delim, " ");
 		else
 			strcat(delim, " ");
 	}
 	if(m_tab)
 	{
 		if(strlen(delim) <= 0)
-			strcpy(delim, "\t");
+			strcpy_s(delim, "\t");
 		else
 			strcat(delim, "\t");
 	}
 	if(m_semicolon)
 	{
 		if(strlen(delim) <= 0)
-			strcpy(delim, ";");
+			strcpy_s(delim, ";");
 		else
 			strcat(delim, ";");
 	}

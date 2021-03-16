@@ -62,7 +62,7 @@ CNFDRSParams::CNFDRSParams()
 	m_timeZoneOffsetHours = 0;
 	m_herbParams.setLiveFuelMoistureMin(30);
 	m_herbParams.setLiveFuelMoistureMax(250);
-	m_woodyParams.setLiveFuelMoistureMin(50);
+	m_woodyParams.setLiveFuelMoistureMin(60);
 	m_woodyParams.setLiveFuelMoistureMax(200);
 }
 
@@ -105,11 +105,13 @@ void CNFDRSParams::InitNFDRS(NFDR2016Calc* pNFDRS)
 	CGSIParams herb = getHerbParams();
 	pNFDRS->SetHerbGSIparams(herb.getGsiMax(), herb.getGsiHerbGreenup(), herb.getGsiTminMin(), herb.getGsiTminMax(), herb.getGsiVpdMin(),
 		herb.getGsiVpdMax(), herb.getGsiDaylenMin(), herb.getGsiDaylenMax(), herb.getGsiAveragingPeriod(),
-		herb.getUseVpdAverage(), herb.getNumPrecipDays(), herb.getRunningTotalPrecipMin(), herb.getRunningTotalPrecipMax(), herb.getUseRTPrecip());
+		herb.getUseVpdAverage(), herb.getNumPrecipDays(), herb.getRunningTotalPrecipMin(), herb.getRunningTotalPrecipMax(), herb.getUseRTPrecip(),
+		herb.getLiveFuelMoistureMin(), herb.getLiveFuelMoistureMax());
 	CGSIParams woody = getWoodyParams();
 	pNFDRS->SetWoodyGSIparams(woody.getGsiMax(), woody.getGsiHerbGreenup(), woody.getGsiTminMin(), woody.getGsiTminMax(), woody.getGsiVpdMin(),
 		woody.getGsiVpdMax(), woody.getGsiDaylenMin(), woody.getGsiDaylenMax(), woody.getGsiAveragingPeriod(),
-		woody.getUseVpdAverage(), woody.getNumPrecipDays(), woody.getRunningTotalPrecipMin(), woody.getRunningTotalPrecipMax(), woody.getUseRTPrecip());
+		woody.getUseVpdAverage(), woody.getNumPrecipDays(), woody.getRunningTotalPrecipMin(), woody.getRunningTotalPrecipMax(), woody.getUseRTPrecip(),
+		woody.getLiveFuelMoistureMin(), woody.getLiveFuelMoistureMax());
 	pNFDRS->SetStartKBDI(getStartKbdi());
 	if (getMaxSC() > 0)
 		pNFDRS->SetSCMax(getMaxSC());

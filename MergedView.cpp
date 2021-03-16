@@ -702,7 +702,7 @@ void CMergedView::OnFileSaveAs()
 		CRect rect(0, 0, saveWidth, saveHeight);
 		DrawToDCRegion(&memhdc, rect);
 		char fName[256];
-		strcpy(fName, fd.GetPathName());
+		strcpy_s(fName, fd.GetPathName());
 		SaveBitmapFile(memhdc.m_hDC, picture, fName); 
 		SelectObject(memhdc.m_hDC, Old);
 		ReleaseDC(whdc);

@@ -603,7 +603,7 @@ BOOL CForecastDialog::OnInitDialog()
 	if(strncmp(fpSet->m_SIG_Station, "SIG", 3) == 0)//SIG
 	{
 		char temp[64], sig[128];
-		strcpy(sig, fpSet->m_SIG_Station);
+		strcpy_s(sig, fpSet->m_SIG_Station);
 		CStationInSIGSet sSet(fpSet->m_pDatabase);
 		sprintf(temp, "[SIG] = '%-20.20s'", &sig[6]);
 		sSet.m_strFilter = _T(temp);
@@ -733,7 +733,7 @@ void CForecastDialog::DoReport()
 	{
 		char temp[64], sig[128];
 		isSIG = true;
-		strcpy(sig, fpSet->m_SIG_Station);
+		strcpy_s(sig, fpSet->m_SIG_Station);
 		CStationInSIGSet sSet(fpSet->m_pDatabase);
 		sprintf(temp, "[SIG] = '%-20.20s'", &sig[6]);
 		sSet.m_strFilter = _T(temp);
@@ -1476,7 +1476,7 @@ void CForecastDialog::OnCalculate()
 		memset(sig_dsr, 0, nDays * sizeof(double));
 		memset(sig_fERC, 0, nDays * sizeof(double));
 		char temp[64], sig[128];
-		strcpy(sig, fpSet->m_SIG_Station);
+		strcpy_s(sig, fpSet->m_SIG_Station);
 		CStationInSIGSet sSet(fpSet->m_pDatabase);
 		sprintf(temp, "[SIG] = '%-20.20s'", &sig[6]);
 		sSet.m_strFilter = _T(temp);

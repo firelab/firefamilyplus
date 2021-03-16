@@ -687,7 +687,7 @@ void CFireStats::BuildQuick(CFireplusSet *fpSet, bool probabilities, BOOL condit
 		staSet.Open();
 		CStationInSIGSet stas(fpSet->m_pDatabase);
 		char tSig[64];
-		strcpy(tSig, fpSet->m_SIG_Station);
+		strcpy_s(tSig, fpSet->m_SIG_Station);
 		stas.m_strFilter.Format("[SIG] = '%s'", &tSig[6]);
 		stas.Open();
 		while(!stas.IsEOF())
@@ -992,7 +992,7 @@ void CFireStats::Build(CFireplusSet *fpSet, bool probabilities, BOOL conditional
 		staSet.Open();
 		CStationInSIGSet stas(fpSet->m_pDatabase);
 		char tSig[64];
-		strcpy(tSig, fpSet->m_SIG_Station);
+		strcpy_s(tSig, fpSet->m_SIG_Station);
 		stas.m_strFilter.Format("[SIG] = '%s'", &tSig[6]);
 		stas.Open();
 		while(!stas.IsEOF())

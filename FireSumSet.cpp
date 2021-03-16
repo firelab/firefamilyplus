@@ -136,7 +136,7 @@ bool CFireSumSet::FilterToWorkingSet(CFireplusSet * fpSet, int causeType, int mo
 {
 	CFireAssocSet assocSet(fpSet->m_pDatabase);
 	char tStr[64];
-	strcpy(tStr, fpSet->m_SIG_Station);
+	strcpy_s(tStr, fpSet->m_SIG_Station);
 	assocSet.m_strFilter.Format("[SIG/Station] = '%s'", 
 		strlen(tStr) > 6 ? &tStr[6] : tStr);
 	assocSet.Open();

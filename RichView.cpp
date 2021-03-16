@@ -487,7 +487,7 @@ void CRichView::OnFileSaveAs()
 	{
 		CRichDoc *pDoc = (CRichDoc *)GetDocument();
 		char trg[MAX_PATH];
-		strcpy(trg, fd.GetPathName());
+		strcpy_s(trg, fd.GetPathName());
 		if(pDoc)
 			pDoc->OnSaveDocument(trg);
 		theApp.SetUserDir(fd.GetPathName());

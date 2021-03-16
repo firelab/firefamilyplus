@@ -149,7 +149,7 @@ void CAddToTermDialog::AddEventsToTerm(int tID)
 		
 		{
 
-			strcpy(buf, (LPCTSTR) strLine);
+			strcpy_s(buf, (LPCTSTR) strLine);
 	
 			
 			buf[10] = 0;

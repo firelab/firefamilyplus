@@ -615,7 +615,7 @@ void CCumulativeBars::OnLButtonUp(UINT nFlags, CPoint point)
 		y1 = rect.Height() / 10;
 		y0 = rect.bottom - 2 * y1;*/
 		if(point.x < x0 || point.x > x1 )
-			strcpy(xtext, "NA");
+			strcpy_s(xtext, "NA");
 		else
 		{
 			//int bw, gap, skip;
@@ -633,7 +633,7 @@ void CCumulativeBars::OnLButtonUp(UINT nFlags, CPoint point)
 				sprintf(xtext, "%.0f", x);
 		}
 		if(point.y > y0 || point.y < y1)
-			strcpy(ytext, "NA");
+			strcpy_s(ytext, "NA");
 		else
 		{
 			//double y = -(((double)(point.y - y0)) / ((double)(y0 - y1)));

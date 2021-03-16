@@ -162,7 +162,7 @@ void CFireStatFrame::OnFileSaveGraph()
 		CRect rect(0, 0, 640, 480);
 		((CFireStatGraph *)m_wndSplitter.GetPane(0, 1))->DrawToDCRegion(&memhdc, rect);
 		char fName[256];
-		strcpy(fName, fd.GetPathName());
+		strcpy_s(fName, fd.GetPathName());
 		SaveBitmapFile(memhdc.m_hDC, picture, fName); 
 		SelectObject(memhdc.m_hDC, Old);
 		ReleaseDC(whdc);

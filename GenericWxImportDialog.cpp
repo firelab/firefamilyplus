@@ -882,9 +882,9 @@ void CGenericWxImportDialog::OnGenericWx(){
 		stream2.getline(sComplete,MAX_INPUT_LINE,delim);
 		//static values?
 		if(staticObsType)
-			strcpy(sObsType, obsType);
+			strcpy_s(sObsType, obsType);
 		if(staticObsTime)
-			strcpy(sObsTime, obsTime);
+			strcpy_s(sObsTime, obsTime);
 
 		COleDateTime obsDate;
 
@@ -895,7 +895,7 @@ void CGenericWxImportDialog::OnGenericWx(){
 		sprintf(logMsg,"%s %s",sObsDate,sObsTime);
 
 		if(strlen(sStationID) <= 0 && stationID.GetLength() > 0)
-			strcpy(sStationID, stationID);
+			strcpy_s(sStationID, stationID);
 		if (strlen(sStationID) < 1)
 		{
 			if (stationID.GetLength() < 1)

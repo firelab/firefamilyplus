@@ -331,7 +331,7 @@ DBFOpen( const char * pszFilename, const char * pszAccess )
 /*	on the passed in filename we will strip it off.			*/
 /* -------------------------------------------------------------------- */
     pszBasename = (char *) malloc(strlen(pszFilename)+5);
-    strcpy( pszBasename, pszFilename );
+    strcpy( pszBasename, pszFilename);
     for( i = strlen(pszBasename)-1; 
 	 i > 0 && pszBasename[i] != '.' && pszBasename[i] != '/'
 	       && pszBasename[i] != '\\';

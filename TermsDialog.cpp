@@ -574,7 +574,7 @@ void CTermsDialog::OnBnClickedButtonImport()
 	{
 		char fName[256], tmp[512],tmp2[512];
 		CString msg;
-		strcpy(fName, dlg.GetPathName());
+		strcpy_s(fName, dlg.GetPathName());
 		FILE *in = fopen(fName, "rt");
 		if(!in)
 		{
@@ -613,7 +613,7 @@ void CTermsDialog::OnBnClickedButtonImport()
 			records->m_SIG_Station = tStationID;//m_fpSet->m_SIG_Station;
 			if(fgets(buf, 511, in))//Name
 			{
-				strcpy(tmp, &buf[1]);
+				strcpy_s(tmp, &buf[1]);
 				stripCRLF(tmp);
 				int q = strlen(tmp) - 1;
 				if(q >= 0)
@@ -624,7 +624,7 @@ void CTermsDialog::OnBnClickedButtonImport()
 				{
 					int len = 0;
 					int more = false;
-					strcpy(tmp, &buf[1]);
+					strcpy_s(tmp, &buf[1]);
 					//stripCRLF(tmp);
 					q = strlen(tmp) - 2;
 					if(q>=0)
@@ -638,13 +638,13 @@ void CTermsDialog::OnBnClickedButtonImport()
 							tmp[q] = 0;
 						}
 						len = q + 2;
-						//strcpy(tmp
+						//strcpy_s(tmp
 						removeChar(tmp,'\"');
 						records->m_Comment = tmp;
 						while(more)
 						{
 							fgets(buf, 511, in);
-							strcpy(tmp, buf);
+							strcpy_s(tmp, buf);
 							//stripCRLF(tmp);
 							q = strlen(tmp) - 2;
 							more = false;

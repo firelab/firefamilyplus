@@ -176,7 +176,7 @@ void CDPFrame::OnFileSaveGraphClasspercentages()
 		CRect rect(0, 0, 480, 640);
 		((CDPFormView *)m_wndSplitter2.GetPane(0, 1))->DrawToDCRegion(&memhdc, rect);
 		char fName[256];
-		strcpy(fName, fd.GetPathName());
+		strcpy_s(fName, fd.GetPathName());
 		SaveBitmapFile(memhdc.m_hDC, picture, fName); 
 		SelectObject(memhdc.m_hDC, Old);
 		ReleaseDC(whdc);
@@ -205,7 +205,7 @@ void CDPFrame::OnFileSaveGraphPercentiles()
 		CRect rect(0, 0, 640, 480);
 		((CDPPcntView *)m_wndSplitter3.GetPane(0, 0))->DrawToDCRegion(&memhdc, rect);
 		char fName[256];
-		strcpy(fName, fd.GetPathName());
+		strcpy_s(fName, fd.GetPathName());
 		SaveBitmapFile(memhdc.m_hDC, picture, fName); 
 		SelectObject(memhdc.m_hDC, Old);
 		ReleaseDC(whdc);
@@ -233,7 +233,7 @@ void CDPFrame::OnFileSaveGraphProbabilities()
 		CRect rect(0, 0, 640, 480);
 		((CDPProbView *)m_wndSplitter3.GetPane(1, 0))->DrawToDCRegion(&memhdc, rect);
 		char fName[256];
-		strcpy(fName, fd.GetPathName());
+		strcpy_s(fName, fd.GetPathName());
 		SaveBitmapFile(memhdc.m_hDC, picture, fName); 
 		SelectObject(memhdc.m_hDC, Old);
 		ReleaseDC(whdc);

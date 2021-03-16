@@ -270,7 +270,7 @@ void CWindRoseDialog::OnOK()
 	{
 		isSIG = true;
 		query += " and (";
-		strcpy(sigName, tStr);
+		strcpy_s(sigName, tStr);
 		sSet.m_strFilter.Format("[SIG] = '%s'", &sigName[6]);
 		sSet.Open();
 		int count = 0;
@@ -1118,7 +1118,7 @@ void CWindRoseDialog::OnOK()
 
 	              if (fpSet->m_SIG_Station.GetLength() > 6){   // SIG
 		             char sig[64];
-		             strcpy(sig, fpSet->m_SIG_Station);
+		             strcpy_s(sig, fpSet->m_SIG_Station);
 		             CString temp;
 		             CStationInSIGSet sSet(fpSet->m_pDatabase);
 		

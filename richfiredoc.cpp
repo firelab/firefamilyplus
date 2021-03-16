@@ -190,7 +190,7 @@ void CRichFireDoc::OnCloseDocument()
 	char temp[256];
 	bool itemp = isTemp;
 	CString pStr = GetPathName();
-	strcpy(temp, tName);
+	strcpy_s(temp, tName);
 	CRichEditDoc::OnCloseDocument();
 	if(itemp || (!itemp && strcmpi(temp, pStr) != 0))
 		unlink(temp);
@@ -320,7 +320,7 @@ void CRichFireDoc::OnDataAddtocandidateslist()
 	{//SIG...just pick first station
 		CStationInSIGSet staSigSet(fpSet->m_pDatabase);
 		char sig[64];
-		strcpy(sig, fpSet->m_SIG_Station);
+		strcpy_s(sig, fpSet->m_SIG_Station);
 		staSigSet.m_strFilter.Format("[SIG] = '%-20.20s'", &sig[6]);
 		staSigSet.Open();
 		if(!staSigSet.IsEOF())

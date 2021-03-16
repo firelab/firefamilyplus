@@ -921,9 +921,9 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
     CFireAssocSet associations(records->m_pDatabase);
 	char tStr[64];
 	if(fpSet)
-		strcpy(tStr, fpSet->m_SIG_Station);
+		strcpy_s(tStr, fpSet->m_SIG_Station);
 	else
-		strcpy(tStr, "######");
+		strcpy_s(tStr, "######");
 	associations.m_strFilter.Format("[SIG/Station] = '%s'", strlen(tStr) > 6 ? &tStr[6] : tStr);
 	associations.Open();
 	if(associations.IsBOF() || associations.IsEOF())
