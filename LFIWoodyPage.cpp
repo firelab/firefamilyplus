@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "fireplus.h"
 #include "LFIWoodyPage.h"
+//#include "ClimAnalysis.h"
 
 
 // CLFIWoodyPage dialog
@@ -72,6 +73,7 @@ void CLFIWoodyPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_PRECIP_MAX2, m_editPcpMax);
 	DDX_Control(pDX, IDC_SPIN_PRECIP_MAX2, m_spinPcpMax);
 	DDX_Control(pDX, IDC_CHECK_USE_RTPRECIP, m_btnUseRTPrecip);
+	DDX_Control(pDX, IDC_BUTTON_CALC_GSI, m_btnCalcMaxGSI);
 }
 
 
@@ -111,6 +113,7 @@ BEGIN_MESSAGE_MAP(CLFIWoodyPage, CPropertyPage)
 	ON_EN_CHANGE(IDC_EDIT_PRECIP_MAX2, &CLFIWoodyPage::OnEnChangeEditPrecipMax)
 	ON_CBN_SELCHANGE(IDC_COMBO_VPD_USAGE, &CLFIWoodyPage::OnCbnSelchangeComboVpdUsage)
 	ON_BN_CLICKED(IDC_CHECK_USE_RTPRECIP, &CLFIWoodyPage::OnBnClickedCheckUseRtprecip)
+	ON_BN_CLICKED(IDC_BUTTON_CALC_GSI, &CLFIWoodyPage::OnBnClickedButtonCalcGsi)
 END_MESSAGE_MAP()
 
 
@@ -238,6 +241,12 @@ BOOL CLFIWoodyPage::OnInitDialog()
 			m_comboVPD.SetCurSel(0);
 		m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
 		EnableRTPrecipFields();
+		//disable CalcMaxGSI button if the defaults...
+		//if (pLfiSet->m_SIG_Station.Compare("######") == 0)
+		//{
+			m_btnCalcMaxGSI.EnableWindow(FALSE);
+			m_btnCalcMaxGSI.ShowWindow(SW_HIDE);
+		//}
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -256,8 +265,8 @@ BOOL CLFIWoodyPage::OnApply()
 		pLfiSet->m_WoodyDaylenMin = m_spinDaylenMin.GetPos();
 		pLfiSet->m_WoodyDaylenMax = m_spinDaylenMax.GetPos();
 		//pLfiSet->m_WoodyUseVPDAvg = ((CButton *)GetDlgItem(IDC_RADIO_VPD_AVG))->GetCheck();
-		int sel = m_comboVPD.GetCurSel();
-		if (sel == 1)
+		//int sel = m_comboVPD.GetCurSel();
+		if (m_comboVPD.GetCurSel() == 1)
 			pLfiSet->m_WoodyUseVPDAvg = TRUE;
 		else
 			pLfiSet->m_WoodyUseVPDAvg = FALSE;
@@ -277,7 +286,7 @@ BOOL CLFIWoodyPage::OnApply()
 
 void CLFIWoodyPage::OnDeltaposSpinTminmin(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -289,7 +298,7 @@ void CLFIWoodyPage::OnEnChangeEditTminmin()
 
 void CLFIWoodyPage::OnDeltaposSpinTminmax(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -301,7 +310,7 @@ void CLFIWoodyPage::OnEnChangeEditTminmax()
 
 void CLFIWoodyPage::OnDeltaposSpinVpdmin(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -313,7 +322,7 @@ void CLFIWoodyPage::OnEnChangeEditVpdmin()
 
 void CLFIWoodyPage::OnDeltaposSpinVpdmax(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -325,7 +334,7 @@ void CLFIWoodyPage::OnEnChangeEditVpdmax()
 
 void CLFIWoodyPage::OnDeltaposSpinDaylenmin(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -337,7 +346,7 @@ void CLFIWoodyPage::OnEnChangeEditDaylenmin()
 
 void CLFIWoodyPage::OnDeltaposSpinDaylenmax(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -349,7 +358,7 @@ void CLFIWoodyPage::OnEnChangeEditDaylenmax()
 
 void CLFIWoodyPage::OnDeltaposSpinDaysAvg(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -361,7 +370,7 @@ void CLFIWoodyPage::OnEnChangeEditDaysAvg()
 
 void CLFIWoodyPage::OnDeltaposSpinMaxgsi(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -373,7 +382,7 @@ void CLFIWoodyPage::OnEnChangeEditMaxgsi()
 
 void CLFIWoodyPage::OnDeltaposSpinGreenup(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -385,7 +394,7 @@ void CLFIWoodyPage::OnEnChangeEditGreenup()
 
 void CLFIWoodyPage::OnDeltaposSpinMaxherbfm(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -397,7 +406,7 @@ void CLFIWoodyPage::OnEnChangeEditMaxherbfm()
 
 void CLFIWoodyPage::OnDeltaposSpinMinherbfm(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -409,7 +418,7 @@ void CLFIWoodyPage::OnEnChangeEditMinherbfm()
 
 void CLFIWoodyPage::OnDeltaposSpinPcpDays(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -544,7 +553,7 @@ void CLFIWoodyPage::OnBnClickedButtonSaveDefaults()
 
 void CLFIWoodyPage::OnDeltaposSpinPrecipMin(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -552,7 +561,7 @@ void CLFIWoodyPage::OnDeltaposSpinPrecipMin(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CLFIWoodyPage::OnDeltaposSpinPrecipMax(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -592,4 +601,10 @@ void CLFIWoodyPage::EnableRTPrecipFields()
 	m_spinPcpMax.EnableWindow(check);
 	m_editPcpDays.EnableWindow(check);
 	m_spinPcpDays.EnableWindow(check);
+}
+
+
+void CLFIWoodyPage::OnBnClickedButtonCalcGsi()
+{
+	// TODO: Add your control notification handler code here
 }

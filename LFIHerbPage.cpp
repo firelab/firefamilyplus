@@ -4,7 +4,9 @@
 #include "stdafx.h"
 #include "fireplus.h"
 #include "LFIHerbPage.h"
-
+//#include "ClimAnalysis.h"
+//#include "fireplusSet.h"
+//#include "fireplusDoc.h"
 
 // CLFIHerbPage dialog
 
@@ -72,6 +74,7 @@ void CLFIHerbPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_PRECIP_MAX2, m_editPcpMax);
 	DDX_Control(pDX, IDC_SPIN_PRECIP_MAX2, m_spinPcpMax);
 	DDX_Control(pDX, IDC_CHECK_USE_RTPRECIP, m_btnUseRTPrecip);
+	DDX_Control(pDX, IDC_BUTTON_CALC_GSI, m_btnCalcMaxGSI);
 }
 
 
@@ -111,6 +114,7 @@ BEGIN_MESSAGE_MAP(CLFIHerbPage, CPropertyPage)
 	ON_EN_CHANGE(IDC_EDIT_PRECIP_MAX2, &CLFIHerbPage::OnEnChangeEditPrecipMax)
 	ON_CBN_SELCHANGE(IDC_COMBO_VPD_USAGE, &CLFIHerbPage::OnCbnSelchangeComboVpdUsage)
 	ON_BN_CLICKED(IDC_CHECK_USE_RTPRECIP, &CLFIHerbPage::OnBnClickedCheckUseRtprecip)
+	ON_BN_CLICKED(IDC_BUTTON_CALC_GSI, &CLFIHerbPage::OnBnClickedButtonCalcGsi)
 END_MESSAGE_MAP()
 
 
@@ -241,6 +245,13 @@ BOOL CLFIHerbPage::OnInitDialog()
 			m_comboVPD.SetCurSel(0);
 		m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);
 		EnableRTPrecipFields();
+
+		//disable CalcMaxGSI button if the defaults...
+		//if (pLfiSet->m_SIG_Station.Compare("######") == 0)
+		//{
+			m_btnCalcMaxGSI.EnableWindow(FALSE);
+			m_btnCalcMaxGSI.ShowWindow(SW_HIDE);
+		//}
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -259,8 +270,8 @@ BOOL CLFIHerbPage::OnApply()
 		pLfiSet->m_HerbDaylenMin = m_spinDaylenMin.GetPos();
 		pLfiSet->m_HerbDaylenMax = m_spinDaylenMax.GetPos();
 		//pLfiSet->m_HerbUseVPDAvg = ((CButton *)GetDlgItem(IDC_RADIO_VPD_AVG))->GetCheck();
-		int sel = m_comboVPD.GetCurSel();
-		if (sel == 1)
+		//int sel = m_comboVPD.GetCurSel();
+		if (m_comboVPD.GetCurSel() == 1)
 			pLfiSet->m_HerbUseVPDAvg = TRUE;
 		else
 			pLfiSet->m_HerbUseVPDAvg = FALSE;
@@ -280,7 +291,7 @@ BOOL CLFIHerbPage::OnApply()
 
 void CLFIHerbPage::OnDeltaposSpinTminmin(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -292,7 +303,7 @@ void CLFIHerbPage::OnEnChangeEditTminmin()
 
 void CLFIHerbPage::OnDeltaposSpinTminmax(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -304,7 +315,7 @@ void CLFIHerbPage::OnEnChangeEditTminmax()
 
 void CLFIHerbPage::OnDeltaposSpinVpdmin(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -316,7 +327,7 @@ void CLFIHerbPage::OnEnChangeEditVpdmin()
 
 void CLFIHerbPage::OnDeltaposSpinVpdmax(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -328,7 +339,7 @@ void CLFIHerbPage::OnEnChangeEditVpdmax()
 
 void CLFIHerbPage::OnDeltaposSpinDaylenmin(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -340,7 +351,7 @@ void CLFIHerbPage::OnEnChangeEditDaylenmin()
 
 void CLFIHerbPage::OnDeltaposSpinDaylenmax(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -352,7 +363,7 @@ void CLFIHerbPage::OnEnChangeEditDaylenmax()
 
 void CLFIHerbPage::OnDeltaposSpinDaysAvg(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -364,7 +375,7 @@ void CLFIHerbPage::OnEnChangeEditDaysAvg()
 
 void CLFIHerbPage::OnDeltaposSpinMaxgsi(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -376,7 +387,7 @@ void CLFIHerbPage::OnEnChangeEditMaxgsi()
 
 void CLFIHerbPage::OnDeltaposSpinGreenup(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -388,7 +399,7 @@ void CLFIHerbPage::OnEnChangeEditGreenup()
 
 void CLFIHerbPage::OnDeltaposSpinMaxherbfm(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -400,7 +411,7 @@ void CLFIHerbPage::OnEnChangeEditMaxherbfm()
 
 void CLFIHerbPage::OnDeltaposSpinMinherbfm(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -424,7 +435,7 @@ void CLFIHerbPage::OnEnChangeEditDaysAvg()
 */
 void CLFIHerbPage::OnDeltaposSpinPcpDays(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -558,7 +569,7 @@ void CLFIHerbPage::OnBnClickedButtonSaveDefaults()
 
 void CLFIHerbPage::OnDeltaposSpinPrecipMin(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -566,7 +577,7 @@ void CLFIHerbPage::OnDeltaposSpinPrecipMin(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CLFIHerbPage::OnDeltaposSpinPrecipMax(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	//LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 	SetModified();
 	*pResult = 0;
 }
@@ -606,4 +617,33 @@ void CLFIHerbPage::EnableRTPrecipFields()
 	m_spinPcpMax.EnableWindow(check);
 	m_editPcpDays.EnableWindow(check);
 	m_spinPcpDays.EnableWindow(check);
+}
+
+//extern CFireplusApp theApp;
+CDocument* GetMDIActiveDocument()
+{
+	CDocument* pDoc = NULL;
+
+	CWnd* pWndMain = AfxGetMainWnd();
+	ASSERT(pWndMain);
+	ASSERT(pWndMain->IsKindOf(RUNTIME_CLASS(CMDIFrameWnd))); // Not an MDI app.
+
+	CFrameWnd* pFrame = ((CMDIFrameWnd*)pWndMain)->MDIGetActive();
+	if (NULL != pFrame)
+	{
+		pDoc = pFrame->GetActiveDocument(); // get the active document
+	}
+	return pDoc;
+}
+
+void CLFIHerbPage::OnBnClickedButtonCalcGsi()
+{
+	int varIDs[2];
+	varIDs[0] = 39;//GSI
+	CString strStation = pLfiSet->m_SIG_Station;
+	//CClimAnalysis clim(pLfiSet->m_pDatabase); 
+	//CFireplusSet* pfpSet = ((CFireplusDoc*)GetMDIActiveDocument())->m_fireplusSet;
+	//need to set/store GSI options, set regular GSI options to Herb GSI options
+	//clim.Analyze(varIDs, 1, pfpSet, false);
+	//clim.
 }

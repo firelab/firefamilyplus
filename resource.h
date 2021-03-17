@@ -1097,6 +1097,7 @@
 #define IDC_EDIT_DEST_FILE              1644
 #define IDC_BUTTON_DEST_FILE            1645
 #define IDC_COMBO_TIME_FORMAT           1646
+#define IDC_BUTTON_CALC_GSI             1647
 #define ID_CLIMATOLOGY                  32771
 #define ID_SIGS                         32772
 #define ID_DATA_IMPORT                  32773
@@ -1283,7 +1284,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        429
 #define _APS_NEXT_COMMAND_VALUE         33004
-#define _APS_NEXT_CONTROL_VALUE         1647
+#define _APS_NEXT_CONTROL_VALUE         1648
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

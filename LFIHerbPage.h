@@ -108,4 +108,6 @@ public:
 	CButton m_btnUseRTPrecip;
 	afx_msg void OnBnClickedCheckUseRtprecip();
 	void EnableRTPrecipFields();
+	afx_msg void OnBnClickedButtonCalcGsi();
+	CButton m_btnCalcMaxGSI;
 };

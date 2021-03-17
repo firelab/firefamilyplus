@@ -3665,7 +3665,7 @@ void CFireplusView::OnWeatherFlammapexports()
 		return;
 	CClimAnalysis ca(m_pSet->m_pDatabase);
 	ca.checkFires = false;
-	int rows = 8;
+	int rows = 7;
 	int *varIDs = new int[rows];
 	//varIDs[0] = 10;
 	varIDs[0] = 12;
@@ -3675,7 +3675,7 @@ void CFireplusView::OnWeatherFlammapexports()
 	varIDs[4] = 19;
 	varIDs[5] = 20;
 	varIDs[6] = 21;
-	varIDs[7] = 22;
+	//varIDs[7] = 22;
 	//varIDs[9] = 23;
 	//varIDs[10] = 30;
 	CString oldPlen = m_pSet->m_PeriodLength;
