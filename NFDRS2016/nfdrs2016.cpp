@@ -115,8 +115,8 @@ void NFDR2016Calc::Init(double inLat, char iFuelModel, int inSlopeClass, double 
 	AvgPrecip = inAvgAnnPrecip;                                    // Average Annual Precip
 	CummPrecip = 0.0;                                           // Place to store cummulative precip
 	KBDIThreshold = kbdiThreshold;															// Initialize the live fuel moisture models
-	//GsiFM.Initialize(Lat, true, isAnnual);
-	//HerbFM.Initialize(Lat, true, isAnnual);                           // Live Herb FM model init
+	GsiFM.Initialize(Lat, true, isAnnual);
+	HerbFM.Initialize(Lat, true, isAnnual);                           // Live Herb FM model init
 	WoodyFM.Initialize(Lat, false, false);                        // Live Woody FM model init
 	GsiFM.SetLFMParameters(GsiFM.GetMaxGSI(), GsiFM.GetGreenupThreshold(), GsiFM.GetMinLFMVal(), GsiFM.GetMaxLFMVal());
 	HerbFM.SetLFMParameters(HerbFM.GetMaxGSI(), HerbFM.GetGreenupThreshold(), HerbFM.GetMinLFMVal(), HerbFM.GetMaxLFMVal());
