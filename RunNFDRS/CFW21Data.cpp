@@ -232,6 +232,13 @@ int CFW21Data::LoadFile(const char *fw21FileName, int tzOffsetHours/* = 0*/)
 		}
 		FW21Record thisRec;
 		strDate = vFields[dtIdx];
+		trim(strDate);
+		if (strDate.empty())
+		{
+			printf("Error: DateTime is blank, line %d\n", lineNo);
+			continue;
+			continue;
+		}
 		if (firstRec)
 		{
 			//need to check for Zulu time

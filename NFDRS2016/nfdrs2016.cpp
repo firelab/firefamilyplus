@@ -48,7 +48,6 @@ NFDR2016Calc::NFDR2016Calc()
 {
 	CTA = 0.0459137;
 	NFDRSVersion = 16;                                          // NFDRS Model Version
-	num_updates = 0;                                            // Counter for number of fuel moisture update cycles
 	CummPrecip = 0.0;                                           // Place to store cummulative precip
 	YKBDI = KBDI = KBDIThreshold = 100;                                                // Starting KBDI
 	MCHERB = 30.0;
@@ -111,7 +110,6 @@ void NFDR2016Calc::Init(double inLat, char iFuelModel, int inSlopeClass, double 
 	CTA = 0.0459137;
 	NFDRSVersion = 16;                                          // NFDRS Model Version
 	Lat = inLat;                                                // Latitude (degrees)
-	num_updates = 0;                                            // Counter for number of fuel moisture update cycles
 	AvgPrecip = inAvgAnnPrecip;                                    // Average Annual Precip
 	CummPrecip = 0.0;                                           // Place to store cummulative precip
 	KBDIThreshold = kbdiThreshold;															// Initialize the live fuel moisture models
@@ -141,7 +139,12 @@ void NFDR2016Calc::Init(double inLat, char iFuelModel, int inSlopeClass, double 
 	HundredHourFM.setMaximumLocalMoisture(0.35);
 	ThousandHourFM.setMaximumLocalMoisture(0.35);
 
-	//iSetFuelModel(FuelModel);                                   // Set the Fuel model
+    OneHourFM.setMoisture(0.2);
+    TenHourFM.setMoisture(0.2);
+    HundredHourFM.setMoisture(0.2);
+    ThousandHourFM.setMoisture(0.2);
+    
+    //iSetFuelModel(FuelModel);                                   // Set the Fuel model
 	UseLoadTransfer = LT;                                       // Use Load Transfer? (bool)
 	UseCuring = Cure;                                           // Use Curing? (bool)
 	YKBDI = KBDI = StartKBDI;// = 100;                                                // Starting KBDI
@@ -285,22 +288,9 @@ void NFDR2016Calc::Update(int Year, int Month, int Day, int Hour, int Julian, do
 		PrevYear = Year;
 	}
 	
-    if (Hour == RegObsHr || num_updates == 0)
-    {
-        if (SnowDay) { SnowCovered = true; }
-        else { SnowCovered = false; }
-    }
 	if (SnowDay) { SnowCovered = true; }
 	else { SnowCovered = false; }
     double temp = (Temp - 32.0) * 5.0 / 9.0, rh = RH / 100.0, /*accprcp = PPTAcc * 2.54, */sr = SolarRad, pptamnt = PPTAmt * 2.54;
-	if (num_updates == 0)
-	{
-
-		OneHourFM.setMoisture(0.2);
-		TenHourFM.setMoisture(0.2);
-		HundredHourFM.setMoisture(0.2);
-		ThousandHourFM.setMoisture(0.2);
-	}
 
     double MyMC1 = 0, MyMC10 = 0, MyMC100 = 0, MyMC1000 = 0;
    // double PPTAmt24 = 0.0;
@@ -420,7 +410,6 @@ void NFDR2016Calc::Update(int Year, int Month, int Day, int Hour, int Julian, do
 
 	double fSC, fERC, fBI, fIC;
 	iCalcIndexes((int)WS, SlopeClass, &fSC, &fERC, &fBI, &fIC);
-	num_updates++;
     YesterdayJDay = Julian;
     lastUtcUpdateTime = thisUtcTime;
 }
@@ -447,23 +436,9 @@ void NFDR2016Calc::Update(int Year, int Month, int Day, int Hour, double Temp, d
         PrevYear = Year;
     }
 
-    if (Hour == m_regObsHour || num_updates == 0)
-    {
-        if (SnowDay) { SnowCovered = true; }
-        else { SnowCovered = false; }
-    }
     if (SnowDay) { SnowCovered = true; }
     else { SnowCovered = false; }
     double temp = (Temp - 32.0) * 5.0 / 9.0, rh = RH / 100.0, /*accprcp = PPTAcc * 2.54, */sr = SolarRad, pptamnt = PPTAmt * 2.54;
-    if (num_updates == 0)
-    {
-
-        OneHourFM.setMoisture(0.2);
-        TenHourFM.setMoisture(0.2);
-        HundredHourFM.setMoisture(0.2);
-        ThousandHourFM.setMoisture(0.2);
-    }
-
     double MyMC1 = 0, MyMC10 = 0, MyMC100 = 0, MyMC1000 = 0;
     // double PPTAmt24 = 0.0;
     double neltemp = floor(temp * 100 + 0.5) / 100;
@@ -617,7 +592,6 @@ void NFDR2016Calc::Update(int Year, int Month, int Day, int Hour, double Temp, d
 
     double fSC, fERC, fBI, fIC;
     iCalcIndexes((int)WS, SlopeClass, &fSC, &fERC, &fBI, &fIC);
-    num_updates++;
     YesterdayJDay = Julian;
     lastUtcUpdateTime = thisUtcTime;
 }
@@ -694,7 +668,6 @@ void NFDR2016Calc::UpdateDaily(int Year, int Month, int Day, int Julian, double 
 		iCalcIndexes((int)WS, SlopeClass, &fSC, &fERC, &fBI, &fIC);
 
 
-	num_updates++;
 	YesterdayJDay = Julian;
 
 	//lastUpdateTime = thisTime;
@@ -1405,7 +1378,6 @@ bool NFDR2016Calc::LoadState(NFDR2016CalcState state)
 	MCHERB = state.m_MCHERB;
 	MCWOOD = state.m_MCWOOD;
 	nConsectiveSnowDays = state.m_nConsectiveSnowDays;
-	num_updates = state.m_num_updates;
 	PrevYear = state.m_PrevYear;
 	SC = state.m_SC;
 	StartKBDI = state.m_StartKBDI;

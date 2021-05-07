@@ -22,7 +22,6 @@ NFDR2016CalcState::NFDR2016CalcState(const NFDR2016CalcState& rhs)
 	herbState = rhs.herbState;
 	woodyState = rhs.woodyState;
 	m_Lat = rhs.m_Lat;
-	m_num_updates = rhs.m_num_updates;
 	m_YesterdayJDay = rhs.m_YesterdayJDay;
 	m_SlopeClass = rhs.m_SlopeClass;
 	m_FuelModel = rhs.m_FuelModel;
@@ -82,7 +81,6 @@ NFDR2016CalcState::NFDR2016CalcState(NFDR2016Calc *pNFDRS)
 	m_MCWOOD = pNFDRS->MCWOOD;
 	m_nConsectiveSnowDays = pNFDRS->nConsectiveSnowDays;
 	m_NFDRSVersion = pNFDRS->NFDRSVersion;
-	m_num_updates = pNFDRS->num_updates;
 	m_PrevYear = pNFDRS->PrevYear;
 	m_SC = pNFDRS->SC;
 	m_SlopeClass = pNFDRS->SlopeClass;
@@ -181,12 +179,6 @@ bool NFDR2016CalcState::LoadState(std::string fileName)
 	}
 
 	nRead = fread(&m_Lat, sizeof(m_Lat), 1, in);
-	if (nRead != 1)
-	{
-		fclose(in);
-		return false;
-	}
-	nRead = fread(&m_num_updates, sizeof(m_num_updates), 1, in);
 	if (nRead != 1)
 	{
 		fclose(in);
@@ -520,12 +512,6 @@ bool NFDR2016CalcState::SaveState(std::string fileName)
 		return false;
 	}
 	nWrite = fwrite(&m_Lat, sizeof(m_Lat), 1, out);
-	if (nWrite != 1)
-	{
-		fclose(out);
-		return false;
-	}
-	nWrite = fwrite(&m_num_updates, sizeof(m_num_updates), 1, out);
 	if (nWrite != 1)
 	{
 		fclose(out);
