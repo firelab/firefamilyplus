@@ -232,7 +232,7 @@ int main(int argc, char* argv[])
 	time_t endTime = clock();
 	int total = endTime - startTime;
 	printf("Total milliseconds time for NFDRS: %d\n", total);
-	if (strlen(saveStateFileName) > 0)
+	if (saveStateFileName && strlen(saveStateFileName) > 0)
 	{
 		bool success = fw21Calc.SaveState(saveStateFileName);
 		if (!success)

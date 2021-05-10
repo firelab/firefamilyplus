@@ -94,13 +94,6 @@ public:
 	void SetMinRH(double minRH) { m_minRH = minRH; }
 	void SetPcp24(double pcp24) { m_pcp24 = pcp24; }
 private:
-	/*tm m_dateTime;
-	double m_temp;
-	double m_RH;
-	double m_pcp;
-	double m_windSpeed;
-	double m_solarRadiation;
-	int m_snowFlag;*/
 	double m_minTemp;
 	double m_maxTemp;
 	double m_minRH;
@@ -120,18 +113,16 @@ public:
 	size_t GetNumRecs() { return m_recs.size(); }
 	bool TimeIsZulu() {return m_bTimeIsZulu; }
 	tm ParseISO8061(const std::string input);
+	int AddRecord(FW21Record rec);
+	int WriteFile(const char* fw21FileName, int offsetHours);
+
 private:
 	std::string m_fileName;
 	std::vector< FW21Record> m_recs;
 	bool m_bTimeIsZulu;
 	int m_timeZoneOffset;
-	//queues necessary for daily min and max and/or totals for building NFDRSRec's
-	//std::deque<double> m_qTemp;
-	//std::deque<double> m_qRH;
-	//std::deque<double> m_qPcp;
-	//int Get24HourTempMin(size_t trgRec);
-	//int Get24HourTempMax(size_t trgRec);
-	//int Get24HourRHMin(size_t trgRec);
-	//double Get24HourPrecip(size_t trgRec);
+	std::vector<std::string> m_vFieldNames = { "DateTime","Temperature(F)","RelativeHumidity(%)","Precipitation(in)",
+		"WindSpeed(mph)","WindAzimuth(degrees)","SolarRadiation(W/m2)","SnowFlag","GustSpeed(mph)","GustAzimuth(degrees)" };
+
 };
 

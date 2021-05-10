@@ -3,6 +3,8 @@
 #include <vector>
 #include "csv_readrow.h"
 #include "utctime.h"
+#include <iostream>
+#include <iomanip>
 
 using namespace std;
 using namespace utctime;
@@ -163,8 +165,8 @@ CFW21Data::~CFW21Data()
 int CFW21Data::LoadFile(const char *fw21FileName, int tzOffsetHours/* = 0*/)
 {
 	m_timeZoneOffset = tzOffsetHours;
-	vector<string> vFieldNames = { "DateTime","Temperature(F)","RelativeHumidity(%)","Precipitation(in)",
-		"WindSpeed(mph)","WindAzimuth(degrees)","SolarRadiation(W/m2)","SnowFlag","GustSpeed(mph)","GustAzimuth(degrees)" };
+	//vector<string> vFieldNames = { "DateTime","Temperature(F)","RelativeHumidity(%)","Precipitation(in)",
+	//	"WindSpeed(mph)","WindAzimuth(degrees)","SolarRadiation(W/m2)","SnowFlag","GustSpeed(mph)","GustAzimuth(degrees)" };
 	m_fileName = fw21FileName;
 	ifstream stream;
 	stream.open(m_fileName);
@@ -181,37 +183,37 @@ int CFW21Data::LoadFile(const char *fw21FileName, int tzOffsetHours/* = 0*/)
 	vector<string> vFields = csv_read_row(line, ',');
 	//get field Indexes
 	int dtIdx, tmpIdx, rhIdx, pcpIdx, wsIdx, wdirIdx, srIdx, snowIdx, gsIdx, gdirIdx;
-	dtIdx = getColIndex(vFieldNames[0], vFields);
-	tmpIdx = getColIndex(vFieldNames[1], vFields);
-	rhIdx = getColIndex(vFieldNames[2], vFields);
-	pcpIdx = getColIndex(vFieldNames[3], vFields);
-	wsIdx = getColIndex(vFieldNames[4], vFields);
-	wdirIdx = getColIndex(vFieldNames[5], vFields);
-	srIdx = getColIndex(vFieldNames[6], vFields);
-	snowIdx = getColIndex(vFieldNames[7], vFields);
-	gsIdx = getColIndex(vFieldNames[8], vFields);
-	gdirIdx = getColIndex(vFieldNames[9], vFields);
+	dtIdx = getColIndex(m_vFieldNames[0], vFields);
+	tmpIdx = getColIndex(m_vFieldNames[1], vFields);
+	rhIdx = getColIndex(m_vFieldNames[2], vFields);
+	pcpIdx = getColIndex(m_vFieldNames[3], vFields);
+	wsIdx = getColIndex(m_vFieldNames[4], vFields);
+	wdirIdx = getColIndex(m_vFieldNames[5], vFields);
+	srIdx = getColIndex(m_vFieldNames[6], vFields);
+	snowIdx = getColIndex(m_vFieldNames[7], vFields);
+	gsIdx = getColIndex(m_vFieldNames[8], vFields);
+	gdirIdx = getColIndex(m_vFieldNames[9], vFields);
 
 	string strDate, strTemp, strRH, strPcp, strWindSpeed, strWDir, strSolRad, strSnow, strGustSpeed, strGustDir;
 	//basic check for required fields
 	if (dtIdx < 0 || tmpIdx < 0 || rhIdx < 0 || pcpIdx < 0 || wsIdx < 0 || wdirIdx < 0 || srIdx < 0 || snowIdx < 0)
 	{
 		if (dtIdx < 0)
-			printf("Error, field %s not found in header\n", vFieldNames[0].c_str());
+			printf("Error, field %s not found in header\n", m_vFieldNames[0].c_str());
 		if (tmpIdx < 0)
-			printf("Error, field %s not found in header\n", vFieldNames[1].c_str());
+			printf("Error, field %s not found in header\n", m_vFieldNames[1].c_str());
 		if (rhIdx < 0)
-			printf("Error, field %s not found in header\n", vFieldNames[2].c_str());
+			printf("Error, field %s not found in header\n", m_vFieldNames[2].c_str());
 		if (pcpIdx < 0)
-			printf("Error, field %s not found in header\n", vFieldNames[3].c_str());
+			printf("Error, field %s not found in header\n", m_vFieldNames[3].c_str());
 		if (wsIdx < 0)
-			printf("Error, field %s not found in header\n", vFieldNames[4].c_str());
+			printf("Error, field %s not found in header\n", m_vFieldNames[4].c_str());
 		if (wdirIdx < 0)
-			printf("Error, field %s not found in header\n", vFieldNames[5].c_str());
+			printf("Error, field %s not found in header\n", m_vFieldNames[5].c_str());
 		if (srIdx < 0)
-			printf("Error, field %s not found in header\n", vFieldNames[6].c_str());
+			printf("Error, field %s not found in header\n", m_vFieldNames[6].c_str());
 		if (snowIdx < 0)
-			printf("Error, field %s not found in header\n", vFieldNames[7].c_str());
+			printf("Error, field %s not found in header\n", m_vFieldNames[7].c_str());
 		printf("Header line is:\n%s\n", buf);
 		stream.close();
 		return -2;
@@ -410,4 +412,77 @@ NFDRSRec CFW21Data::GetNFDRSRec(size_t recNum)//zero based! valid: 0->GetNumRecs
 	goodRec.SetMinRH(rhMin);
 	goodRec.SetPcp24(pcp);
 	return goodRec;
+}
+
+int CFW21Data::AddRecord(FW21Record rec)
+{
+	if (m_recs.size() > 0)//ensure rec is after last record
+	{
+		FW21Record lastRec = m_recs[m_recs.size() - 1];
+		UTCTime lastUtc(lastRec.GetYear(), lastRec.GetMonth(), lastRec.GetDay(), lastRec.GetHour(), lastRec.GetMinutes(), 0);
+		UTCTime recUtc(rec.GetYear(), rec.GetMonth(), rec.GetDay(), rec.GetHour(), rec.GetMinutes(), 0);
+		//tm recTM = rec.GetDateTime();
+		//time_t recTime = mktime(&recTM);
+		//tm lastTM = m_recs[m_recs.size() - 1].GetDateTime();
+		//time_t lastTime = mktime(&lastTM);
+		//if (recTime - lastTime <= 0)
+		if (recUtc <= lastUtc)
+		{
+			cout << "Error, rectime is <= last record time\n";
+			return -1;
+		}
+	}
+	m_recs.push_back(rec);
+	return 1;
+}
+
+string FormatTM(tm in, int offsetHours)
+{
+	char buf[64];
+	string ret = "";
+	if(offsetHours < 0)
+		sprintf_s(buf, "%4d-%02d-%02dT%02d:%02d:00%03d:00",
+			in.tm_year + 1900, in.tm_mon + 1, in.tm_mday,
+			in.tm_hour, in.tm_min, offsetHours);
+	else
+		sprintf_s(buf, "%4d-%02d-%02dT%02d:%02d:00%02d:00",
+			in.tm_year + 1900, in.tm_mon + 1, in.tm_mday,
+			in.tm_hour, in.tm_min, offsetHours);
+
+	ret = buf;
+	return ret;
+}
+
+int CFW21Data::WriteFile(const char* fw21FileName, int offsetHours)
+{
+	ofstream out;
+	out.open(fw21FileName, ofstream::out | ofstream::trunc);
+	for (vector<string>::iterator it = m_vFieldNames.begin(); it != m_vFieldNames.end(); ++it)
+	{
+		if (it != m_vFieldNames.begin())
+			out << ", ";
+		out << *it;
+	}
+	out << "\n";
+
+
+	for (vector<FW21Record>::iterator it = m_recs.begin(); it != m_recs.end(); ++it)
+	{
+		FW21Record rec = *it;
+		string dateStr = FormatTM(rec.GetDateTime(), offsetHours);
+		out << dateStr << ",";
+		
+		out << std::fixed << std::setw(1) << std::setprecision(0) << rec.GetTemp() << ",";
+		out << std::fixed << std::setw(1) << std::setprecision(0) << rec.GetRH() << ",";
+		out << std::fixed << std::setw(5) << std::setprecision(3) << rec.GetPrecip() << ",";
+		out << std::fixed << std::setw(1) << std::setprecision(0) << rec.GetWindSpeed() << ",";
+		out << rec.GetWindAzimuth() << ",";
+		out << std::fixed << std::setw(1) << std::setprecision(0) << rec.GetSolarRadiation() << ",";
+		out << rec.GetSnowFlag() << ",";
+		out << std::fixed << std::setw(1) << std::setprecision(0) << rec.GetGustSpeed() << ",";
+		out << rec.GetGustAzimuth() << "\n";
+	}
+
+	out.close();
+	return 1;
 }
