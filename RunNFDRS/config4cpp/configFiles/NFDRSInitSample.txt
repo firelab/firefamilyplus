@@ -70,3 +70,39 @@ woody_opts {
 	fuelMoistureMax = "200";
 	fuelMoistureMin = "50";
 }
+
+#Dead Fuel Moisture settings
+#1hr, 10 hr, 100hr, 1000hr
+deadFuelMoisture.defaults {
+#These were previously specific to stick size, should always be present
+	radius = "0.64";
+	adsorptionRate = "0.079548303";
+#These were previously defaults in DeadFuelMoisture::initializeParameters()
+	stickDensity = "0.400";
+	maxLocalMoisture = "0.35";
+	desorptionRate = "0.06";
+}
+# 1hr options
+1hr_opts {
+	@copyFrom "deadFuelMoisture.defaults";
+	radius = "0.2";
+	adsorptionRate = "0.462252733";
+}
+# 10hr options
+10hr_opts {
+	@copyFrom "deadFuelMoisture.defaults";
+	radius = "0.64";
+	adsorptionRate = "0.079548303";
+}
+# 100hr options
+100hr_opts {
+	@copyFrom "deadFuelMoisture.defaults";
+	radius = "2.0";
+	adsorptionRate = "0.06";
+}
+# 1000hr options
+1000hr_opts {
+	@copyFrom "deadFuelMoisture.defaults";
+	radius = "3.81";
+	adsorptionRate = "0.06";
+}

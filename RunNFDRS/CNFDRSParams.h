@@ -60,6 +60,31 @@ private:
 	bool m_useRTPrecip;
 };
 
+class CDeadFuelMoistureParams
+{
+public:
+	CDeadFuelMoistureParams();
+	CDeadFuelMoistureParams(const CDeadFuelMoistureParams& rhs);
+	~CDeadFuelMoistureParams();
+
+	double getRadius() { return m_radius; }
+	double getAdsorptionRate() { return m_adsorptionRate; }
+	double getStickDensity() { return m_stickDensity; }
+	double getMaxLocalMoisture() { return m_maxLocalMoisture; }
+	double getDesorptionRate() { return m_desorptionRate; }
+	void setRadius(double radius) { m_radius = radius; }
+	void setAdsorptionRate(double adsortionRate) { m_adsorptionRate = adsortionRate; }
+	void setStickDensity(double stickDensity) { m_stickDensity = stickDensity; }
+	void setMaxLocalMoisture(double maxLocalMoisture) { m_maxLocalMoisture = maxLocalMoisture; }
+	void setDesortionRate(double desorptionRate) { m_desorptionRate = desorptionRate; }
+private:
+	double m_radius;
+	double m_adsorptionRate;
+	double m_stickDensity;
+	double m_maxLocalMoisture;
+	double m_desorptionRate;
+};
+
 class CNFDRSParams
 {
 public:
@@ -86,6 +111,10 @@ public:
 	CGSIParams getGsiParams() { return m_gsiParams; }
 	CGSIParams getHerbParams() { return m_herbParams; }
 	CGSIParams getWoodyParams() { return m_woodyParams; }
+	CDeadFuelMoistureParams get1HourParams() { return m_1HourParams; }
+	CDeadFuelMoistureParams get10HourParams() { return m_10HourParams; }
+	CDeadFuelMoistureParams get100HourParams() { return m_100HourParams; }
+	CDeadFuelMoistureParams get1000HourParams() { return m_1000HourParams; }
 	//setters
 	void setFuelModel(char fuelModel) { m_fuelModel = fuelModel; }
 	void setMaxSC(int maxSC) { m_maxSC = maxSC; }
@@ -103,6 +132,10 @@ public:
 		void setGsiParams(CGSIParams gsiParams) { m_gsiParams = gsiParams; }
 	void setHerbParams(CGSIParams herbParams) { m_herbParams = herbParams; }
 	void setWoodyParams(CGSIParams woodyParams) { m_woodyParams = woodyParams; }
+	void set1HourParams(CDeadFuelMoistureParams oneHourParams) { m_1HourParams = oneHourParams; }
+	void set10HourParams(CDeadFuelMoistureParams tenHourParams) { m_10HourParams = tenHourParams; }
+	void set100HourParams(CDeadFuelMoistureParams hundredHourParams) { m_100HourParams = hundredHourParams; }
+	void set1000HourParams(CDeadFuelMoistureParams thousandHourParams) { m_1000HourParams = thousandHourParams; }
 private:
 	//init params
 	char m_fuelModel;
@@ -123,6 +156,9 @@ private:
 	CGSIParams m_gsiParams;
 	CGSIParams m_herbParams;
 	CGSIParams m_woodyParams;
-
+	CDeadFuelMoistureParams m_1HourParams;
+	CDeadFuelMoistureParams m_10HourParams;
+	CDeadFuelMoistureParams m_100HourParams;
+	CDeadFuelMoistureParams m_1000HourParams;
 };
 

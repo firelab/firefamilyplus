@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
 		}
 		//if(!allExists)
 			//fprintf(allOut, "DateTime, Temp, RH, Precip, WindSpeed, SolarRadiation, SnowFlag, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
-		fprintf(allOut, "DateTime, Temperature(F), RelativeHumidity(%), Precipitation(in), WindSpeed(mph), SolarRadiation(W/m2), SnowFlag, MinTemp, MaxTemp, MinRH, Pcp24, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
+		fprintf(allOut, "DateTime, Temperature(F), RelativeHumidity(%%), Precipitation(in), WindSpeed(mph), SolarRadiation(W/m2), SnowFlag, MinTemp, MaxTemp, MinRH, Pcp24, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
 	}
 	if (indexOutputsFileName && strlen(indexOutputsFileName) > 0)
 	{

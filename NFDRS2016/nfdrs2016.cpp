@@ -1306,6 +1306,138 @@ void NFDR2016Calc::SetWoodyGSIparams(double MaxGSI, double GreenupThreshold, dou
         MCWOOD = woodyMax;
 }
 
+void NFDR2016Calc::SetOneHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
+{
+    Set1HourRadius(radius);
+    Set1HourAdsorptionRate(adsorptionRate);
+    Set1HourStickDensity(stickDensity);
+    Set1HourMaxLocalMoisture(maxLocalMoisture);
+    Set1HourDesorptionRate(desorptionRate);
+}
+void NFDR2016Calc::SetTenHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
+{
+    Set10HourRadius(radius);
+    Set10HourAdsorptionRate(adsorptionRate);
+    Set10HourStickDensity(stickDensity);
+    Set10HourMaxLocalMoisture(maxLocalMoisture);
+    Set10HourDesorptionRate(desorptionRate);
+}
+void NFDR2016Calc::SetHundredHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
+{
+    Set100HourRadius(radius);
+    Set100HourAdsorptionRate(adsorptionRate);
+    Set100HourStickDensity(stickDensity);
+    Set100HourMaxLocalMoisture(maxLocalMoisture);
+    Set100HourDesorptionRate(desorptionRate);
+}
+void NFDR2016Calc::SetThousandHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
+{
+    Set1000HourRadius(radius);
+    Set1000HourAdsorptionRate(adsorptionRate);
+    Set1000HourStickDensity(stickDensity);
+    Set1000HourMaxLocalMoisture(maxLocalMoisture);
+    Set1000HourDesorptionRate(desorptionRate);
+}
+
+void NFDR2016Calc::Set1HourRadius(double radius)
+{
+    OneHourFM.initializeParameters(radius, "One Hour");
+}
+
+void NFDR2016Calc::Set1HourAdsorptionRate(double adsorptionRate)
+{
+    OneHourFM.setAdsorptionRate(adsorptionRate);
+}
+
+void NFDR2016Calc::Set1HourStickDensity(double stickDensity)
+{
+    OneHourFM.setStickDensity(stickDensity);
+}
+
+void NFDR2016Calc::Set1HourMaxLocalMoisture(double maxLocalMoisture)
+{
+    OneHourFM.setMaximumLocalMoisture(maxLocalMoisture);
+}
+
+void NFDR2016Calc::Set1HourDesorptionRate(double desorptionRate)
+{
+    OneHourFM.setDesorptionRate(desorptionRate);
+}
+
+void NFDR2016Calc::Set10HourRadius(double radius)
+{
+    TenHourFM.initializeParameters(radius, "Ten Hour");
+}
+
+void NFDR2016Calc::Set10HourAdsorptionRate(double adsorptionRate)
+{
+    TenHourFM.setAdsorptionRate(adsorptionRate);
+}
+
+void NFDR2016Calc::Set10HourStickDensity(double stickDensity)
+{
+    TenHourFM.setStickDensity(stickDensity);
+}
+
+void NFDR2016Calc::Set10HourMaxLocalMoisture(double maxLocalMoisture)
+{
+    TenHourFM.setMaximumLocalMoisture(maxLocalMoisture);
+}
+
+void NFDR2016Calc::Set10HourDesorptionRate(double desorptionRate)
+{
+    TenHourFM.setDesorptionRate(desorptionRate);
+}
+
+void NFDR2016Calc::Set100HourRadius(double radius)
+{
+    HundredHourFM.initializeParameters(radius, "Hundred Hour");
+}
+
+void NFDR2016Calc::Set100HourAdsorptionRate(double adsorptionRate)
+{
+    HundredHourFM.setAdsorptionRate(adsorptionRate);
+}
+
+void NFDR2016Calc::Set100HourStickDensity(double stickDensity)
+{
+    HundredHourFM.setStickDensity(stickDensity);
+}
+
+void NFDR2016Calc::Set100HourMaxLocalMoisture(double maxLocalMoisture)
+{
+    HundredHourFM.setMaximumLocalMoisture(maxLocalMoisture);
+}
+
+void NFDR2016Calc::Set100HourDesorptionRate(double desorptionRate)
+{
+    HundredHourFM.setDesorptionRate(desorptionRate);
+}
+
+void NFDR2016Calc::Set1000HourRadius(double radius)
+{
+    ThousandHourFM.initializeParameters(radius, "Thousand Hour");
+}
+
+void NFDR2016Calc::Set1000HourAdsorptionRate(double adsorptionRate)
+{
+    ThousandHourFM.setAdsorptionRate(adsorptionRate);
+}
+
+void NFDR2016Calc::Set1000HourStickDensity(double stickDensity)
+{
+    ThousandHourFM.setStickDensity(stickDensity);
+}
+
+void NFDR2016Calc::Set1000HourMaxLocalMoisture(double maxLocalMoisture)
+{
+    ThousandHourFM.setMaximumLocalMoisture(maxLocalMoisture);
+}
+
+void NFDR2016Calc::Set1000HourDesorptionRate(double desorptionRate)
+{
+    ThousandHourFM.setDesorptionRate(desorptionRate);
+}
 
 void NFDR2016Calc::SetStartKBDI(int sKBDI)
 {

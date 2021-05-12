@@ -108,5 +108,8 @@
     <Text Include="config4cpp\configFiles\RunNFDRSSample.txt">
       <Filter>Input Files</Filter>
     </Text>
+    <Text Include="config4cpp\EditingConfigFiles.txt">
+      <Filter>Input Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

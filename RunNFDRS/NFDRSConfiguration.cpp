@@ -138,6 +138,35 @@ void NFDRSConfiguration::parse(
 		woodyParams.setUseVpdAverage(cfg->lookupInt(cfgScope, "woody_opts.gsiUseVpdAvg"));
 		woodyParams.setUseRTPrecip(cfg->lookupInt(cfgScope, "woody_opts.gsiUseRTPrecip"));
 		m_nfdrsParams.setWoodyParams(woodyParams);
+
+		CDeadFuelMoistureParams oneHourParams;
+		oneHourParams.setRadius(cfg->lookupFloat(cfgScope, "1hr_opts.radius"));
+		oneHourParams.setAdsorptionRate(cfg->lookupFloat(cfgScope, "1hr_opts.adsorptionRate"));
+		oneHourParams.setStickDensity(cfg->lookupFloat(cfgScope, "1hr_opts.stickDensity"));
+		oneHourParams.setMaxLocalMoisture(cfg->lookupFloat(cfgScope, "1hr_opts.maxLocalMoisture"));
+		oneHourParams.setDesortionRate(cfg->lookupFloat(cfgScope, "1hr_opts.desorptionRate"));
+		m_nfdrsParams.set1HourParams(oneHourParams);
+		CDeadFuelMoistureParams tenHourParams;
+		tenHourParams.setRadius(cfg->lookupFloat(cfgScope, "10hr_opts.radius"));
+		tenHourParams.setAdsorptionRate(cfg->lookupFloat(cfgScope, "10hr_opts.adsorptionRate"));
+		tenHourParams.setStickDensity(cfg->lookupFloat(cfgScope, "10hr_opts.stickDensity"));
+		tenHourParams.setMaxLocalMoisture(cfg->lookupFloat(cfgScope, "10hr_opts.maxLocalMoisture"));
+		tenHourParams.setDesortionRate(cfg->lookupFloat(cfgScope, "10hr_opts.desorptionRate"));
+		m_nfdrsParams.set10HourParams(tenHourParams);
+		CDeadFuelMoistureParams hundredHourParams;
+		hundredHourParams.setRadius(cfg->lookupFloat(cfgScope, "100hr_opts.radius"));
+		hundredHourParams.setAdsorptionRate(cfg->lookupFloat(cfgScope, "100hr_opts.adsorptionRate"));
+		hundredHourParams.setStickDensity(cfg->lookupFloat(cfgScope, "100hr_opts.stickDensity"));
+		hundredHourParams.setMaxLocalMoisture(cfg->lookupFloat(cfgScope, "100hr_opts.maxLocalMoisture"));
+		hundredHourParams.setDesortionRate(cfg->lookupFloat(cfgScope, "100hr_opts.desorptionRate"));
+		m_nfdrsParams.set100HourParams(hundredHourParams);
+		CDeadFuelMoistureParams thousandHourParams;
+		thousandHourParams.setRadius(cfg->lookupFloat(cfgScope, "1000hr_opts.radius"));
+		thousandHourParams.setAdsorptionRate(cfg->lookupFloat(cfgScope, "1000hr_opts.adsorptionRate"));
+		thousandHourParams.setStickDensity(cfg->lookupFloat(cfgScope, "1000hr_opts.stickDensity"));
+		thousandHourParams.setMaxLocalMoisture(cfg->lookupFloat(cfgScope, "1000hr_opts.maxLocalMoisture"));
+		thousandHourParams.setDesortionRate(cfg->lookupFloat(cfgScope, "1000hr_opts.desorptionRate"));
+		m_nfdrsParams.set1000HourParams(thousandHourParams);
 		//let's try dump to see what we get!
 		//saveAs("Dummyfile.cfg");
 	}
