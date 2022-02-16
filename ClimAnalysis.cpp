@@ -371,7 +371,9 @@ CClimAnalysis::CClimAnalysis(CDatabase *db)
 		tClimSet.MoveNext();
 	}
 	tClimSet.Close();
-
+	m_strRequiredFields = " AND NOT([SolarRadiation]) IS NULL AND NOT([ObsDate]) IS NULL AND NOT([Temp]) IS NULL "
+		"AND NOT([RH]) IS NULL AND NOT([PPTAMT]) IS NULL AND NOT([WS]) IS NULL AND NOT([TmpMax]) IS NULL AND NOT([TmpMin]) IS NULL "
+		"AND NOT([RHMin]) IS NULL AND NOT([HourlyPrecip]) IS NULL";
 }
 
 CClimAnalysis::~CClimAnalysis()
@@ -790,12 +792,20 @@ int CClimAnalysis::Analyze(int *_varIDs, int _nVarIDs, CFireplusSet *_fpSet, boo
 		if(!reCalc2016 && isNFDRS2016(staSet.m_NFDRSFM[0]) && !m_usedExtremes)
 			temp2.Format("[StationID] = '%6.6s' AND [DailyObs] = 1 AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#", staSet.m_StationID,
 				n2Start.Format(), n2End.Format());
-		else if((reCalc2016 && isNFDRS2016(staSet.m_NFDRSFM[0])) || (m_usedExtremes && isNFDRS2016(staSet.m_NFDRSFM[0])))
+		else if (reCalc2016 && isNFDRS2016(staSet.m_NFDRSFM[0]))
+		{
+			query = "";
+			temp2.Format("[StationID] = '%6.6s' AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#", staSet.m_StationID,
+				n2Start.Format(), n2End.Format());
+		}
+		else if (m_usedExtremes && isNFDRS2016(staSet.m_NFDRSFM[0]))
 			temp2.Format("[StationID] = '%6.6s' AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#", staSet.m_StationID,
 				n2Start.Format(), n2End.Format());
 		else
 	       temp2.Format("([StationID] = '%6.6s' AND [DailyObs] = 1)", staSet.m_StationID);
 		query += temp2;
+		if(useNFDRS && isNFDRS2016(staSet.m_NFDRSFM[0]))
+			query += m_strRequiredFields;
 
 		wxSet = new CWxSet(pDB);
 		wxSet->m_strSort = _T("[ObsDate]");
@@ -2655,7 +2665,8 @@ int CClimAnalysis::AnalyzeSIG(const CString query, bool isFPA /* = false*/)
 			else
 				temp2.Format("([StationID] = '%6.6s' AND [DailyObs] = 1)", staSet.m_StationID);
 			tmp += temp2;
-
+			if (useNFDRS && isNFDRS2016(staSet.m_NFDRSFM[0]))
+				tmp += m_strRequiredFields;
 			wxSet = new CWxSet(pDB);
 			wxSet->m_strSort = _T("[ObsDate]");
 			wxSet->m_strFilter = _T(tmp);
@@ -6919,6 +6930,8 @@ int CClimAnalysis::AnalyzeBatchItem(CWnd *_caller, int *_varIDs, int _nVarIDs, C
 		else
 			temp2.Format("([StationID] = '%6.6s' AND [DailyObs] = 1)", staSet.m_StationID);
 		query += temp2;
+		if (useNFDRS && isNFDRS2016(staSet.m_NFDRSFM[0]))
+			query += m_strRequiredFields;
 
 		wxSet = new CWxSet(pDB);
 		wxSet->m_strSort = _T("[ObsDate]");
@@ -7350,6 +7363,8 @@ int CClimAnalysis::AnalyzeBatchSIG(const CString query, bool isFPA)
 			else
 				temp2.Format("([StationID] = '%6.6s' AND [DailyObs] = 1)", staSet.m_StationID);
 			tmp += temp2;
+			if(useNFDRS && isNFDRS2016(staSet.m_NFDRSFM[0]))
+				tmp += m_strRequiredFields;
 
 			wxSet = new CWxSet(pDB);
 			wxSet->m_strSort = _T("[ObsDate]");

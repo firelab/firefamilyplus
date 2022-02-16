@@ -931,6 +931,10 @@ BOOL CRerapDialog::ReadData()
 		query.Format("([StationID] = '%6.6s' AND [DailyObs] = 1)", tStaSet.m_StationID);
 	//query.Format("([StationID] = '%s' AND ([ObsType] = 'O' OR ([ObsType] = 'R' AND [Hour] = %d AND [SOW] IS NOT NULL)))", tStaSet.m_StationID, tStaSet.m_RegSchdObs);
 	tStaSet.Close();
+	if (isNFDRS2016(tStaSet.m_NFDRSFM[0]))
+		query += " AND NOT([SolarRadiation]) IS NULL AND NOT([ObsDate]) IS NULL AND NOT([Temp]) IS NULL "
+		"AND NOT([RH]) IS NULL AND NOT([PPTAMT]) IS NULL AND NOT([WS]) IS NULL AND NOT([TmpMax]) IS NULL AND NOT([TmpMin]) IS NULL "
+		"AND NOT([RHMin]) IS NULL AND NOT([HourlyPrecip]) IS NULL";
 
 	//use all records to keep models in sync
 	//query.Format("Year([ObsDate]) >= %d and Year([ObsDate]) <= %d and [StationID] = '%6.6s' and [ObsType] = 'O'", 

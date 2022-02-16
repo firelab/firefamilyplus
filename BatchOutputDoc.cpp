@@ -287,16 +287,20 @@ void CRawClim::AllocData()
 				wxSet.Close();
 			}
 		}
+		CString regFields = " AND NOT([SolarRadiation]) IS NULL AND NOT([ObsDate]) IS NULL AND NOT([Temp]) IS NULL "
+		"AND NOT([RH]) IS NULL AND NOT([PPTAMT]) IS NULL AND NOT([WS]) IS NULL AND NOT([TmpMax]) IS NULL AND NOT([TmpMin]) IS NULL "
+			"AND NOT([RHMin]) IS NULL AND NOT([HourlyPrecip]) IS NULL";
 		if ((isNFDRS2016(staSet.m_NFDRSFM[0]) && reCalc) || (m_usedExtremes && isNFDRS2016(staSet.m_NFDRSFM[0]))) // we need hourly data for new calculator
-			wxSet.m_strFilter.Format("[StationID] = '%6.6s' AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#", m_sigStaID,
+			wxSet.m_strFilter.Format("[StationID] = '%6.6s' AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#" + regFields, m_sigStaID,
 				n2Start.Format(), n2End.Format());
 		else if (!reCalc && isNFDRS2016(staSet.m_NFDRSFM[0]))
 		{
-			wxSet.m_strFilter.Format("[StationID] = '%6.6s' AND [DailyObs] = 1 AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#", m_sigStaID,
+			wxSet.m_strFilter.Format("[StationID] = '%6.6s' AND [DailyObs] = 1 AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#" + regFields, m_sigStaID,
 				n2Start.Format(), n2End.Format());
 		}
 		else
 			wxSet.m_strFilter.Format("[StationID] = '%s' AND [DailyObs] = 1", m_sigStaID);
+
 		wxSet.Open();
 		if (!wxSet.IsBOF() && !wxSet.IsEOF())
 		{

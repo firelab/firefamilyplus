@@ -231,7 +231,10 @@ private:
 	COleDateTime *sDates;
 	COleDateTime *eDates;
 	int startDay;
-	
+	CString m_strRequiredFields;// = " AND NOT([SolarRadiation]) IS NULL AND NOT([ObsDate]) IS NULL AND NOT([Temp]) IS NULL "
+		//"AND NOT([RH]) IS NULL AND NOT([PPTAMT]) IS NULL AND NOT([WS]) IS NULL AND NOT([TmpMax]) IS NULL AND NOT([TmpMin]) IS NULL "
+		//"AND NOT([RHMin]) IS NULL AND NOT([HourlyPrecip]) IS NULL";
+
 };
 
 class CAnalysisData

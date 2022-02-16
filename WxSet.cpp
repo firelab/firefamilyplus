@@ -1699,7 +1699,7 @@ void Period::Accumulate(const COleDateTime& yearDate, double in)
 	int yr = tYr - start.GetYear();
 	/* ljs quick fix TODO */
 	if (yr < 0)
-		yr = 0;
+		return;// yr = 0;
 
 	yStats[yr].Accumulate(in);
 	if(n == 0)
