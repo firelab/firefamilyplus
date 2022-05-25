@@ -851,7 +851,7 @@ void CFireplusView::DoDataExchange(CDataExchange* pDX)
 	DDX_FieldCBString(pDX, IDC_SMONTH, m_pSet->m_StartMonth, m_pSet);
 	DDX_FieldCBString(pDX, IDC_EMONTH, m_pSet->m_EndMonth, m_pSet);
 	DDX_FieldCBString(pDX, IDC_COMBO1, m_pSet->m_PeriodLength, m_pSet);
-	DDX_FieldCheck(pDX, IDC_ENABLEALTERNATE, m_pSet->m_Use78, m_pSet);
+	//DDX_FieldCheck(pDX, IDC_ENABLEALTERNATE, m_pSet->m_Use78, m_pSet);
 	DDX_Check(pDX, IDC_CHECK_FORCE_RECOMPUTE, theApp.m_ForceNFDRS2016Recompute);
 	DDX_Check(pDX, IDC_CHECK_DAILY_EXTREMES, theApp.m_UseDailyExtremes);
 	//DDX_FieldText(pDX, IDC_SDAY, m_iStartDay);
@@ -1150,7 +1150,7 @@ void CFireplusView::OnSelchangeSigstation()
 			int row = 0;
 			while(!sSet.IsEOF())
 			{
-				sprintf(temp, "[StationID] = '%6.6s'", sSet.m_StationID);
+				sprintf(temp, "[StationID] = '%6.6s'", sSet.m_StationID.GetBuffer());
 				ssSet.m_strFilter = _T(temp);
 				ssSet.Requery();
 				if(!ssSet.IsBOF() && !ssSet.IsEOF())//has a record
@@ -1287,7 +1287,7 @@ void CFireplusView::OnSelchangeSigstation()
 			if (sta.Mid(5,1)== _T("-"))
 			   sta.Format("%4.4s",station);
 
-			sprintf(temp, "[StationID] = '%6.6s'", sta);
+			sprintf(temp, "[StationID] = '%6.6s'", sta.GetBuffer());
 			
 
 			ssSet.m_strFilter = _T(temp);
@@ -1457,7 +1457,7 @@ void CFireplusView::InitSigstation()
 			int row = 0;
 			while(!sSet.IsEOF())
 			{
-				sprintf(temp, "[StationID] = '%6.6s'", sSet.m_StationID);
+				sprintf(temp, "[StationID] = '%6.6s'", sSet.m_StationID.GetBuffer());
 				ssSet.m_strFilter = _T(temp);
 				ssSet.Requery();
 				if(!ssSet.IsBOF() && !ssSet.IsEOF())//has a record
@@ -3960,7 +3960,7 @@ bool CFireplusView::SetYears(CString fmStr)
 			int row = 0;
 			while (!sSet.IsEOF() && (!using2016 || (using2016 && isValid2016)))
 			{
-				sprintf(temp, "[StationID] = '%6.6s'", sSet.m_StationID);
+				sprintf(temp, "[StationID] = '%6.6s'", sSet.m_StationID.GetBuffer());
 				wxSet.m_strFilter = _T(temp);
 				wxSet.Requery();
 				if (!wxSet.IsBOF() && !wxSet.IsEOF())//has records

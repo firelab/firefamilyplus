@@ -42,6 +42,7 @@ public:
 	~CFireplusSet();
 	DECLARE_DYNAMIC(CFireplusSet)
 	void BuildBaseQuery(CString& query, CString dateField, bool yearsOnly, bool inverted = false);
+	void BuildBaseQuery2(CString& query, CString dateField, bool yearsOnly, int startYear, int endYear);
 	void BuildBaseNFDRS2016Query(CString& query, CString dateField, bool yearsOnly, bool inverted = false);
 	bool GetNFDRS2016Range(CString stnID, COleDateTime *start, COleDateTime *end);
 	CTermDatesDialog *m_pTermDatesDialog;

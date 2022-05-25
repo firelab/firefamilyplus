@@ -1103,18 +1103,24 @@ int NFDR2016Calc::iCalcIndexes (int iWS, int iSlopeCls,double* fSC,double* fERC,
           + 18.54 * (1.0 - exp(-0.151 * MC1))
           + 6.4 * MC1;
 
-    if (QIGN >= 344.0) IC = 0;
-
-    CHI = (344.0 - QIGN) / 10.0;
-    if ((pow(CHI, 3.66) * 0.000923 / 50) <= PNORM1) IC = 0;
-
-    PI = ((pow(CHI, 3.66) * 0.000923 / 50) - PNORM1) * 100.0 / PNORM2;
-    if (PI < 0) PI = 0;
-    if (PI > 100) PI = 100;
-    SCN = 100.0 * SC / SCM;
-    if (SCN > 100.0) SCN = 100.0;
-    PFI = pow(SCN, 0.5);
-    IC = 0.10 * PI * PFI;
+    if (QIGN >= 344.0) 
+        IC = 0;
+    else
+    {
+        CHI = (344.0 - QIGN) / 10.0;
+        if ((pow(CHI, 3.66) * 0.000923 / 50) <= PNORM1) 
+            IC = 0;
+        else
+        {
+            PI = ((pow(CHI, 3.66) * 0.000923 / 50) - PNORM1) * 100.0 / PNORM2;
+            if (PI < 0) PI = 0;
+            if (PI > 100) PI = 100;
+            SCN = 100.0 * SC / SCM;
+            if (SCN > 100.0) SCN = 100.0;
+            PFI = pow(SCN, 0.5);
+            IC = 0.10 * PI * PFI;
+        }
+    }
 
     if (SC < 0.00001) IC = 0;
     *fIC = IC;

@@ -221,6 +221,9 @@ public:
 	int humanCause;   // optional human cause filter (bitvector)
 	bool m_extremeIsMax[MAXVARIDS];
 	bool m_usedExtremes;
+	Period*** GetWorkingSetPeriods(Period*** overallPeriods);
+	CFireDay** GetWorkingSetFires(CFireDay** overallFires, int *wsFireYears);
+	int Analyze2(int* _varIDs, int _nVarIDs, CFireplusSet* _fpSet, bool isFPA = false);// = false);
 private:
 	//CCancelDialog *recCounter;
 	int AnalyzeStation(CString stationStr, bool isFPA = false, CString sigID = _T(""));
@@ -234,7 +237,7 @@ private:
 	CString m_strRequiredFields;// = " AND NOT([SolarRadiation]) IS NULL AND NOT([ObsDate]) IS NULL AND NOT([Temp]) IS NULL "
 		//"AND NOT([RH]) IS NULL AND NOT([PPTAMT]) IS NULL AND NOT([WS]) IS NULL AND NOT([TmpMax]) IS NULL AND NOT([TmpMin]) IS NULL "
 		//"AND NOT([RHMin]) IS NULL AND NOT([HourlyPrecip]) IS NULL";
-
+	int firesStartYear;
 };
 
 class CAnalysisData

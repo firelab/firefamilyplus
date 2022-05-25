@@ -620,7 +620,7 @@ int CWxExportDialog::ExportFlamMapFARSITEStream()
 
 	fprintf(out,"RAWS_UNITS: English\n\n");
 
-	fprintf(out, "Year  Mth  Day   Time    Temp     RH  HrlyPcp   WindSpd  WindDir CloudCov\n");
+	fprintf(out, "Year  Mth  Day   Time    Temp     RH    HrlyPcp   WindSpd  WindDir CloudCov\n");
     //				  2010   12      30   0100      10           20             1.2                 40            50         60
 	records->MoveFirst();
 	while(!records->IsEOF())
@@ -658,7 +658,7 @@ int CWxExportDialog::ExportFlamMapFARSITEStream()
 		}
 
 		
-		sprintf(buf, "%4d   %2d   %2d   %04d    %4d   %4d   %6.2f   %6d  %6d",
+		sprintf(buf, "%4d   %2d   %2d   %04d    %4d   %4d   %8.2f   %6d  %6d",
 			records->m_ObsDate.GetYear(),
 			records->m_ObsDate.GetMonth(),
 			records->m_ObsDate.GetDay(),

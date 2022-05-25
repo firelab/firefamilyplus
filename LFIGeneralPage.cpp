@@ -125,49 +125,49 @@ BOOL CLFIGeneralPage::OnInitDialog()
 			m_UseRTPrecip = pLfiSet->m_UseRTPrecip;
 		m_spinTminMin.SetDecimalPlaces (1);
 		m_spinTminMin.SetTrimTrailingZeros (FALSE);
-		m_spinTminMin.SetRangeAndDelta (-50.0, 200.0, 0.1);
+		m_spinTminMin.SetRangeAndDelta (-5.0, 20.0, 0.1);
 		m_spinTminMin.SetBuddy(&m_editTminMin);
 		m_spinTminMin.SetPos(tminMin);
 
 		m_spinTminMax.SetDecimalPlaces (1);
 		m_spinTminMax.SetTrimTrailingZeros (FALSE);
-		m_spinTminMax.SetRangeAndDelta (-50.0, 200.0, 0.1);
+		m_spinTminMax.SetRangeAndDelta (-5.0, 20.0, 0.1);
 		m_spinTminMax.SetBuddy(&m_editTminMax);
 		m_spinTminMax.SetPos(tminMax);
 
 		m_spinVPDMin.SetDecimalPlaces (1);
 		m_spinVPDMin.SetTrimTrailingZeros (FALSE);
-		m_spinVPDMin.SetRangeAndDelta (0.0, 10000.0, 10.0);
+		m_spinVPDMin.SetRangeAndDelta (0.0, 8000.0, 10.0);
 		m_spinVPDMin.SetBuddy(&m_editVPDMin);
 		m_spinVPDMin.SetPos(vpdMin);
 
 		m_spinVPDMax.SetDecimalPlaces (1);
 		m_spinVPDMax.SetTrimTrailingZeros (FALSE);
-		m_spinVPDMax.SetRangeAndDelta (0.0, 10000.0, 10.0);
+		m_spinVPDMax.SetRangeAndDelta (0.0, 8000.0, 10.0);
 		m_spinVPDMax.SetBuddy(&m_editVPDMax);
 		m_spinVPDMax.SetPos(vpdMax);
 
 		m_spinDaylenMin.SetDecimalPlaces (1);
 		m_spinDaylenMin.SetTrimTrailingZeros (FALSE);
-		m_spinDaylenMin.SetRangeAndDelta (0.0, 86400.0, 10.0);
+		m_spinDaylenMin.SetRangeAndDelta (36000.0, 50400.0, 10.0);
 		m_spinDaylenMin.SetBuddy(&m_editDaylenMin);
 		m_spinDaylenMin.SetPos(daylenMin);
 
 		m_spinDaylenMax.SetDecimalPlaces (1);
 		m_spinDaylenMax.SetTrimTrailingZeros (FALSE);
-		m_spinDaylenMax.SetRangeAndDelta (0.0, 86400.0, 10.0);
+		m_spinDaylenMax.SetRangeAndDelta (36000.0, 50400.0, 10.0);
 		m_spinDaylenMax.SetBuddy(&m_editDaylenMax);
 		m_spinDaylenMax.SetPos(daylenMax);
 
 		m_spinPcpMin.SetDecimalPlaces(1);
 		m_spinPcpMin.SetTrimTrailingZeros(FALSE);
-		m_spinPcpMin.SetRangeAndDelta(0.0, 90.0, 0.1);
+		m_spinPcpMin.SetRangeAndDelta(0.0, 10.0, 0.1);
 		m_spinPcpMin.SetBuddy(&m_editPcpMin);
 		m_spinPcpMin.SetPos(pcpMin);
 
 		m_spinPcpMax.SetDecimalPlaces(1);
 		m_spinPcpMax.SetTrimTrailingZeros(FALSE);
-		m_spinPcpMax.SetRangeAndDelta(0.0, 90.0, 0.1);
+		m_spinPcpMax.SetRangeAndDelta(0.0, 10.0, 0.1);
 		m_spinPcpMax.SetBuddy(&m_editPcpMax);
 		m_spinPcpMax.SetPos(pcpMax);
 
@@ -179,10 +179,10 @@ BOOL CLFIGeneralPage::OnInitDialog()
 		//((CButton *)GetDlgItem(IDC_RADIO_VPD_MAX))->SetCheck(!m_UseVPDavg);
 		//((CButton *)GetDlgItem(IDC_RADIO_VPD_AVG))->SetCheck(m_UseVPDavg);
 
-		m_spinDaysAvg.SetRange(1, 90);
+		m_spinDaysAvg.SetRange(10, 31);
 		m_spinDaysAvg.SetPos(daysAvg);
 
-		m_spinPcpDays.SetRange(1, 90);
+		m_spinPcpDays.SetRange(2, 60);
 		m_spinPcpDays.SetPos(daysPcp);
 
 		m_btnUseRTPrecip.SetCheck(m_UseRTPrecip);

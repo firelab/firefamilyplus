@@ -17,16 +17,16 @@ class CFARSITEDialog : public CDialog
 // Construction
 public:
 	void GetLastPcp();
-	void WriteWinds();
-	void WriteWx4();
-	void WriteWx3();
+	//void WriteWinds();
+	//void WriteWx4();
+	//void WriteWx3();
 	void WriteWxs();
 
 	void GenerateFiles();
 	void EnableSelections();
-	FILE * winds;
-	FILE * wx4;
-	FILE * wx3;
+	//FILE * winds;
+	//FILE * wx4;
+	//FILE * wx3;
 	FILE * wxs;
 
 	CFireplusSet *fpSet;
@@ -36,29 +36,29 @@ public:
 // Dialog Data
 	//{{AFX_DATA(CFARSITEDialog)
 	enum { IDD = IDD_FARSITEDIALOG };
-	CStatic	wndStatic;
-	CStatic	wtr4Static;
+	//CStatic	wndStatic;
+	//CStatic	wtr4Static;
 	//CStatic	wtr3Static;
-	CButton	wtr4Button;
+	//CButton	wtr4Button;
 	//CButton	wtr3Button;
-	CButton	wndButton;
+	//CButton	wndButton;
 	CButton wxsButton;
 	CButton windsAveButton;
 	CButton windsGustButton;
 	int windsType;
-	CEdit	wtr4Edit;
-	CEdit	wtr3Edit;
-	CEdit	wndEdit;
+	//CEdit	wtr4Edit;
+	//CEdit	wtr3Edit;
+	//CEdit	wndEdit;
 	CEdit	wxsEdit;
 
-	BOOL	bWnd;
+	//BOOL	bWnd;
 	//BOOL	bWtr3;
-	BOOL	bWtr4;
-	BOOL    bWxs;
+	//BOOL	bWtr4;
+	//BOOL    bWxs;
 
-	CString	wndFileName;
+	//CString	wndFileName;
 	//CString	wtr3FileName;
-	CString	wtr4FileName;
+	//CString	wtr4FileName;
 	//}}AFX_DATA
 	CString	wxsFileName;
 
@@ -75,13 +75,13 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(CFARSITEDialog)
 	virtual void OnOK();
-	afx_msg void OnWtr4check();
+	//afx_msg void OnWtr4check();
 	//afx_msg void OnWtr3check();
-	afx_msg void OnWndcheck();
-	afx_msg void OnWndfilebutton();
+	//afx_msg void OnWndcheck();
+	//afx_msg void OnWndfilebutton();
 	//afx_msg void OnWtr3filebutton();
-	afx_msg void OnWtr4filebutton();
-	afx_msg void OnWxscheck();
+	//afx_msg void OnWtr4filebutton();
+	//afx_msg void OnWxscheck();
 	afx_msg void OnWxsAvecheck();
 	afx_msg void OnWxsGustcheck();
 	afx_msg void OnWxsfilebutton();

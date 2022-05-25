@@ -35,6 +35,7 @@ public:
 	~CRawClim();
 	void AllocData();
 	//void CalcNFDRS2016Quick(CSIGStationSet *staSet);
+	INT_PTR Run();
 	void GetFires();
 	void DestroyData();
 //	CString GetModelString(CSIGStationSet *stn);

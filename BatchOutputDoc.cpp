@@ -107,6 +107,43 @@ CRawClim::~CRawClim()
 	DestroyData();
 }
 
+bool CRawClimRunProc(const CUPDUPDATA* pCUPDUPData)
+{
+	CRawClim* pClim = (CRawClim*)pCUPDUPData->GetAppData();
+	pClim->pCUPDUPData = (CUPDUPDATA*)pCUPDUPData;
+	pCUPDUPData->SetProgress(_T("Initializing.."), 0);
+	pClim->AllocData();
+
+	return true;
+}
+
+INT_PTR CRawClim::Run()
+{
+	int StartDay = m_fpSet->m_StartDay;
+	CString StartMonth = m_fpSet->m_StartMonth;
+	int StartYear = m_fpSet->m_StartYear;
+	int EndDay = m_fpSet->m_EndDay;
+	CString EndMonth = m_fpSet->m_EndMonth;
+	int EndYear = m_fpSet->m_EndYear;
+	CString PeriodLength = m_fpSet->m_PeriodLength;
+
+	CUPDialog cupDlg(AfxGetMainWnd()->m_hWnd, CRawClimRunProc, this);
+	INT_PTR ret = cupDlg.DoModal();
+	if (IDOK == ret)
+	{
+		m_fpSet->Edit();
+		m_fpSet->m_StartDay = StartDay;
+		m_fpSet->m_StartMonth = StartMonth;
+		m_fpSet->m_StartYear = StartYear;
+		m_fpSet->m_EndDay = EndDay;
+		m_fpSet->m_EndMonth = EndMonth;
+		m_fpSet->m_EndYear = EndYear;
+		m_fpSet->m_PeriodLength = PeriodLength;
+		m_fpSet->Update();
+		m_fpSet->MoveLast();
+	}
+	return ret;
+}
 
 void CRawClim::AllocData()
 {

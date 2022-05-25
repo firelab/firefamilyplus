@@ -9,7 +9,8 @@ class CFireSumSet : public CRecordset
 {
 public:
 	CFireSumSet(CDatabase* pDatabase = NULL);
-	bool FilterToWorkingSet(CFireplusSet *fpSet, int causeType, int moreCauseFlag, bool inverted = false);
+	bool FilterToWorkingSet(CFireplusSet* fpSet, int causeType, int moreCauseFlag, bool inverted = false);
+	bool FilterToWorkingSet2(CFireplusSet* fpSet, int causeType, int moreCauseFlag);
 	DECLARE_DYNAMIC(CFireSumSet)
 
 // Field/Param Data

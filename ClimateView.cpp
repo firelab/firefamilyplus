@@ -17,6 +17,7 @@
 #include "FFPOptsSet.h"
 #include "ClimateSet.h"
 #include "MainFrm.h"
+#include "BatchOutputDoc.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -470,6 +471,12 @@ void CClimateView::OnRunclimatology()
 		m_climSet->MoveNext();
 	}
 
+	/*CRawClim* pRawClim = new CRawClim(m_pSet->m_pDatabase, m_pSet->m_SIG_Station);
+	INT_PTR ret = pRawClim->Run();
+	if (ret == IDOK)
+	{
+		pRawClim->GetAnalysis
+	}*/
 
 	CClimAnalysis *climAnalysis = new CClimAnalysis(m_pSet->m_pDatabase);
 	INT_PTR ret = climAnalysis->RunAnalyze(tIDs, repCount, m_pSet, false);

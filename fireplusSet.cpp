@@ -167,6 +167,80 @@ void CFireplusSet::BuildBaseQuery(CString& query, CString dateField, bool yearsO
 	}
 }
 
+void CFireplusSet::BuildBaseQuery2(CString& query, CString dateField, bool yearsOnly, int startYear, int endYear)
+{
+	CString temp;
+	//DETERMINE DAY OF YEAR ORDERING
+	int dOrder = DOY_NORMAL;
+	COleDateTime d1, d2;
+	d1.SetDate(BASISYEAR, MonthChtoInt(m_StartMonth), m_StartDay);
+	d2.SetDate(BASISYEAR, MonthChtoInt(m_EndMonth), m_EndDay);
+	COleDateTimeSpan day(1, 0, 0, 0);
+	if (d1 == d2)// || d2 + day == d1)
+		dOrder = DOY_EQUAL;
+	else if (d1 > d2)
+		dOrder = DOY_FLIPPED;
+	//add years to query
+		query.Format("(Year([%s]) >= %d and Year([%s]) <= %d)",
+			dateField, startYear, dateField, endYear);
+	//else
+		//query.Format("(Year([%s]) < %d or Year([%s]) > %d)",
+			//dateField, startYear, dateField, endYear);
+	if (!yearsOnly)
+	{
+		switch (dOrder)
+		{
+			//case DOY_EQUAL:
+				//simplest case: All days of year.
+				//add nothing to query
+		//		break;
+		case DOY_FLIPPED:
+		{
+			//END DOY EARLIER THAN START DOY
+			temp.Format(" and ((Month([%s]) > %d or Month([%s]) < %d)",
+				dateField, d1.GetMonth(), dateField, d2.GetMonth());
+			query += temp;
+			if (d1.GetMonth() == d2.GetMonth())
+			{
+				temp.Format(" or (Month([%s]) = %d and Day([%s]) >= %d"
+					" or Day([%s]) <= %d))",
+					dateField, d1.GetMonth(), dateField, m_StartDay, dateField, m_EndDay);
+			}
+			else
+			{
+				temp.Format(
+					" or (Month([%s]) = %d and Day([%s]) >= %d)"
+					" or (Month([%s]) = %d and Day([%s]) <= %d))",
+					dateField, d1.GetMonth(), dateField, m_StartDay,
+					dateField, d2.GetMonth(), dateField, m_EndDay);
+			}
+			query += temp;
+		}
+		break;
+		case DOY_EQUAL:
+		default: //DOY NORMAL
+			if (d1.GetMonth() == d2.GetMonth())
+			{
+				temp.Format(" and Month([%s]) = %d and Day([%s]) >= %d"
+					" and Day([%s]) <= %d",
+					dateField, d1.GetMonth(), dateField, m_StartDay, dateField, m_EndDay);
+			}
+			else
+			{
+				temp.Format(" and ((Month([%s]) > %d and Month([%s]) < %d)",
+					dateField, d1.GetMonth(), dateField, d2.GetMonth());
+				query += temp;
+				temp.Format(
+					" or (Month([%s]) = %d and Day([%s]) >= %d)"
+					" or (Month([%s]) = %d and Day([%s]) <= %d))",
+					dateField, d1.GetMonth(), dateField, m_StartDay,
+					dateField, d2.GetMonth(), dateField, m_EndDay);
+			}
+			query += temp;
+		}
+	}
+}
+
 void CFireplusSet::BuildBaseNFDRS2016Query(CString& query, CString dateField, bool yearsOnly, bool inverted/* = false*/)
 {
 	CString temp;

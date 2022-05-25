@@ -25,16 +25,17 @@ CFARSITEDialog::CFARSITEDialog(CWnd* pParent /*=NULL*/, CFireplusSet *_fpSet /*=
 	: CDialog(CFARSITEDialog::IDD, pParent), wxSet(_fpSet->m_pDatabase)
 {
 	//{{AFX_DATA_INIT(CFARSITEDialog)
-	bWnd = FALSE;
+	//bWnd = FALSE;
 	//bWtr3 = FALSE;
-	bWtr4 = FALSE;
-	bWxs = FALSE;
-	wndFileName = _T("");
+	//bWtr4 = FALSE;
+	//bWxs = FALSE;
+	//wndFileName = _T("");
 	//wtr3FileName = _T("");
-	wtr4FileName = _T("");
+	//wtr4FileName = _T("");
 	wxsFileName = _T("");
 	//}}AFX_DATA_INIT
-	wx3 = wx4 = winds = wxs = NULL;
+	//wx3 = wx4 = winds = 
+	wxs = NULL;
 	windsType = 0;
 
 	fpSet = _fpSet;
@@ -45,27 +46,27 @@ void CFARSITEDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CFARSITEDialog)
-	DDX_Control(pDX, IDC_STATIC3, wndStatic);
-	DDX_Control(pDX, IDC_STATIC2, wtr4Static);
+	//DDX_Control(pDX, IDC_STATIC3, wndStatic);
+	//DDX_Control(pDX, IDC_STATIC2, wtr4Static);
 	//DDX_Control(pDX, IDC_STATIC1, wtr3Static);
-	DDX_Control(pDX, IDC_WTR4FILEBUTTON, wtr4Button);
+	//DDX_Control(pDX, IDC_WTR4FILEBUTTON, wtr4Button);
 	//DDX_Control(pDX, IDC_WTR3FILEBUTTON, wtr3Button);
-	DDX_Control(pDX, IDC_WNDFILEBUTTON, wndButton);
-	DDX_Control(pDX, IDC_WTR4EDIT, wtr4Edit);
+	//DDX_Control(pDX, IDC_WNDFILEBUTTON, wndButton);
+	//DDX_Control(pDX, IDC_WTR4EDIT, wtr4Edit);
 	DDX_Control(pDX, IDC_WXSFILEBUTTON, wxsButton);
 	//DDX_Control(pDX, IDC_WTR3EDIT, wtr3Edit);
-	DDX_Control(pDX, IDC_WNDEDIT, wndEdit);
-	DDX_Check(pDX, IDC_WNDCHECK, bWnd);
+	//DDX_Control(pDX, IDC_WNDEDIT, wndEdit);
+	//DDX_Check(pDX, IDC_WNDCHECK, bWnd);
 
-	DDX_Check(pDX, IDC_FLAMMAPFARSITE_STREAM, bWxs);
+	//DDX_Check(pDX, IDC_FLAMMAPFARSITE_STREAM, bWxs);
 	DDX_Control(pDX, IDC_RADIO1, windsAveButton);
 	DDX_Control(pDX, IDC_RADIO2, windsGustButton);
 
 	//DDX_Check(pDX, IDC_WTR3CHECK, bWtr3);
-	DDX_Check(pDX, IDC_WTR4CHECK, bWtr4);
-	DDX_Text(pDX, IDC_WNDEDIT, wndFileName);
+	//DDX_Check(pDX, IDC_WTR4CHECK, bWtr4);
+	//DDX_Text(pDX, IDC_WNDEDIT, wndFileName);
 	//DDX_Text(pDX, IDC_WTR3EDIT, wtr3FileName);
-	DDX_Text(pDX, IDC_WTR4EDIT, wtr4FileName);
+	//DDX_Text(pDX, IDC_WTR4EDIT, wtr4FileName);
 	DDX_Control(pDX, IDC_WXSEDIT, wxsEdit);
 	DDX_Text(pDX, IDC_WXSEDIT, wxsFileName);
 
@@ -75,15 +76,15 @@ void CFARSITEDialog::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CFARSITEDialog, CDialog)
 	//{{AFX_MSG_MAP(CFARSITEDialog)
-	ON_BN_CLICKED(IDC_WTR4CHECK, OnWtr4check)
+	//ON_BN_CLICKED(IDC_WTR4CHECK, OnWtr4check)
 	//ON_BN_CLICKED(IDC_WTR3CHECK, OnWtr3check)
-	ON_BN_CLICKED(IDC_WNDCHECK, OnWndcheck)
-	ON_BN_CLICKED(IDC_WNDFILEBUTTON, OnWndfilebutton)
+	//ON_BN_CLICKED(IDC_WNDCHECK, OnWndcheck)
+	//ON_BN_CLICKED(IDC_WNDFILEBUTTON, OnWndfilebutton)
 	//ON_BN_CLICKED(IDC_WTR3FILEBUTTON, OnWtr3filebutton)
-	ON_BN_CLICKED(IDC_WTR4FILEBUTTON, OnWtr4filebutton)
+	//ON_BN_CLICKED(IDC_WTR4FILEBUTTON, OnWtr4filebutton)
 	ON_BN_CLICKED(IDC_WXSFILEBUTTON, OnWxsfilebutton)
 
-	ON_BN_CLICKED(IDC_FLAMMAPFARSITE_STREAM, OnWxscheck)
+	//ON_BN_CLICKED(IDC_FLAMMAPFARSITE_STREAM, OnWxscheck)
 	ON_BN_CLICKED(IDC_RADIO1, OnWxsAvecheck)
 	ON_BN_CLICKED(IDC_RADIO2, OnWxsGustcheck)
 	//}}AFX_MSG_MAP
@@ -105,22 +106,9 @@ BOOL CFARSITEDialog::OnInitDialog()
 void CFARSITEDialog::OnOK() 
 {
 	UpdateData();
-	// make sure something selected
-	if(!bWtr4 && !bWnd && !bWxs)
+	if((wxsFileName.GetLength() == 0))
 	{
-		AfxMessageBox("ERROR: At least one file type must be selected.");
-		return;
-	}
-	if((bWtr4 && wtr4FileName.GetLength() == 0)
-		|| (bWnd && wndFileName.GetLength() == 0)
-		|| (bWxs && wxsFileName.GetLength() == 0))
-	{
-		AfxMessageBox("ERROR: A required file name is blank.");
-		return;
-	}
-	if((bWnd && bWtr4 && wndFileName.CompareNoCase(wtr4FileName) == 0))
-	{
-		AfxMessageBox("ERROR: Identical names selected for output files.");
+		AfxMessageBox("ERROR: WXS file name is blank.");
 		return;
 	}
 
@@ -128,7 +116,7 @@ void CFARSITEDialog::OnOK()
 
 	CWaitCursor wait;
 	
-	if(bWtr4)
+	/*if (bWtr4)
 	{
 		wx4 = fopen(wtr4FileName, "wt");
 		if(!wx4)
@@ -167,7 +155,7 @@ void CFARSITEDialog::OnOK()
 	}
 
 	if(bWxs)
-	{
+	{*/
 		wxs = fopen(wxsFileName, "wt");
 		if(!wxs)
 		{
@@ -181,16 +169,16 @@ void CFARSITEDialog::OnOK()
 			}
 			return;
 		}
-	}
+	//}
 
 
 	GenerateFiles();
-	if(wx3)
+	/*if (wx3)
 		fclose(wx3);
 	if(wx4)
 		fclose(wx4);
 	if(winds)
-		fclose(winds);
+		fclose(winds);*/
 	if(wxs)
 		fclose(wxs);
 
@@ -207,7 +195,7 @@ void CFARSITEDialog::OnOK()
 		if(str == _T("TextFile"))
 		{
 			
-			if(bWtr4)
+			/*if (bWtr4)
 			{
 				CRichDoc *pDoc = (CRichDoc *)	curTemplate->OpenDocumentFile(wtr4FileName);
 				pDoc->isTemp = false;
@@ -223,11 +211,11 @@ void CFARSITEDialog::OnOK()
 
 
 			if(bWxs)
-			{
+			{*/
 				CRichDoc *pDoc = (CRichDoc *)	curTemplate->OpenDocumentFile(wxsFileName);
 				pDoc->isTemp = false;
 				pDoc->SetTitle(wxsFileName);
-			}
+			//}
 		}
 	}
 	CDialog::OnOK();
@@ -238,33 +226,28 @@ void CFARSITEDialog::EnableSelections()
 	//wtr3Static.EnableWindow(bWtr3);
 	//wtr3Button.EnableWindow(bWtr3);
 	//wtr3Edit.EnableWindow(bWtr3);
-	wtr4Static.EnableWindow(bWtr4);
-	wtr4Button.EnableWindow(bWtr4);
-	wtr4Edit.EnableWindow(bWtr4);
-	wxsEdit.EnableWindow(bWxs);
-	wndStatic.EnableWindow(bWnd);
-	wndButton.EnableWindow(bWnd);
-	wndEdit.EnableWindow(bWnd);
+	//wtr4Static.EnableWindow(bWtr4);
+	//wtr4Button.EnableWindow(bWtr4);
+	//wtr4Edit.EnableWindow(bWtr4);
+	wxsEdit.EnableWindow(1);
+	//wndStatic.EnableWindow(bWnd);
+	//wndButton.EnableWindow(bWnd);
+	//wndEdit.EnableWindow(bWnd);
 
 
-	wxsButton.EnableWindow(bWxs);
-	windsAveButton.EnableWindow(bWxs);
-	windsGustButton.EnableWindow(bWxs);
-	if (bWxs)
-	{
-         
+	wxsButton.EnableWindow(1);
+	windsAveButton.EnableWindow(1);
+	windsGustButton.EnableWindow(1);
 	      windsAveButton.SetCheck(! windsType);
 		  windsGustButton.SetCheck(windsType);
-		  
-	}
 	
 }
 
-void CFARSITEDialog::OnWtr4check() 
+/*void CFARSITEDialog::OnWtr4check()
 {
 	UpdateData();
 	EnableSelections();
-}
+}*/
 
 //void CFARSITEDialog::OnWtr3check() 
 //{
@@ -272,11 +255,11 @@ void CFARSITEDialog::OnWtr4check()
 //	EnableSelections();
 //}
 
-void CFARSITEDialog::OnWndcheck() 
+/*void CFARSITEDialog::OnWndcheck()
 {
 	UpdateData();
 	EnableSelections();
-}
+}*/
 
 void CFARSITEDialog::OnWxsAvecheck()
 {
@@ -288,13 +271,13 @@ void CFARSITEDialog::OnWxsGustcheck()
 	windsType = windsGustButton.GetCheck();
 }
 
-void CFARSITEDialog::OnWxscheck() 
+/*void CFARSITEDialog::OnWxscheck()
 {
 	UpdateData();
 	EnableSelections();
-}
+}*/
 
-void CFARSITEDialog::OnWndfilebutton() 
+/*void CFARSITEDialog::OnWndfilebutton()
 {
 	CFileDialog fd(FALSE, "wtr", NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
 		"FARSITE Wind Files (*.wnd)|*.wnd|All Files (*.*)|*.*||", this);
@@ -305,7 +288,7 @@ void CFARSITEDialog::OnWndfilebutton()
 	}
 	
 }
-/*
+
 void CFARSITEDialog::OnWtr3filebutton() 
 {
 	CFileDialog fd(FALSE, "wtr", NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
@@ -316,7 +299,7 @@ void CFARSITEDialog::OnWtr3filebutton()
 		UpdateData(FALSE);
 	}
 }
-*/
+
 void CFARSITEDialog::OnWtr4filebutton() 
 {
 	CFileDialog fd(FALSE, "wtr", NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
@@ -326,7 +309,7 @@ void CFARSITEDialog::OnWtr4filebutton()
 		wtr4FileName = fd.GetPathName();
 		UpdateData(FALSE);
 	}
-}
+}*/
 
 void CFARSITEDialog::OnWxsfilebutton() 
 {
@@ -412,16 +395,16 @@ void CFARSITEDialog::GenerateFiles()
 		//fill in missing data w/same as last day of data
 		while(DayOfYear(curDay) != DayOfYear(wxSet.m_ObsDate))
 		{
-			if(wx3)
-				WriteWx3();
-			if(wx4)
-				WriteWx4();
+			//if(wx3)
+			//	WriteWx3();
+			//if(wx4)
+			//	WriteWx4();
 			curDay += span;
 			newDay = true;
 		}
 		curDay = wxSet.m_ObsDate;
-		if(winds)
-			WriteWinds();
+		//if(winds)
+			//WriteWinds();
 		if(newDay)
 		{
 			minHr = maxHr = wxSet.m_ObsDate.GetHour() * 100 + wxSet.m_ObsDate.GetMinute();
@@ -480,23 +463,23 @@ void CFARSITEDialog::GenerateFiles()
 		else
 			newDay = false;
 	}
-	if(wx3)
-		WriteWx3();
-	if(wx4)
-		WriteWx4();
+	//if(wx3)
+	//	WriteWx3();
+	//if(wx4)
+	//	WriteWx4();
 	
 
 	wxSet.Close();
 	staSet.Close();
 }
 
-void CFARSITEDialog::WriteWx3()
+/*void CFARSITEDialog::WriteWx3()
 {
 	if(wx3)
 		fprintf(wx3, "%d %d %.0f %d %d %d %d %d %d %d\n",
 			curDay.GetMonth(), curDay.GetDay(), pcp * 100.0, 
 			minHr, maxHr, minT, maxT, maxRH, minRH, elev);
-}
+}*/
 
 void CFARSITEDialog::WriteWxs()
 {
@@ -577,7 +560,7 @@ void CFARSITEDialog::WriteWxs()
 }
 
 
-void CFARSITEDialog::WriteWx4()
+/*void CFARSITEDialog::WriteWx4()
 {
 	if(wx4)
 	{
@@ -602,9 +585,9 @@ void CFARSITEDialog::WriteWx4()
 			curDay.GetMonth(), curDay.GetDay(), pcp * 100.0, 
 			minHr, maxHr, minT, maxT, maxRH, minRH, elev);
 	}
-}
+}*/
 
-void CFARSITEDialog::WriteWinds()
+/*void CFARSITEDialog::WriteWinds()
 {
 	if(winds)
 	{
@@ -692,7 +675,7 @@ void CFARSITEDialog::WriteWinds()
 			wdir,
 			cc);
 	}
-}
+}*/
 
 void CFARSITEDialog::GetLastPcp()
 {

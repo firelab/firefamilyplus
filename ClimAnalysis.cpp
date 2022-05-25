@@ -296,10 +296,21 @@ bool ClimAnalysisRunProc(const CUPDUPDATA* pCUPDUPData)
 	pData->pClim->pCUPDUPData = (CUPDUPDATA*)pCUPDUPData;
 	pCUPDUPData->ShowProgressBar(false);
 	pCUPDUPData->SetProgress(_T("Initializing.."), 0);
-	int ret = pData->pClim->Analyze(pData->varIDs, pData->nVarIDs, pData->pFpSet, pData->inverted, pData->isFPA);
+	int ret = pData->pClim->Analyze2(pData->varIDs, pData->nVarIDs, pData->pFpSet, pData->isFPA);
 
 	if (ret == 0)
+	{
+		int wsFireYears = 0;
+		Period *** wsPeriods = pData->pClim->GetWorkingSetPeriods(pData->pClim->periods);
+		pData->pClim->m_opts.numtPeriods = pData->pClim->numPeriods;
+		pData->pClim->m_opts.tPeriods = pData->pClim->periods;
+		CFireDay** wsFires = pData->pClim->GetWorkingSetFires(pData->pClim->fires, &wsFireYears);
+		pData->pClim->m_opts.tFires = pData->pClim->fires;
+		pData->pClim->periods = wsPeriods;
+		pData->pClim->fires = wsFires;
+		pData->pClim->fireYears = wsFireYears;
 		return true;
+	}
 	return false;
 }
 
@@ -374,6 +385,7 @@ CClimAnalysis::CClimAnalysis(CDatabase *db)
 	m_strRequiredFields = " AND NOT([SolarRadiation]) IS NULL AND NOT([ObsDate]) IS NULL AND NOT([Temp]) IS NULL "
 		"AND NOT([RH]) IS NULL AND NOT([PPTAMT]) IS NULL AND NOT([WS]) IS NULL AND NOT([TmpMax]) IS NULL AND NOT([TmpMin]) IS NULL "
 		"AND NOT([RHMin]) IS NULL AND NOT([HourlyPrecip]) IS NULL";
+	firesStartYear = 0;
 }
 
 CClimAnalysis::~CClimAnalysis()
@@ -3019,7 +3031,7 @@ int CClimAnalysis::GenerateClimatologyReports(CClimateSet *_climSet)
 		}
 		climSet->MoveNext();
 	}
-	if(fpSet->m_Use78 && useAux)//auxilliary years
+	/*if (fpSet->m_Use78 && useAux)//auxilliary years
 	{
 		CClimAnalysis tAnalysis(pDB);
 		int *tVarIDs = new int[nVarIDs];
@@ -3038,7 +3050,7 @@ int CClimAnalysis::GenerateClimatologyReports(CClimateSet *_climSet)
 			killPeriods = true;
 			return 0;
 		}
-	}
+	}*/
 	climSet->MoveFirst();
 	while(!climSet->IsEOF())
 	{
@@ -3052,7 +3064,8 @@ int CClimAnalysis::GenerateClimatologyReports(CClimateSet *_climSet)
 		}
 		if(climSet->m_Stats_Graph)
 		{
-			pdDoc = AddGraphView(pdDoc, climSet->m_VarID - 1, climSet->m_OptionType, tnumPeriods, tperiods, tFires);
+			//pdDoc = AddGraphView(pdDoc, climSet->m_VarID - 1, climSet->m_OptionType, tnumPeriods, tperiods, tFires);
+			pdDoc = AddGraphView(pdDoc, climSet->m_VarID - 1, climSet->m_OptionType, m_opts.numtPeriods, m_opts.tPeriods, m_opts.tFires);
 		}
 		if(climSet->m_Data_Count)
 			DataCount(climSet->m_VarID - 1);
@@ -11229,4 +11242,574 @@ void CClimAnalysis::LoadPocketOptions(CPocketCardSet *pocketSet, int _varID)
 	{
 		m_pocketOpts.m_Fire3Val = GetIndexValue(_varID, m_pocketOpts.m_Fire3Date);
 	}
+}
+
+int CClimAnalysis::Analyze2(int* _varIDs, int _nVarIDs, CFireplusSet* _fpSet, bool isFPA /*= false*/)
+{
+	int ret = 0;
+	CWaitCursor wait;
+	nVarIDs = _nVarIDs;
+	varIDs = _varIDs;
+	//model use flags - optimize to only calculate models used
+	killPeriods = true;
+	fpSet = _fpSet;
+	useCanadian = false;
+	useNFDRS = false;
+	useLFI = false;
+	count = 0;
+	userCount = 0;
+	for (int v = 0; v < nVarIDs; v++)
+	{
+		if (OptionFromVarID(varIDs[v]) == 1)
+			useNFDRS = true;
+		if (OptionFromVarID(varIDs[v]) == 3)
+			useCanadian = true;
+		if (varIDs[v] == 39 || varIDs[v] == 42 || varIDs[v] == 43)
+			useLFI = true;
+	}
+	int sYear = fpSet->m_StartYear, eYear = fpSet->m_EndYear;
+	CSIGStationSet staSet(pDB);
+	staSet.Open();
+	CString query = "", temp, staQuery;
+	//if (inverted)
+	//{//need to know how many years
+		CString wxQuery = "";
+		CWxSet tSet(fpSet->m_pDatabase);
+
+		tSet.m_strSort = "[ObsDate]";
+		tSet.Open();
+		if (fpSet->m_SIG_Station.GetLength() > 6)//SIG
+		{
+			char sig[64];
+			strcpy_s(sig, fpSet->m_SIG_Station);
+			CString temp;
+			CStationInSIGSet sSet(pDB);
+			temp.Format("[SIG] = '%-20.20s'", &sig[6]);
+			sSet.m_strFilter = _T(temp);
+			sSet.Open();
+			staSet.m_strFilter.Format("[StationID] = '%6.6s'", sSet.m_StationID);
+			while (!sSet.IsEOF())
+			{
+				tSet.m_strFilter.Format("([StationID] = '%6.6s' AND [DailyObs] = 1)", sSet.m_StationID);
+				tSet.Requery();
+				if (!tSet.IsBOF() && !tSet.IsEOF())
+				{
+					sYear = min(sYear, tSet.m_ObsDate.GetYear());
+					tSet.MoveLast();
+					eYear = max(eYear, tSet.m_ObsDate.GetYear());
+				}
+				sSet.MoveNext();
+			}
+			if (HasUserVars())
+			{
+				CString tmpStr = "", strSQL;
+				sSet.MoveFirst();
+				strSQL.Format("SELECT * FROM ffpUserVals WHERE [StationID] ='%s'", sSet.m_StationID);
+				sSet.MoveNext();
+				while (!sSet.IsEOF())
+				{
+					tmpStr.Format(" or [StationID] = '%6.6s'", sSet.m_StationID);
+					strSQL += tmpStr;
+					sSet.MoveNext();
+				}
+				CRecordset userVals(pDB);
+				userVals.m_strSort = _T("[ObsDate]");
+				userVals.Open(CRecordset::dynaset, strSQL);
+				if (!userVals.IsBOF() && !userVals.IsEOF())
+				{
+					COleDateTime dt;
+					CDBVariant var;
+					userVals.GetFieldValue("ObsDate", var);
+					sYear = min(sYear, var.m_pdate->year);
+					userVals.MoveLast();
+					userVals.GetFieldValue("ObsDate", var);
+					eYear = max(eYear, var.m_pdate->year);
+				}
+				userVals.Close();
+			}
+			sSet.Close();
+		}
+		else //single station
+		{
+			staQuery.Format("[StationID] = '%6.6s'", fpSet->m_SIG_Station);
+			staSet.m_strFilter = _T(staQuery);
+			staSet.Requery();
+			tSet.m_strFilter.Format("([StationID] = '%6.6s' AND [DailyObs] = 1)", fpSet->m_SIG_Station);
+			tSet.Requery();
+			if (!tSet.IsBOF() && !tSet.IsEOF())
+			{
+				sYear = min(sYear, tSet.m_ObsDate.GetYear());
+				tSet.MoveLast();
+				eYear = max(eYear, tSet.m_ObsDate.GetYear());
+			}
+			if (HasUserVars())
+			{
+				CRecordset userVals(pDB);
+				CString strSQL;
+				strSQL.Format("SELECT * FROM ffpUserVals WHERE [StationID] ='%s'", fpSet->m_SIG_Station);
+				userVals.m_strSort = _T("[ObsDate]");
+				userVals.Open(CRecordset::dynaset, strSQL);
+				if (!userVals.IsBOF() && !userVals.IsEOF())
+				{
+					CDBVariant var;
+					userVals.GetFieldValue("ObsDate", var);
+					sYear = min(sYear, var.m_pdate->year);
+					userVals.MoveLast();
+					userVals.GetFieldValue("ObsDate", var);
+					eYear = max(eYear, var.m_pdate->year);
+				}
+				userVals.Close();
+			}
+		}
+		tSet.Close();
+	//}
+	int pLen = atoi(fpSet->m_PeriodLength);
+	COleDateTimeSpan span(pLen - 1, 0, 0, 0);
+	COleDateTime d1, d2, d3;
+	numPeriods = 0;
+	d1.SetDate(BASISYEAR, MonthChtoInt(fpSet->m_StartMonth), fpSet->m_StartDay);
+	d2 = d1 + span;
+	// performance update 2012 - reduce number of Get () calls
+	int d1M = d1.GetMonth(),
+		d1D = d1.GetDay();
+
+	//ensure don't cross month boundary
+	while (d1M != d2.GetMonth())
+		d2 -= 1;
+
+	int d2M = d2.GetMonth(),
+		d2D = d2.GetDay();
+
+	while (1)
+	{
+		//new period coming into loop
+		numPeriods++;
+		if (MonthChtoInt(fpSet->m_EndMonth) == d1M
+			&& fpSet->m_EndDay >= d1D
+			&& fpSet->m_EndDay <= d2D)
+			break;
+		d3 = d2 + span;
+		d3 += 1;
+		if (d2M != d3.GetMonth())//does next period cross a month boundary?
+		{
+			if (d3.GetDay() <= pLen / 2)//will create a new period, otherwise will combine
+				numPeriods++;
+			if (MonthChtoInt(fpSet->m_EndMonth) == d1M
+				&& fpSet->m_EndDay >= d1D
+				&& fpSet->m_EndDay <= daysInMonth[d1M - 1])
+				break;
+			//reset locators to beginning of next month
+			d1.SetDate(BASISYEAR, d3.GetMonth(), 1);
+			d1M = d1.GetMonth();
+			d1D = d1.GetDay();
+
+			d2 = d1 + span;
+			d2M = d2.GetMonth();
+			d2D = d2.GetDay();
+		}
+		else
+		{
+			d1 = d2;
+
+			d1 += 1;
+			d1M = d1.GetMonth();
+			d1D = d1.GetDay();
+			d2 = d1 + span;
+			d2M = d2.GetMonth();
+			d2D = d2.GetDay();
+		}
+		//ensure don't cross month boundary
+		while (d1M != d2.GetMonth())
+			d2 -= 1;
+
+		d2M = d2.GetMonth();
+		d2D = d2.GetDay();
+	}
+
+	//ok, got numPeriods. Allocate date arrays and fill values by repeating loop
+	sDates = new COleDateTime[numPeriods];
+	eDates = new COleDateTime[numPeriods];
+	int dLoc = 0;
+	d1.SetDate(BASISYEAR, MonthChtoInt(fpSet->m_StartMonth), fpSet->m_StartDay);
+	d1M = d1.GetMonth();
+	d1D = d1.GetDay();
+	d2 = d1 + span;
+	//safety
+	while (d1M != d2.GetMonth())
+		d2 -= 1;
+	d2M = d2.GetMonth();
+	d2D = d2.GetDay();
+	while (1)
+	{
+		//new period coming into loop
+		sDates[dLoc].SetDate(sYear, d1M, d1D);
+		eDates[dLoc++].SetDate(eYear, d1M, d2D);
+		d3 = d2 + span;
+		d3 += 1;
+		if (d2M != d3.GetMonth()) //will next period cross a month boundary???
+		{
+			if (d3.GetDay() <= pLen / 2 && dLoc < numPeriods)
+			{
+				//extra group to fill
+				sDates[dLoc].SetDate(sYear, d1M, d2D + 1);
+				if (IsLeap(eYear))
+				{
+					eDates[dLoc++].SetDate(eYear, d1M, daysInMonth[d1M - 1]);
+				}
+				else
+				{
+					if (d1M != 2)
+						eDates[dLoc++].SetDate(eYear, d1M, daysInMonth[d1M - 1]);
+					else
+						eDates[dLoc++].SetDate(eYear, d1M, 28);
+				}
+				if (dLoc >= numPeriods)
+					break;
+			}
+			else
+			{//combine into previous group
+				if (d1M < MonthChtoInt(fpSet->m_EndMonth))
+				{
+					if (IsLeap(eYear))// % 4 == 0 && (eYear % 100 != 0 || eYear % 400 == 0))
+						eDates[dLoc - 1].SetDate(eYear, d1M, daysInMonth[d1M - 1]);
+					else
+					{
+						if (d1M != 2)
+							eDates[dLoc - 1].SetDate(eYear, d1M, daysInMonth[d1M - 1]);
+						else
+							eDates[dLoc - 1].SetDate(eYear, d1M, 28);
+					}
+				}
+				else//last month of query
+				{
+					if (IsLeap(eYear))// % 4 == 0 && (eYear % 100 != 0 || eYear % 400 == 0))
+						eDates[dLoc - 1].SetDate(eYear, d1M, fpSet->m_EndDay);
+					else//daysInMonth[d1.GetMonth() - 1]);
+					{
+						if (d1M != 2)
+							eDates[dLoc - 1].SetDate(eYear, d1M, fpSet->m_EndDay);
+						else
+							eDates[dLoc - 1].SetDate(eYear, d1M, min(fpSet->m_EndDay, 28));
+					}
+				}
+			}
+			//reset locators to beginning of next month
+			d1.SetDate(BASISYEAR, d3.GetMonth(), 1);
+			d1M = d1.GetMonth();
+			d1D = d1.GetDay();
+			d2 = d1 + span;
+			d2M = d2.GetMonth();
+			d2D = d2.GetDay();
+		}
+		else
+		{//won't cross boundary, increment normally
+			d1 = d2;
+			d1 += 1;
+			d1M = d1.GetMonth();
+			d1D = d1.GetDay();
+			d2 = d1 + span;
+			d2M = d2.GetMonth();
+			d2D = d2.GetDay();
+		}
+		//ensure same month
+		while (d1M != d2.GetMonth())
+			d2 -= 1;
+		d2M = d2.GetMonth();
+		d2D = d2.GetDay();
+		if (dLoc >= numPeriods)
+			break;
+	}
+
+	periods = new Period * *[MAXVARIDS];
+	for (int p = 0; p < MAXVARIDS; p++)
+		periods[p] = NULL;
+	for (int v = 0; v < nVarIDs; v++)
+	{
+		//create data storage structure
+		COleDateTime m1, m2;
+		periods[varIDs[v]] = new Period * [numPeriods];
+		for (int i = 0; i < numPeriods; i++)
+			periods[varIDs[v]][i] = new Period(sDates[i], eDates[i]);
+	}
+
+	//DATA STORAGE CREATED.
+	//now process selected station(s)
+	//set up SIGStationSet
+	fpSet->BuildBaseQuery2(query, "ObsDate", true, sYear, eYear);
+	if (query.GetLength() > 0)
+		query += " AND ";
+	m_usedExtremes = theApp.m_UseDailyExtremes;
+	if (fpSet->m_SIG_Station.GetLength() <= 6)//a single station
+	{
+		staQuery.Format("[StationID] = '%6.6s'", fpSet->m_SIG_Station);
+		staSet.m_strFilter.Format(staQuery);
+		staSet.Requery();
+		CString temp2;
+
+		bool reCalc2016 = false;
+		reCalc2016 = theApp.m_ForceNFDRS2016Recompute;
+		COleDateTime n2Start, n2End;
+		fpSet->GetNFDRS2016Range(staSet.m_StationID, &n2Start, &n2End);
+		if (!reCalc2016 && isNFDRS2016(staSet.m_NFDRSFM[0])) // we need hourly data for new calculator?
+		{
+			CWxSet tWxSet(pDB);
+			tWxSet.m_strFilter.Format("[StationID] = '%6.6s' AND [DailyObs] = 1 AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#", staSet.m_StationID,
+				n2Start.Format(), n2End.Format());
+			tWxSet.Open();
+			if (tWxSet.IsFieldNull(&tWxSet.m_FM1) || tWxSet.IsFieldNull(&tWxSet.m_FM10) || tWxSet.IsFieldNull(&tWxSet.m_FM100) || tWxSet.IsFieldNull(&tWxSet.m_FM1000) || tWxSet.IsFieldNull(&tWxSet.m_FuelTemperature)
+				|| tWxSet.m_FM1 <= 0.0 || tWxSet.m_FM10 <= 0.0 || tWxSet.m_FM100 <= 0.0 || tWxSet.m_FM1000 <= 0.0 || tWxSet.m_FuelTemperature <= -999.0)
+				reCalc2016 = true;
+			if (!reCalc2016)
+			{
+				tWxSet.MoveLast();
+				if (tWxSet.IsFieldNull(&tWxSet.m_FM1) || tWxSet.IsFieldNull(&tWxSet.m_FM10) || tWxSet.IsFieldNull(&tWxSet.m_FM100) || tWxSet.IsFieldNull(&tWxSet.m_FM1000) || tWxSet.IsFieldNull(&tWxSet.m_FuelTemperature)
+					|| tWxSet.m_FM1 <= 0.0 || tWxSet.m_FM10 <= 0.0 || tWxSet.m_FM100 <= 0.0 || tWxSet.m_FM1000 <= 0.0 || tWxSet.m_FuelTemperature <= -999.0)
+					reCalc2016 = true;
+			}
+			tWxSet.Close();
+		}
+		if (!useNFDRS)
+			reCalc2016 = false;
+		if (!reCalc2016 && isNFDRS2016(staSet.m_NFDRSFM[0]) && !m_usedExtremes)
+			temp2.Format("[StationID] = '%6.6s' AND [DailyObs] = 1 AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#", staSet.m_StationID,
+				n2Start.Format(), n2End.Format());
+		else if (reCalc2016 && isNFDRS2016(staSet.m_NFDRSFM[0]))
+		{
+			query = "";
+			temp2.Format("[StationID] = '%6.6s' AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#", staSet.m_StationID,
+				n2Start.Format(), n2End.Format());
+		}
+		else if (m_usedExtremes && isNFDRS2016(staSet.m_NFDRSFM[0]))
+			temp2.Format("[StationID] = '%6.6s' AND [ObsDate] >= #%s# AND [ObsDate] <= #%s#", staSet.m_StationID,
+				n2Start.Format(), n2End.Format());
+		else
+			temp2.Format("([StationID] = '%6.6s' AND [DailyObs] = 1)", staSet.m_StationID);
+		query += temp2;
+		if (useNFDRS && isNFDRS2016(staSet.m_NFDRSFM[0]))
+			query += m_strRequiredFields;
+
+		wxSet = new CWxSet(pDB);
+		wxSet->m_strSort = _T("[ObsDate]");
+		wxSet->m_strFilter = query;
+		wxSet->Open();
+
+		m_strStationName = staSet.m_Name;
+		m_strModel = GetModelString(&staSet);
+
+		//ret = AnalyzeStation(fpSet->m_SIG_Station + " - " + staSet.m_Name);
+		ret = AnalyzeStation(CString(fpSet->m_SIG_Station + " - " + staSet.m_Name), isFPA, "");
+
+		wxSet->Close();
+		delete wxSet;
+		wxSet = NULL;
+	}
+	else
+		//is a SIG - multiple stations
+	{
+		ret = AnalyzeSIG(query, isFPA);
+
+	}
+
+	//weather data read and analyzed....
+	//make sure we have some data
+	if (pCUPDUPData->ShouldTerminate())
+	{
+		staSet.Close();
+		return -1;
+	}
+	bool hasSomeData = false;
+	for (int v = 0; v < nVarIDs; v++)
+	{
+		for (int i = 0; i < numPeriods; i++)
+		{
+			if (periods[varIDs[v]][i]->N() > 0)
+			{
+				hasSomeData = true;
+				break;
+			}
+		}
+	}
+	if (!hasSomeData && !inverted)
+	{
+		AfxMessageBox("Error: No valid data values found.");
+		ret = -2;
+	}
+
+	//now get fires
+	if (checkFires && ret == 0)
+	{
+		fireYears = eYear - sYear + 1;
+		firesStartYear = sYear;
+		fires = new CFireDay * [fireYears];
+		for (int y = 0; y < fireYears; y++)
+			fires[y] = new CFireDay[numPeriods];
+		CFireSumSet fireSet(fpSet->m_pDatabase);
+		fireSet.Open();
+		//have query for fires, need to process and put into fires structure
+		//note that will still have to treat fires by individual days,
+		//then put days into periods
+		double lA = 0.0, hA = 0.0;
+		long lF = 0, hF = 0;
+		if (fireSet.FilterToWorkingSet2(fpSet, 0, 0))//has fires
+		{
+			for (int y = 0; y < fireYears; y++)
+			{
+				//for each year...
+				for (int i = 0; i < numPeriods; i++)
+					//for (int i = 0; i < numPeriods && (!recCounter || !recCounter->Abort()); i++)
+				{
+					//see if there's fire days - look at each day
+					//deal with leap years
+					for (int d = DayOfYear(periods[varIDs[0]][i]->start);
+						d <= DayOfYear(periods[varIDs[0]][i]->end);// && (! recCounter || !recCounter->Abort());
+						d++)
+					{
+						lA = 0.0;
+						hA = 0.0;
+						lF = 0;
+						hF = 0;
+						while (!fireSet.IsEOF()
+							&& fireSet.m_Discovery.GetYear() < periods[varIDs[0]][i]->baseYear + y)
+							fireSet.MoveNext();
+						while (!fireSet.IsEOF()
+							&& fireSet.m_Discovery.GetYear() <= periods[varIDs[0]][i]->baseYear + y
+							&& DayOfYear(fireSet.m_Discovery) < d)
+							fireSet.MoveNext();
+						if (!fireSet.IsEOF()
+							&& fireSet.m_Discovery.GetYear() == periods[varIDs[0]][i]->baseYear + y
+							&& DayOfYear(fireSet.m_Discovery) == d)
+						{
+							while (!fireSet.IsEOF()
+								&& fireSet.m_Discovery.GetYear() == periods[varIDs[0]][i]->baseYear + y
+								&& DayOfYear(fireSet.m_Discovery) == d)
+							{
+								switch (fireSet.m_StatisticalCause)
+								{
+								case 1://lightning
+									lF++;
+									lA = max(lA, fireSet.m_TotalAcres);
+									break;
+								default:
+									int passesCauseFilter = 1;
+
+									if (fireSet.m_AgencyID == 1) // USFS
+										passesCauseFilter = (humanCause >> (fireSet.m_StatisticalCause - 1)) & 1;
+									else
+									{
+										// convert to USFS cause type
+										int usfs = fireSet.m_StatisticalCause;
+										switch (fireSet.m_StatisticalCause)
+										{
+										case 2: usfs = 4; break;
+										case 4: usfs = 5; break;
+										case 5: usfs = 7; break;
+										case 6: usfs = 2; break;
+										case 7: usfs = 6; break;
+										}
+										passesCauseFilter = (humanCause >> (usfs - 1)) & 1;
+									}
+
+
+									if (passesCauseFilter)
+									{
+										hF++;
+										hA = max(hA, fireSet.m_TotalAcres);
+									}
+								}
+								fireSet.MoveNext();
+								//if(recCounter)
+								//	recCounter->Increment();
+							}
+						}
+						fires[y][i].lightning = max(fires[y][i].lightning, lF);
+						fires[y][i].human = max(fires[y][i].human, hF);
+						fires[y][i].lAcresMax = max(fires[y][i].lAcresMax, lA);
+						fires[y][i].hAcresMax = max(fires[y][i].hAcresMax, hA);
+					}
+				}
+			}
+		}
+		fireSet.Close();
+	}
+	staSet.Close();
+	return ret;
+
+}
+
+Period*** CClimAnalysis::GetWorkingSetPeriods(Period*** overallPeriods)
+{
+	Period*** wsPeriods = NULL;
+	int sYear = fpSet->m_StartYear;
+	int eYear = fpSet->m_EndYear;
+	int nYears = eYear - sYear + 1;
+
+	COleDateTime* startDates, * endDates;
+	startDates = new COleDateTime[numPeriods];
+	endDates = new COleDateTime[numPeriods];
+	for (int p = 0; p < numPeriods; p++)
+	{
+		//startDates[p] = sDates[p];
+		startDates[p].SetDate(fpSet->m_StartYear, sDates[p].GetMonth(), sDates[p].GetDay());
+		endDates[p].SetDate(fpSet->m_EndYear, eDates[p].GetMonth(), eDates[p].GetDay());
+	}
+	wsPeriods = new Period **[MAXVARIDS];
+	for (int v = 0; v < MAXVARIDS; v++)
+		wsPeriods[v] = NULL;
+	for(int v = 0; v < nVarIDs; v++)
+	{
+		wsPeriods[varIDs[v]] = new Period * [numPeriods];
+		for (int i = 0; i < numPeriods; i++)
+			wsPeriods[varIDs[v]][i] = new Period(startDates[i], endDates[i]);
+	}
+	for (int v = 0; v < MAXVARIDS; v++)
+	{
+		if (periods[v])
+		{
+			for (int p = 0; p < numPeriods; p++)
+			{
+				if (periods[v][p])
+				{
+					int yOffset = fpSet->m_StartYear - periods[v][p]->start.GetYear();
+					for (int y = 0; y < wsPeriods[v][p]->years; y++)
+						//for (int y = 0; y < periods[v][p]->years; y++)
+					{
+						COleDateTime dt(startDates[p].GetYear() + y, startDates[p].GetMonth(), startDates[p].GetDay(), 1,1,1);
+						for (int q = 0; q < periods[v][p]->yStats[y + yOffset].N(); q++)
+							wsPeriods[v][p]->Accumulate(dt, periods[v][p]->yStats[y + yOffset].Mean());
+					}
+					wsPeriods[v][p]->Complete();
+				}
+			}
+		}
+	}
+	delete[] startDates;
+	delete[] endDates;
+	return wsPeriods;
+}
+
+CFireDay** CClimAnalysis::GetWorkingSetFires(CFireDay** overallFires, int* wsFireYears)
+{
+	*wsFireYears = 0;
+	CFireDay** wsFires = NULL;
+	if (fires == NULL)
+		return NULL;
+	int sYear = fpSet->m_StartYear;
+	int eYear = fpSet->m_EndYear;
+	int nYears = eYear - sYear + 1;
+	wsFires = new CFireDay * [nYears];
+	for (int y = 0; y < nYears; y++)
+		wsFires[y] = new CFireDay[numPeriods];
+	int yOffset = fpSet->m_StartYear - firesStartYear;
+	for (int y = 0; y < nYears; y++)
+	{
+		for (int p = 0; p < numPeriods; p++)
+		{
+			wsFires[y][p].hAcresMax = fires[y + yOffset][p].hAcresMax;
+			wsFires[y][p].human = fires[y + yOffset][p].human;
+			wsFires[y][p].lAcresMax = fires[y + yOffset][p].lAcresMax;
+			wsFires[y][p].lightning = fires[y + yOffset][p].lightning;
+		}
+	}
+	*wsFireYears = nYears;
+	return wsFires;
 }
