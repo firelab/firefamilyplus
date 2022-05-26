@@ -507,8 +507,8 @@ protected:
             int     randseed=0,
             bool    allowRainfall2=false,
             bool    allowRainstorm=false,
-            bool    pertubateColumn=true,
-            bool    rampRai0=true
+            bool    pertubateColumn=false,
+            bool    rampRai0=false
          ) ;
 
 // Protected data members

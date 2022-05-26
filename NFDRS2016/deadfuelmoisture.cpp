@@ -767,8 +767,8 @@ void DeadFuelMoisture::initializeParameters( double radius, const string& name )
         0,      // random number seed (none)
         false,  // If TRUE, applies Nelson's logic for rainfall runoff after the first hour
         false,  // If TRUE, applies Nelson's logic for rainstorm transition and state
-        true,   // If TRUE, the continuous liquid column condition get pertubated
-        true    // If TRUE, used Bevins' ramping of rainfall runoff factor rather than Nelsons rai0 *= 0.15
+        false,   // If TRUE, the continuous liquid column condition get pertubated
+        false    // If TRUE, used Bevins' ramping of rainfall runoff factor rather than Nelsons rai0 *= 0.15
     );
     return;
 }
@@ -2059,7 +2059,7 @@ SB 1/6/2007
                     double rn = uniformRandom( -.0001, 0.0001 );
                     m_s[i] += rn;
                 }
-                m_s[i] = ( m_s[i] > 1. ) ? 1. : m_s[i];
+                m_s[i] = ( m_s[i] > Sir ) ? Sir : m_s[i];
                 m_s[i] = ( m_s[i] < 0. ) ? 0. : m_s[i];
             }
             m_s[ m_nodes-1 ] = m_s[ m_nodes-2 ];
@@ -2078,7 +2078,7 @@ SB 1/6/2007
 
             // If all nodes have continuous liquid columns (s >= Sir) ...
             // This never happens for the 1-h or 10-h test data!
-            if ( continuousLiquid )
+            if ( continuousLiquid)
             {
                 for ( int i=1; i<m_nodes-1; i++ )
                 {
