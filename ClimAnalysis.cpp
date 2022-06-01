@@ -2455,8 +2455,8 @@ int CClimAnalysis::AnalyzeSIG(const CString query, bool isFPA /* = false*/)
 	}
 	//ok, got new numPeriods. Allocate new date arrays and fill values by repeating loop
 	int sYear = fpSet->m_StartYear, eYear = fpSet->m_EndYear;
-	if(inverted)
-	{//need to know how many years
+	//if(inverted)
+	//{//need to know how many years
 		CString wxQuery = "";
 		CWxSet tSet(fpSet->m_pDatabase);
 		tSet.m_strSort = "[ObsDate]";
@@ -2545,7 +2545,7 @@ int CClimAnalysis::AnalyzeSIG(const CString query, bool isFPA /* = false*/)
 			}
 		}
 		tSet.Close();
-	}
+	//}
 	sDates = new COleDateTime[numPeriods];
 	eDates = new COleDateTime[numPeriods];
 	int dLoc = 0;

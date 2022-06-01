@@ -75,6 +75,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_AE46C9DBEE994FE8B443CF4510F7C75E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B26A9A4713864EDF9733288D9FE1EC50"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -487,15 +493,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FireFamily Plus 5"
-        "ProductCode" = "8:{6F23B276-4661-41BA-BE9A-A8C16B1C92B4}"
-        "PackageCode" = "8:{9F2906C6-E7AC-4C0F-912E-44DB8AB9D849}"
+        "ProductCode" = "8:{4D4B63A0-0800-4203-9C77-076A0E874DCF}"
+        "PackageCode" = "8:{5A2D6A6C-758D-489A-8B1E-D85B503E140D}"
         "UpgradeCode" = "8:{F8587583-3FC5-468D-ADCE-121EDD2AF2A6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:5.0.30"
+        "ProductVersion" = "8:5.0.40"
         "Manufacturer" = "8:USFS"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1100,6 +1106,34 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{CD10527D-0651-43C9-B752-B1846DFD4B17}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_AE46C9DBEE994FE8B443CF4510F7C75E"
+            {
+            "SourcePath" = "8:..\\x64\\Release\\RunNFDRS.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:Release|x64"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{5130EA61-B0B2-4337-A809-79D072C20F01}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
