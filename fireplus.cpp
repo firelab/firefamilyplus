@@ -1178,3 +1178,22 @@ void CFireplusApp::UpdateCandidatesFrame(CDatabase * pDB)
 		}
 	}
 }
+
+void CFireplusApp::OverrideMXD(CSIGStationSet* staSet)
+{
+	if (!staSet->IsFieldNull(&staSet->m_MXD_Override) && staSet->m_MXD_Override > 0)
+	{
+		int iSA1, iSA10, iSA100, iSA1000, iSAWOOD, iSAHERB;
+		double fW1, fW10, fW100, fW1000, fWWOOD, fWHERB, fWDROUGHT, fDEPTH;
+		int iMXD, iHD, iSCM;
+		double fWNDFC, fWNDFCMin, fWNDFCMax;
+		m_NFDRS.iGetFuelBed(&iSA1, &iSA10, &iSA100, &iSA1000,
+			&iSAWOOD, &iSAHERB, &fW1, &fW10, &fW100,
+			&fW1000, &fWWOOD, &fWHERB, &fWDROUGHT, &fDEPTH,
+			&iMXD, &iHD, &iSCM, &fWNDFC, &fWNDFCMin, &fWNDFCMax);
+		m_NFDRS.iSetFuelBed(iSA1, iSA10, iSA100, iSA1000,
+			iSAWOOD, iSAHERB, fW1, fW10, fW100,
+			fW1000, fWWOOD, fWHERB, fWDROUGHT, fDEPTH,
+			staSet->m_MXD_Override, iHD, iSCM, fWNDFC, fWNDFCMin, fWNDFCMax);
+	}
+}

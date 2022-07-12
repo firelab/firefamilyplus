@@ -7360,7 +7360,8 @@ void CFireplusDoc::CheckWxStationTable()
 
 	bool  newLat = true, newLon = true, hasWRCC = false, hasUseDormant = false,
 		hasDormantDay = false, hasUseStick = false, hasRegSchdObs = false,
-		hasNESDIS_ID = false, hasTimeZone = false, hasKBDIThreshold = false;// , hasMaxGSI = false, hasGSIGreenup = false;
+		hasNESDIS_ID = false, hasTimeZone = false, hasKBDIThreshold = false,
+		hasMxdOverride = false;// , hasMaxGSI = false, hasGSIGreenup = false;
 	//added for NFDR2016 / FFP5
 	bool hasMaxSC = false, hasMXD = false;
 	try
@@ -7404,6 +7405,8 @@ void CFireplusDoc::CheckWxStationTable()
 				hasTimeZone = true;
 			if (columns.m_strColumnName.CompareNoCase("KBDIThreshold") == 0)
 				hasKBDIThreshold = true;
+			if (columns.m_strColumnName.CompareNoCase("MXD_Override") == 0)
+				hasMxdOverride = true;
 			columns.MoveNext();
 		}
 		columns.Close();
@@ -7588,6 +7591,19 @@ void CFireplusDoc::CheckWxStationTable()
 		{
 			CString strSql;
 			strSql = "ALTER TABLE [WxStation] ADD [KBDIThreshold] INTEGER";
+			m_pDB->ExecuteSQL(strSql);
+		}
+		catch (CDBException* e)
+		{
+			e->Delete();
+		}
+	}
+	if (!hasMxdOverride)
+	{
+		try
+		{
+			CString strSql;
+			strSql = "ALTER TABLE [WxStation] ADD [MXD_Override] INTEGER";
 			m_pDB->ExecuteSQL(strSql);
 		}
 		catch (CDBException* e)

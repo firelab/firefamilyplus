@@ -159,9 +159,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CFW21Data.cpp" />
     <ClCompile Include="CNFDRSParams.cpp" />
     <ClCompile Include="csv_readrow.cpp" />
+    <ClCompile Include="fw21.cpp" />
     <ClCompile Include="NFDRSConfiguration.cpp" />
     <ClCompile Include="NFDRSInitConfig.cpp" />
     <ClCompile Include="RunNFDRS.cpp" />
@@ -169,7 +169,6 @@
     <ClCompile Include="RunNFDRSConfiguration.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CFW21Data.h" />
     <ClInclude Include="CNFDRSParams.h" />
     <ClInclude Include="config4cpp\include\config4cpp\Configuration.h" />
     <ClInclude Include="config4cpp\include\config4cpp\ConfigurationException.h" />
@@ -179,6 +178,7 @@
     <ClInclude Include="config4cpp\include\config4cpp\StringBuffer.h" />
     <ClInclude Include="config4cpp\include\config4cpp\StringVector.h" />
     <ClInclude Include="csv_readrow.h" />
+    <ClInclude Include="fw21.h" />
     <ClInclude Include="NFDRSConfiguration.h" />
     <ClInclude Include="NFDRSInitConfig.h" />
     <ClInclude Include="RunNFDRSConfig.h" />

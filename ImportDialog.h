@@ -107,6 +107,7 @@ public:
 	CButton m_genericFireButton;
 	CButton m_nasfFireButton;
 	CButton m_WFMIbutton;
+	afx_msg void OnBnClickedFw21();
 };
 
 #define MAX_INPUT_LINE	4096

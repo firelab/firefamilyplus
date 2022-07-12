@@ -42,13 +42,13 @@
     <ClCompile Include="NFDRSInitConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CFW21Data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="csv_readrow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RunNFDRSConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fw21.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,13 +86,13 @@
     <ClInclude Include="NFDRSInitConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CFW21Data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="csv_readrow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RunNFDRSConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fw21.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

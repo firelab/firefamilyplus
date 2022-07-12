@@ -433,6 +433,7 @@ void CRawClim::AllocData()
 				(int)(staSet.m_LatDegrees), staSet.m_HerbAnnual, staSet.m_Deciduous, staSet.m_FM1Eq10,
 				staSet.m_Start1000 - 5.0, staSet.m_Start1000, sKBDI, staSet.m_AvgPrecip);
 			theApp.m_NFDRS.iSetFuelModel(staSet.m_NFDRSFM[0], 0);
+			theApp.OverrideMXD(&staSet);
 			if (!staSet.IsFieldNull(&staSet.m_UseDormant) && !staSet.IsFieldNull(&staSet.m_DormantJulian))
 			{
 				if (staSet.m_UseDormant && staSet.m_DormantJulian.GetStatus() == COleDateTime::valid)

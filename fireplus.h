@@ -9,6 +9,8 @@
 #include "NFDRS2016.h"
 #include "CTimeZones.h"
 
+class CSIGStationSet;
+
 #if !defined(AFX_FIREPLUS_H__F8C34258_BF4C_11D1_B8AE_000000000000__INCLUDED_)
 #define AFX_FIREPLUS_H__F8C34258_BF4C_11D1_B8AE_000000000000__INCLUDED_
 
@@ -243,7 +245,7 @@ public:
 	//}}AFX_VIRTUAL
     CString getVarSortOrderStr(int i);
 // Implementation
-
+	void OverrideMXD(CSIGStationSet* staSet);
 	//{{AFX_MSG(CFireplusApp)
 	afx_msg void OnAppAbout();
 	afx_msg void OnAppNASF();

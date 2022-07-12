@@ -114,6 +114,7 @@ public:
 	CComboBox m_comboTimeZone;
 	CEdit m_editKBDIThreshold;
 	CSpinButtonCtrl m_spinKBDIThreshold;
+	CEdit m_editMXD;
 };
 
 //{{AFX_INSERT_LOCATION}}

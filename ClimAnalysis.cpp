@@ -1723,7 +1723,7 @@ int CClimAnalysis::AnalyzeStation(CString stationStr, bool isFPA /* = false*/, C
 		sKBDI = staSet.m_StartKBDI;
 	if(useNFDRS || useLFI)
 	{
-		int lookGreen, lookFreeze, sKBDI = 0;
+		int lookGreen, lookFreeze;// , sKBDI = 0;
 		lookGreen = DayOfYear(staSet.m_GreenJulian);
 		lookFreeze = DayOfYear(staSet.m_FreezeJulian);
 		if (isNFDRS2016(staSet.m_NFDRSFM[0]) || useLFI)
@@ -1760,6 +1760,7 @@ int CClimAnalysis::AnalyzeStation(CString stationStr, bool isFPA /* = false*/, C
 				(int)(staSet.m_LatDegrees), staSet.m_HerbAnnual, staSet.m_Deciduous, staSet.m_FM1Eq10,
 				staSet.m_Start1000 - 5.0, staSet.m_Start1000, sKBDI, staSet.m_AvgPrecip);
 			theApp.m_NFDRS.iSetFuelModel((!isFPA) ? staSet.m_NFDRSFM[0] : 'G', 0);
+			theApp.OverrideMXD(&staSet);
 			if (!staSet.IsFieldNull(&staSet.m_UseDormant) && !staSet.IsFieldNull(&staSet.m_DormantJulian))
 			{
 				if (staSet.m_UseDormant && staSet.m_DormantJulian.GetStatus() == COleDateTime::valid)
@@ -7574,6 +7575,7 @@ int CClimAnalysis::AnalyzeBatchStation(CString stationStr, bool isFPA, CString s
 				(int)(staSet.m_LatDegrees), staSet.m_HerbAnnual, staSet.m_Deciduous, staSet.m_FM1Eq10,
 				staSet.m_Start1000 - 5.0, staSet.m_Start1000, sKBDI, staSet.m_AvgPrecip);
 			theApp.m_NFDRS.iSetFuelModel((!isFPA) ? staSet.m_NFDRSFM[0] : 'G', 0);
+			theApp.OverrideMXD(&staSet);
 			if (!staSet.IsFieldNull(&staSet.m_UseDormant) && !staSet.IsFieldNull(&staSet.m_DormantJulian))
 			{
 				if (staSet.m_UseDormant && staSet.m_DormantJulian.GetStatus() == COleDateTime::valid)

@@ -443,6 +443,7 @@
     <ClCompile Include="CandidatesView.cpp" />
     <ClCompile Include="cdtlib.cpp" />
     <ClCompile Include="CFW21ExportDlg.cpp" />
+    <ClCompile Include="CFW21ImportDlg.cpp" />
     <ClCompile Include="ChildFrm.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -2501,6 +2502,7 @@
     <ClInclude Include="CandidatesView.h" />
     <ClInclude Include="cdtlib.h" />
     <ClInclude Include="CFW21ExportDlg.h" />
+    <ClInclude Include="CFW21ImportDlg.h" />
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="ClimAnalysis.h" />
     <ClInclude Include="ClimateSet.h" />

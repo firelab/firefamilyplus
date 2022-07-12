@@ -62,7 +62,8 @@ CSIGStationSet::CSIGStationSet(CDatabase* pdb)
 
 	m_timeZoneOffset = 0;
 	m_KBDIThreshold = 100;
-	m_nFields = 46;
+	m_MXD_Override = 0;
+	m_nFields = 47;
 	m_nDefaultType = dynaset;
 
 }
@@ -135,6 +136,7 @@ void CSIGStationSet::DoFieldExchange(CFieldExchange* pFX)
 	RFX_Bool(pFX, _T("[MX_Humid_Z]"), m_MX_Humid_Z);
 	RFX_Int(pFX, _T("TimeZoneOffset"), m_timeZoneOffset);
 	RFX_Int(pFX, _T("KBDIThreshold"), m_KBDIThreshold);
+	RFX_Int(pFX, _T("MXD_Override"), m_MXD_Override);
 }
 
 

@@ -6,7 +6,7 @@
 #include "NFDRSConfiguration.h"
 #include "CNFDRSParams.h"
 #include "NFDR2016CalcState.h"
-#include "CFW21Data.h"
+#include "fw21.h"
 #include <io.h>
 #include <stdlib.h>
 using namespace std;

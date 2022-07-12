@@ -903,6 +903,7 @@
     </ClCompile>
     <ClCompile Include="CTimeZones.cpp" />
     <ClCompile Include="CFW21ExportDlg.cpp" />
+    <ClCompile Include="CFW21ImportDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UGInclude\ExtCheckBox.h">
@@ -1825,6 +1826,7 @@
     <ClInclude Include="NFDRS2016WxDoc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CFW21ImportDlg.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

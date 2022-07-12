@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <deque>
-#include "CFW21Data.h"
+#include "fw21.h"
 #include "csv_readrow.h"
 #include "utctime.h"
 #include <vector>

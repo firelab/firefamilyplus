@@ -70,6 +70,7 @@ public:
 	BOOL m_MX_Humid_Z;
 	int m_timeZoneOffset;//offset from UTC
 	int m_KBDIThreshold;
+	int m_MXD_Override;
 	// Overrides
 	// Wizard generated virtual function overrides
 	public:

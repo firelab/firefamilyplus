@@ -206,6 +206,7 @@
 #define IDB_BITMAP8                     419
 #define IDB_BITMAP_FFP5                 421
 #define IDD_DIALOG_FW21_EXPORT          427
+#define IDD_DIALOG_FW21_IMPORT          431
 #define IDC_DBNAME                      1005
 #define IDC_SIGSTATION                  1006
 #define IDC_SYEAR                       1007
@@ -505,6 +506,7 @@
 #define IDC_FWX                         1177
 #define IDC_PCHAFWX                     1178
 #define IDC_FWSTXT                      1178
+#define IDC_FW21                        1178
 #define IDC_CAUSES                      1179
 #define IDC_GWI                         1179
 #define IDC_USEALL                      1180
@@ -1098,6 +1100,10 @@
 #define IDC_BUTTON_DEST_FILE            1645
 #define IDC_COMBO_TIME_FORMAT           1646
 #define IDC_BUTTON_CALC_GSI             1647
+#define IDC_EDIT_FW21_FILE              1648
+#define IDC_BUTTON_FW21_FILE            1649
+#define ID_IMPORT_FW21                  1650
+#define IDC_EDIT_MXD                    1651
 #define ID_CLIMATOLOGY                  32771
 #define ID_SIGS                         32772
 #define ID_DATA_IMPORT                  32773
@@ -1282,9 +1288,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        429
+#define _APS_NEXT_RESOURCE_VALUE        433
 #define _APS_NEXT_COMMAND_VALUE         33004
-#define _APS_NEXT_CONTROL_VALUE         1648
+#define _APS_NEXT_CONTROL_VALUE         1652
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

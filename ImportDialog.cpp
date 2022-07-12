@@ -35,6 +35,7 @@
 #include "GenericFireImportDialog.h"
 
 #include "DOIunitSet.h"
+#include "CFW21ImportDlg.h"
 //#include "updialog2.h"
 
 using namespace std;  // needed for stream stuff.... std::<whatever> won't work :(
@@ -293,6 +294,7 @@ BEGIN_MESSAGE_MAP(CImportDialog, CDialog)
 	ON_BN_CLICKED(IDC_WRCCRAWS,OnWRCCRAWS)
 	//ON_BN_CLICKED(IDC_WFMI, OnWFMICodes)
 	//}}AFX_MSG_MAP
+	ON_BN_CLICKED(IDC_FW21, &CImportDialog::OnBnClickedFw21)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -10188,4 +10190,10 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			return TRUE;
 
 		return FALSE;
+	}
+
+	void CImportDialog::OnBnClickedFw21()
+	{
+		CFW21ImportDlg dlg(this);
+		dlg.DoModal();
 	}

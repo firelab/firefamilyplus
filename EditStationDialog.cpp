@@ -117,6 +117,7 @@ void CEditStationDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_TIMEZONE, m_comboTimeZone);
 	DDX_Control(pDX, IDC_EDIT_KBDI_THRESHOLD, m_editKBDIThreshold);
 	DDX_Control(pDX, IDC_SPIN_KBDI_THRESHOLD, m_spinKBDIThreshold);
+	DDX_Control(pDX, IDC_EDIT_MXD, m_editMXD);
 }
 
 BEGIN_MESSAGE_MAP(CEditStationDialog, CDialog)
@@ -341,6 +342,12 @@ BOOL CEditStationDialog::OnInitDialog()
 						break;
 					}
 				}
+			}
+			if (!station->IsFieldNull(&station->m_MXD_Override))
+			{
+				CString tmpMXD;
+				tmpMXD.Format("%d", station->m_MXD_Override);
+				m_editMXD.SetWindowTextA(tmpMXD);
 			}
 
 		}
@@ -624,6 +631,12 @@ void CEditStationDialog::SaveStation()
 		int sel = m_comboTimeZone.GetCurSel();
 		if (sel >= 0)
 			station->m_timeZoneOffset = m_comboTimeZone.GetItemData(sel);
+		CString mxdStr;
+		m_editMXD.GetWindowTextA(mxdStr);
+		if (mxdStr.GetLength() > 0)
+			station->m_MXD_Override = atoi(mxdStr);
+		else
+			station->SetFieldNull(&station->m_MXD_Override);
 		//commit the changes
 		station->Update();
 
