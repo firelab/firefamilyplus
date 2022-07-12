@@ -25,6 +25,9 @@
     <Filter Include="config4cpp\lib">
       <UniqueIdentifier>{02c6a54c-66cf-4e63-a7c6-7ef5628c47cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="config4cpp\lib\x86">
+      <UniqueIdentifier>{9ee59942-20e5-45de-ba55-772b7df3687b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RunNFDRS.cpp">
@@ -99,6 +102,9 @@
   <ItemGroup>
     <Library Include="config4cpp\lib\config4cpp.lib">
       <Filter>config4cpp\lib</Filter>
+    </Library>
+    <Library Include="config4cpp\lib\x86\config4cpp.lib">
+      <Filter>config4cpp\lib\x86</Filter>
     </Library>
   </ItemGroup>
   <ItemGroup>
