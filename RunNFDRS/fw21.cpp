@@ -434,6 +434,8 @@ NFDRSDailyRec CFW21Data::GetNFDRSDailyRec(size_t recNum)//zero based! valid: 0->
 	tm trgTime = rec.GetDateTime();
 	time_t trgTimet = mktime(&trgTime), thisTimet;
 	double tMin = rec.GetTemp(), tMax = rec.GetTemp(), rhMin = rec.GetRH(), pcp = rec.GetPrecip();
+	if (pcp < 0.0)
+		pcp = 0.0;
 	size_t checkRec = recNum - 1;
 	while (checkRec >= 0)
 	{

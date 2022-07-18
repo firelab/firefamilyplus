@@ -506,8 +506,8 @@
 #define IDC_FWX                         1177
 #define IDC_PCHAFWX                     1178
 #define IDC_FWSTXT                      1178
-#define IDC_FW21                        1178
-#define IDC_CAUSES                      1179
+#define IDC_FW21                        1184
+#define IDC_CAUSES                      1183
 #define IDC_GWI                         1179
 #define IDC_USEALL                      1180
 #define IDC_WFMI                        1180

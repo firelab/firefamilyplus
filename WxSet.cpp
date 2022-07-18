@@ -360,11 +360,11 @@ long CWxSet::CalcSOW()
 {
 	long nUpdates = 0;
 	CSIGStationSet staSet(m_pDatabase);
-	staSet.m_strFilter.Format("[StationID] = '%6.6s'", m_StationID);
+	staSet.m_strFilter.Format("[StationID] = '%6.6s'", m_StationID.GetBuffer());
 	staSet.Open();
 	CSowThresholdsSet sowSet(m_pDatabase);
 	MoveFirst();
-	sowSet.m_strFilter.Format("[SIG_Station] = '%s'", m_StationID);
+	sowSet.m_strFilter.Format("[SIG_Station] = '%s'", m_StationID.GetBuffer());
 	sowSet.Open();
 	if(sowSet.IsBOF() && sowSet.IsEOF())
 	{

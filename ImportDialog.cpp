@@ -10194,6 +10194,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 
 	void CImportDialog::OnBnClickedFw21()
 	{
-		CFW21ImportDlg dlg(this);
+		CFW21ImportDlg dlg(this); 
+		dlg.pDoc = pDoc;
 		dlg.DoModal();
 	}

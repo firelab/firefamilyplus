@@ -904,6 +904,15 @@
     <ClCompile Include="CTimeZones.cpp" />
     <ClCompile Include="CFW21ExportDlg.cpp" />
     <ClCompile Include="CFW21ImportDlg.cpp" />
+    <ClCompile Include="RunNFDRS\fw21.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NFDRS2016\utctime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunNFDRS\csv_readrow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UGInclude\ExtCheckBox.h">
@@ -1827,6 +1836,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CFW21ImportDlg.h" />
+    <ClInclude Include="RunNFDRS\fw21.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunNFDRS\csv_readrow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NFDRS2016\utctime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
