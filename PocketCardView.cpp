@@ -1066,26 +1066,59 @@ void CPocketCardView::DrawToDCRegion(CDC * pDC, CRect rect)
 	pDC->TextOut(l, t, tStr);
 	tSize = pDC->GetTextExtent(tStr);
 	l += tSize.cx + tSize.cx / 7;
-	tStr.Format("-- %.0f%% of the %ld days from %d - %d", 
-		(m_pAnalysis->m_pocketOpts.cp >= 0.5) ? (1.0 - m_pAnalysis->m_pocketOpts.cp) * 100.0 : m_pAnalysis->m_pocketOpts.cp * 100.0, m_nObs, 
-		m_pAnalysis->m_pocketOpts.startYear, 
-		m_pAnalysis->m_pocketOpts.endYear);
-	pDC->SetTextColor(0x00000000);
-	pDC->TextOut(l, t, tStr);
-	t += tSize.cy + 1;
-	if ((m_pAnalysis->m_pocketOpts.varID >=4 &&    // RH MeanRH MinRH MaxRH
-		m_pAnalysis->m_pocketOpts.varID <=7) || 
-		(m_pAnalysis->m_pocketOpts.varID >=16 &&   // FM1 FM10 FM100 FM1000 FMHerb FMWood
-		m_pAnalysis->m_pocketOpts.varID <=21))
-		tStr.Format("had an %s %s %.0f", 
-		m_pAnalysis->m_pocketOpts.m_IndexString, 
-		"below",
-		pcntile97);
+	CClimateSet climSet(m_pAnalysis->pDB);
+	climSet.m_strFilter.Format("[VarID]=%d", m_pAnalysis->m_pocketOpts.varID+1);
+	climSet.Open();
+	if (climSet.IsBOF() || climSet.IsEOF())
+	{
+		tStr.Format("-- %.0f%% of the %ld days from %d - %d",
+			(m_pAnalysis->m_pocketOpts.cp >= 0.5) ? (1.0 - m_pAnalysis->m_pocketOpts.cp) * 100.0 : m_pAnalysis->m_pocketOpts.cp * 100.0, m_nObs,
+			m_pAnalysis->m_pocketOpts.startYear,
+			m_pAnalysis->m_pocketOpts.endYear);
+		pDC->SetTextColor(0x00000000);
+		pDC->TextOut(l, t, tStr);
+		t += tSize.cy + 1;
+		if ((m_pAnalysis->m_pocketOpts.varID >= 4 &&    // RH MeanRH MinRH MaxRH
+			m_pAnalysis->m_pocketOpts.varID <= 7) ||
+			(m_pAnalysis->m_pocketOpts.varID >= 16 &&   // FM1 FM10 FM100 FM1000 FMHerb FMWood
+				m_pAnalysis->m_pocketOpts.varID <= 21))
+			tStr.Format("had an %s %s %.0f",
+				m_pAnalysis->m_pocketOpts.m_IndexString,
+				"below",
+				pcntile97);
+		else
+			tStr.Format("had an %s %s %.0f",
+				m_pAnalysis->m_pocketOpts.m_IndexString,
+				"above",
+				pcntile97);
+	}
 	else
-		tStr.Format("had an %s %s %.0f", 
-		m_pAnalysis->m_pocketOpts.m_IndexString, 
-		"above",
-		pcntile97);
+	{
+		bool wantLower = false;
+		if (climSet.m_CriticalPercentile >= climSet.m_cp2)
+			wantLower = true;
+		tStr.Format("-- %.0f%% of the %ld days from %d - %d",
+			wantLower ? m_pAnalysis->m_pocketOpts.cp * 100.0 : (1.0 - m_pAnalysis->m_pocketOpts.cp) * 100.0, m_nObs,
+			m_pAnalysis->m_pocketOpts.startYear,
+			m_pAnalysis->m_pocketOpts.endYear);
+		pDC->SetTextColor(0x00000000);
+		pDC->TextOut(l, t, tStr);
+		t += tSize.cy + 1;
+		//if (climSet.m_CriticalPercentile >= climSet.m_cp2)//RH, moistures, etc
+		//{
+			tStr.Format("had an %s %s %.0f",
+				m_pAnalysis->m_pocketOpts.m_IndexString,
+				wantLower ? "below" : "above",
+				pcntile97);
+		/* }
+		else // normal
+		{
+			tStr.Format("had an %s %s %.0f",
+				m_pAnalysis->m_pocketOpts.m_IndexString,
+				"above",
+				pcntile97);
+		}*/
+	}
 	pDC->TextOut(slRect.left, t, tStr);
 	
 
