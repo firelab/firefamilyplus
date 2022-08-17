@@ -11,9 +11,9 @@ using namespace std;
 using namespace utctime;
 
 
-tm CFW21Data::ParseISO8061(const string input)
+TM CFW21Data::ParseISO8061(const string input)
 {
-	tm thisTime = { 0 };
+	TM thisTime = { 0 };
 	//first, need to know if extended or basic ISO 8061 format, and if Zulu time or time zone offset, also if milliseconds are included(but we'll ignore them...)
 	bool isExtended = false;
 	bool isZulu = false;
@@ -65,6 +65,11 @@ tm CFW21Data::ParseISO8061(const string input)
 			else
 				nRead = sscanf(input.c_str(), "%4d%2d%2dT%2d%2d%2d%3d%2d", &y, &M, &d, &h, &m, &s, &tzh, &tzm);
 		}
+	}
+	if (y < 0 || M <= 0 || M > 12 || d <= 0 || d > 31 || h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59)
+	{
+		thisTime.tm_year = thisTime.tm_mon = thisTime.tm_mday = thisTime.tm_hour = thisTime.tm_min = thisTime.tm_sec = -1;
+		return thisTime;
 	}
 	//now build the tm
 	if (isZulu)//convert to local time
@@ -250,7 +255,6 @@ int CFW21Data::LoadFile(const char *fw21FileName, int tzOffsetHours/* = 0*/)
 		{
 			printf("Error: DateTime is blank, line %d\n", lineNo);
 			continue;
-			continue;
 		}
 		if (firstRec)
 		{
@@ -259,7 +263,12 @@ int CFW21Data::LoadFile(const char *fw21FileName, int tzOffsetHours/* = 0*/)
 				m_bTimeIsZulu = true;
 			firstRec = false;
 		}
-		tm recTime = ParseISO8061(strDate);
+		TM recTime = ParseISO8061(strDate);
+		if (recTime.tm_mon < 0 || recTime.tm_mday <= 0 || recTime.tm_hour < 0 || recTime.tm_min < 0 || recTime.tm_sec < 0)
+		{
+			printf("Error, line %d date (%s) is invalid, skipping record\n", lineNo, strDate.c_str());
+			continue;
+		}
 		thisRec.SetDateTime(recTime);
 		if (tmpIdx >= 0)//use Fahrenheit if present
 		{
@@ -431,17 +440,15 @@ NFDRSDailyRec CFW21Data::GetNFDRSDailyRec(size_t recNum)//zero based! valid: 0->
 	}
 	rec = GetRec(recNum);
 	NFDRSDailyRec goodRec(rec);
-	tm trgTime = rec.GetDateTime();
-	time_t trgTimet = mktime(&trgTime), thisTimet;
+	TM trgTime = rec.GetDateTime();
+	Time64_T trgTimet = mktime64(&trgTime), thisTimet;
 	double tMin = rec.GetTemp(), tMax = rec.GetTemp(), rhMin = rec.GetRH(), pcp = rec.GetPrecip();
-	if (pcp < 0.0)
-		pcp = 0.0;
 	size_t checkRec = recNum - 1;
 	while (checkRec >= 0)
 	{
 		rec2 = GetRec(checkRec);
-		tm thisTime = rec2.GetDateTime();
-		thisTimet = mktime(&thisTime);
+		TM thisTime = rec2.GetDateTime();
+		thisTimet = mktime64(&thisTime);
 		if (difftime(trgTimet, thisTimet) >= SECS_PER_DAY)
 			break;
 		double thisTemp = rec2.GetTemp(), thisRH = rec2.GetRH(), thisPcp = rec2.GetPrecip();
@@ -490,16 +497,16 @@ int CFW21Data::AddRecord(FW21Record rec)
 	return 1;
 }
 
-string FormatTM(tm in, int offsetHours)
+string FormatTM(TM in, int offsetHours)
 {
 	char buf[64];
 	string ret = "";
 	if(offsetHours < 0)
-		sprintf(buf, "%4d-%02d-%02dT%02d:%02d:00%03d:00",
+		sprintf(buf, "%4ld-%02d-%02dT%02d:%02d:00%03d:00",
 			in.tm_year + 1900, in.tm_mon + 1, in.tm_mday,
 			in.tm_hour, in.tm_min, offsetHours);
 	else
-		sprintf(buf, "%4d-%02d-%02dT%02d:%02d:00%02d:00",
+		sprintf(buf, "%4ld-%02d-%02dT%02d:%02d:00%02d:00",
 			in.tm_year + 1900, in.tm_mon + 1, in.tm_mday,
 			in.tm_hour, in.tm_min, offsetHours);
 

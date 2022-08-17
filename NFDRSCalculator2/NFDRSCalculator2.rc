@@ -146,7 +146,7 @@ BEGIN
     LTEXT           "Temperature:",IDC_STATIC,249,21,43,8
     GROUPBOX        "Weather",IDC_STATIC,236,7,142,52,0,WS_EX_DLGMODALFRAME
     LTEXT           "SOW:",IDC_STATIC,250,45,20,8
-    GROUPBOX        "NFDRS2016 Specific",IDC_STATIC,7,157,373,66
+    GROUPBOX        "NFDRS4 Specific",IDC_STATIC,7,157,373,66
     LTEXT           "GSI:",IDC_STATIC,15,167,54,8,0,WS_EX_RIGHT
     EDITTEXT        IDC_GSI,82,165,63,12,ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN_GSI,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,148,166,12,14
@@ -233,7 +233,7 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "Comments", "Includes NFDR2016, and uses CNFDRS.dll, the C++ National Fire Danger Rating System DLL"
+            VALUE "Comments", "Includes NFDRS4, and uses CNFDRS.dll, the C++ National Fire Danger Rating System DLL"
             VALUE "CompanyName", "Fire Sciences Lab"
             VALUE "FileDescription", "National Fire Danger Rating System Calculator"
             VALUE "FileVersion", "2.1.0.14"

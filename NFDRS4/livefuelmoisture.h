@@ -3,8 +3,8 @@
 #include <math.h>
 #include <vector>
 #include <deque>
-#include "LFMCalcState.h"
-using namespace std;
+#include "lfmcalcstate.h"
+
 #define NOVALUE -9999.9
 #define RADPERDAY 0.017214
 #define RADPERDEG 0.01745329
@@ -58,7 +58,7 @@ class LiveFuelMoisture
         double CalcDayl(double lat,int yday);
         double CalcVPDavg(double TempDewF, double TempAvgF);
         double CalcVPD(double RH, double TempF);
-        double CalcDPT(double tempF, int RH);
+        double CalcDPT(double tempF, double RH);
         double CalcVP(double tempF);
 
 		double GetMaxGSI();
@@ -80,7 +80,7 @@ class LiveFuelMoisture
         bool m_IsAnnual;
         int m_LFIdaysAvg;
         double m_Lat;
-		deque<double> qGSI;
+		std::deque<double> qGSI;
         double m_TminMin;
         double m_TminMax;
         double m_VPDMin;

@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
-#include "NFDR2016StateSizes.h"
+#include "nfdrs4statesizes.h"
+#include <stdio.h>
+#include <time.h>
 
 class LFMCalcState
 {
@@ -40,7 +42,5 @@ public:
 	FP_STORAGE_TYPE m_pcpMax;
 
 	std::vector<FP_STORAGE_TYPE> m_qGSI;
-	//char m_qPrecipSize;
-	//std::vector<float> m_qPrecip;
 };
 

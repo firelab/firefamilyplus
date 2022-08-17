@@ -28,8 +28,7 @@
 #include<numeric>
 
 #include "livefuelmoisture.h"
-#include <atlbase.h>
-#include <ctime>
+//#include <ctime>
 
 using namespace std;
 
@@ -447,12 +446,12 @@ double LiveFuelMoisture::GetDaylInd(double Dayl)
     }
 }
 
-double LiveFuelMoisture::CalcDPT(double tempF, int RH)
+double LiveFuelMoisture::CalcDPT(double tempF, double RH)
 {
     //double vp = CalcVP(tempF);
     //return (273/(1-log(vp/611)/19.59)) - 273;
     double safeTemp = min(140.0, tempF);
-    int safeRH = max(5.0, (double) RH);
+    int safeRH = (int)max(5.0, RH);
     double dp = -398.36 - 7428.6 / (-15.674 + log(safeRH / 100.0 * exp(-7482.6/(safeTemp + 398.36) + 15.675)));
     return dp;
 }

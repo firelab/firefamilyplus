@@ -34,6 +34,10 @@
 using std::cerr;
 using std::endl;
 using std::ostringstream;
+using std::istream;
+using std::ostream;
+using std::string;
+using std::vector;
 
 // Custom include files
 #include "deadfuelmoisture.h"
@@ -2059,6 +2063,8 @@ SB 1/6/2007
                     double rn = uniformRandom( -.0001, 0.0001 );
                     m_s[i] += rn;
                 }
+                //constrain to Sir instead of 1.0 as otherwise once we get in here we never leave saturation (continuousLiquid stays always true)
+                //this has only been found to occur when m_wmx is > 0.45 via call to setMaxLocalMoisture() for 1 hour sticks
                 m_s[i] = ( m_s[i] > Sir ) ? Sir : m_s[i];
                 m_s[i] = ( m_s[i] < 0. ) ? 0. : m_s[i];
             }
@@ -2496,13 +2502,13 @@ DFMCalcState DeadFuelMoisture::GetState()
 	{
 		//float tVal;
 		//tVal = m_t[i];
-		ret.m_t.push_back(m_t[i]);
+		ret.m_t.push_back((float)m_t[i]);
 		//tVal = m_s[i];
-		ret.m_s.push_back(m_s[i]);
+		ret.m_s.push_back((float)m_s[i]);
 		//tVal = m_d[i];
-		ret.m_d.push_back(m_d[i]);
+		ret.m_d.push_back((float)m_d[i]);
 		//tVal = m_w[i];
-		ret.m_w.push_back(m_w[i]);
+		ret.m_w.push_back((float)m_w[i]);
 	}
 	return ret;
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include "CNFDRS.h"
-#include "nfdrs2016.h"
+#include "nfdrs4.h"
 #include "UGCtrl.h"
 #include "ExtCheckBox.h"
 
@@ -47,7 +47,7 @@ public:
 	CComboBox m_FMCombo;
 	BOOL m_use88;
 	CNFDRS m_nfdrs;
-	NFDR2016Calc m_nfdrs2016;
+	NFDRS4 m_nfdrs2016;
 	afx_msg void OnBnClickedAddToTable();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);

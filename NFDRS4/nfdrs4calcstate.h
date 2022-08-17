@@ -1,20 +1,20 @@
 #pragma once
-#include "DFMCalcState.h"
-#include "LFMCalcState.h"
+#include "dfmcalcstate.h"
+#include "lfmcalcstate.h"
 #include <string>
 #include <vector>
-#include "NFDR2016StateSizes.h"
+#include "nfdrs4statesizes.h"
 #include "utctime.h"
 
-class NFDR2016Calc;
+class NFDRS4;
 
-class NFDR2016CalcState
+class NFDRS4State
 {
 public:
-	NFDR2016CalcState();
-	NFDR2016CalcState(NFDR2016Calc *pNFDRS);
-	NFDR2016CalcState(const NFDR2016CalcState& rhs);
-	~NFDR2016CalcState();
+	NFDRS4State();
+	NFDRS4State(NFDRS4 *pNFDRS);
+	NFDRS4State(const NFDRS4State& rhs);
+	~NFDRS4State();
 
 	bool LoadState(std::string fileName);
 	bool SaveState(std::string fileName);

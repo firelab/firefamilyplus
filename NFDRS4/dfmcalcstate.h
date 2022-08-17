@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-#include "NFDR2016StateSizes.h"
+#include "nfdrs4statesizes.h"
 
 class DFMCalcState
 {

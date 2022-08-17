@@ -251,11 +251,11 @@ CString modelStrings[] =
 	"S - Tundra",
 	"T - Sagebrush-Grass",
 	"U - Western Pines",
-	"V - Grass (2016)",
-	"W - Grass-Shrub (2016)",
-	"X - Brush (2016)",
-	"Y - Timber (2016)",
-	"Z - Slash/Blowdown (2016)"
+	"V - Grass (NFDRS4)",
+	"W - Grass-Shrub (NFDRS4)",
+	"X - Brush (NFDRS4)",
+	"Y - Timber (NFDRS4)",
+	"Z - Slash/Blowdown (NFDRS4)"
 };
 
 CPocketCardDialog::CPocketCardDialog(CWnd* pParent /*=NULL*/, CFireplusSet *_fpSet /*=NULL*/,

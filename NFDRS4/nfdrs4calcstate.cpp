@@ -1,17 +1,17 @@
-#include "NFDR2016CalcState.h"
-#include "NFDRS2016.h"
+#include "nfdrs4.h"
+#include "nfdrs4calcstate.h"
 
 
-NFDR2016CalcState::NFDR2016CalcState()
+NFDRS4State::NFDRS4State()
 {
 }
 
 
-NFDR2016CalcState::~NFDR2016CalcState()
+NFDRS4State::~NFDRS4State()
 {
 }
 
-NFDR2016CalcState::NFDR2016CalcState(const NFDR2016CalcState& rhs)
+NFDRS4State::NFDRS4State(const NFDRS4State& rhs)
 {
 	m_NFDRSVersion = rhs.m_NFDRSVersion;
 	fm1State = rhs.fm1State;
@@ -57,7 +57,7 @@ NFDR2016CalcState::NFDR2016CalcState(const NFDR2016CalcState& rhs)
 
 }
 
-NFDR2016CalcState::NFDR2016CalcState(NFDR2016Calc *pNFDRS)
+NFDRS4State::NFDRS4State(NFDRS4 *pNFDRS)
 {
 	m_AvgPrecip = pNFDRS->AvgPrecip;
 	m_BI = pNFDRS->BI;
@@ -93,7 +93,7 @@ NFDR2016CalcState::NFDR2016CalcState(NFDR2016Calc *pNFDRS)
 	std::deque<double> qCopy = pNFDRS->qPrecip;
 	while(qCopy.size() > 0)
 	{
-		tVal = qCopy.front();
+		tVal = (float)qCopy.front();
 		m_qPrecip.push_back(tVal);
 		qCopy.pop_front();
 	}
@@ -103,9 +103,9 @@ NFDR2016CalcState::NFDR2016CalcState(NFDR2016Calc *pNFDRS)
 	std::deque<double> qPcpCopy = pNFDRS->qHourlyPrecip;
 	for (int h = 0; h < pNFDRS->nHoursPerDay; h++)
 	{
-		m_qHourlyTemp.push_back(qTempCopy.front());
-		m_qHourlyRH.push_back(qRHcopy.front());
-		m_qHourlyPrecip.push_back(qPcpCopy.front());
+		m_qHourlyTemp.push_back((float)qTempCopy.front());
+		m_qHourlyRH.push_back((float)qRHcopy.front());
+		m_qHourlyPrecip.push_back((float)qPcpCopy.front());
 		qTempCopy.pop_front();
 		qRHcopy.pop_front();
 		qPcpCopy.pop_front();
@@ -121,14 +121,14 @@ NFDR2016CalcState::NFDR2016CalcState(NFDR2016Calc *pNFDRS)
 }
 
 
-bool NFDR2016CalcState::LoadState(std::string fileName)
+bool NFDRS4State::LoadState(std::string fileName)
 {
 	FILE *in = fopen(fileName.c_str(), "rb");
 	if (!in)
 		return false;
 
 	bool status;
-	int nRead = fread(&m_NFDRSVersion, sizeof(m_NFDRSVersion), 1, in);
+	size_t nRead = fread(&m_NFDRSVersion, sizeof(m_NFDRSVersion), 1, in);
 	if (nRead != 1)
 	{
 		fclose(in);
@@ -455,7 +455,7 @@ bool NFDR2016CalcState::LoadState(std::string fileName)
 	return true;
 }
 
-bool NFDR2016CalcState::SaveState(std::string fileName)
+bool NFDRS4State::SaveState(std::string fileName)
 {
 	FILE *out = fopen(fileName.c_str(), "wb");
 	if (!out)
@@ -463,7 +463,7 @@ bool NFDR2016CalcState::SaveState(std::string fileName)
 
 	bool status;
 	//write version first
-	int nWrite = fwrite(&m_NFDRSVersion, sizeof(m_NFDRSVersion), 1, out);
+	size_t nWrite = fwrite(&m_NFDRSVersion, sizeof(m_NFDRSVersion), 1, out);
 	if (nWrite != 1)
 	{
 		fclose(out);

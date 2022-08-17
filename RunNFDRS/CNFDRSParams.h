@@ -1,5 +1,5 @@
 #pragma once
-#include "NFDRS2016.h"
+#include "NFDRS4.h"
 
 class CGSIParams
 {

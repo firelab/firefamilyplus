@@ -11,7 +11,7 @@
 #include <direct.h>
 #include "fw21.h"
 #include "ImportDoneDialog.h"
-//#include <deque>
+#include <string>
 
 // CFW21ImportDlg dialog
 extern CFireplusApp theApp;
@@ -66,8 +66,8 @@ struct FW21ImportData
 	int nErrors;
 	bool bOverwrite;
 	FILE* errLog;
-	string importFileName;
-	string stationID;
+	std::string importFileName;
+	std::string stationID;
 	CFireplusDoc* pDoc;
 	int count;
 };
@@ -130,8 +130,8 @@ bool ImportFW21RunProc(const CUPDUPDATA* pCUPDUPData)
 		pCUPDUPData->SetProgress(progText);
 		pCUPDUPData->SetProgress((double)r / (double)fw21Data.GetNumRecs() * 100.0);
 		FW21Record rec = fw21Data.GetRec(r), rec2;
-		tm trgTime = rec.GetDateTime();
-		time_t trgTimet = mktime(&trgTime), thisTimet;
+		TM trgTime = rec.GetDateTime();
+		time_t trgTimet = mktime64(&trgTime), thisTimet;
 		double tMin = rec.GetTemp(), tMax = rec.GetTemp(), rhMin = rec.GetRH(), rhMax = rec.GetRH(), pcp = rec.GetPrecip();
 		if (pcp < 0.0)
 			pcp = 0.0;
@@ -143,8 +143,8 @@ bool ImportFW21RunProc(const CUPDUPDATA* pCUPDUPData)
 		while (checkRec >= 0)
 		{
 			rec2 = fw21Data.GetRec(checkRec);
-			tm thisTime = rec2.GetDateTime();
-			thisTimet = mktime(&thisTime);
+			TM thisTime = rec2.GetDateTime();
+			thisTimet = mktime64(&thisTime);
 			if (difftime(trgTimet, thisTimet) >= SECS_PER_DAY)
 				break;
 			double thisTemp = rec2.GetTemp(), thisRH = rec2.GetRH(), thisPcp = rec2.GetPrecip();
@@ -172,7 +172,7 @@ bool ImportFW21RunProc(const CUPDUPDATA* pCUPDUPData)
 		//ok, now place record in twxObs
 		twxObs.AddNew();
 		twxObs.m_StationID = pData->stationID.c_str();
-		tm dateTime = rec.GetDateTime();
+		TM dateTime = rec.GetDateTime();
 		int y = dateTime.tm_year + 1900;
 		int m = dateTime.tm_mon + 1;
 		int d = dateTime.tm_mday;

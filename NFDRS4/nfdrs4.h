@@ -1,5 +1,5 @@
-#ifndef _NFDRS2016_H
-#define _NFDRS2016_H
+#ifndef _NFDRS4_H
+#define _NFDRS4_H
 
 
 // Standard include files
@@ -17,25 +17,14 @@
 #include <deque>
 #include "deadfuelmoisture.h"
 #include "livefuelmoisture.h"
-#include "station.h"
+#include "nfdrs4calcstate.h"
 #include "utctime.h"
 
-/*using namespace std;
-using std::istream;
-using std::ostream;
-using std::setfill;
-using std::setw;
-using std::string;
-using std::vector;
-*/
 
-class NFDR2016CalcState;
-/**************************** NFDRDLL.H ***********************************
+
+/**************************** nfdrs4.h ***********************************
 
 First Letter of Variable or Function Name:
-
-    i = integer (2-byte)
-   f = doubleing Point
 
 Variable Names Used in Function Calls:
 
@@ -83,65 +72,31 @@ Functions:
 
     Calc		Performs a calculation, returns value(s)
     Do			Performs an action
-    Get		Returns values from the DLL
-      Set		Sets values in the DLL
+    Get		Returns values
+    Set		Sets values
 
     Some functions return calculated values. Most, especially integer
    typed functions, return "success status": 1=Success, 0=Failure.
 
    Most requested values are returned as function arguments.
 
-Visual BASIC Notes:
-
-    integer used throughout, to be compatable with VB Integer Type.
-   Strings Avoided to prevent calling issues between VB/C.
-
-   In VB, use "ByVal" unless pointer (*) in DLL.
-
-   Example DECLARE statements and calling conventions:
-
-    DECLARE FUNCTION iSetFuelModel LIB "NFDRCALC.DLL"
-            (ByVal intFuelMod) as integer
-
-      DECLARE FUNCTION iGetFuelModel LIB "NFDRCALC.DLL"
-            (intFuelModel) as integer
-
-      Dim strFM as string
-      dim intFM as integer
-      dim intReturn as integer
-
-      strFM = "A"
-      intFM = ASC(strFM)
-      intReturn = iSetFuelModel (intFM)
-      if intReturn = 0 then
-        msgbox "Invalid Fuel Model"
-      end if
-
-      ...
-
-      intReturn = iGetFuelModel (intFM)
-      if intReturn = 0 then
-        msgbox "No Fuel Model Loaded Into DLL."
-      else
-        msgbox "Current Fuel Model Is " & CHR$(intFM)
-      end if
 
 ***************************************************************************/
 
 //------------------------------------------------------------------------------
-/*! \class NFDR2016Calc
+/*! \class NFDRS4
     \brief Main calculator for the US National Fire Danger Rating System components
     and indices.
 */
-class NFDR2016Calc
+class NFDRS4
 {
     public:
-		NFDR2016Calc();
-        NFDR2016Calc(double Lat,char FuelModel,int SlopeClass, double AvgAnnPrecip,bool LT,bool Cure, bool IsAnnual);
-        ~NFDR2016Calc();
+		NFDRS4();
+        NFDRS4(double Lat,char FuelModel,int SlopeClass, double AvgAnnPrecip,bool LT,bool Cure, bool IsAnnual);
+        ~NFDRS4();
         // Member functions
 		void Init(double Lat, char FuelModel, int SlopeClass, double AvgAnnPrecip, bool LT, bool Cure, bool isAnnual, int kbdiThreshold, int RegObsHour = 13);
-       void Update(Wx);
+      // void Update(Wx);
 	   void Update(int Year, int Month, int Day, int Hour, int Julian, double Temp, double MinTemp, double MaxTemp, double RH, double MinRH, double PPTAmt, double pcp24, double SolarRad, double WS, bool SnowDay, int RegObsHr);
        void Update(int Year, int Month, int Day, int Hour, double Temp, double RH, double PPTAmt, double SolarRad, double WS, bool SnowDay);
        void UpdateDaily(int Year, int Month, int Day, int Julian, double Temp, double MinTemp, double MaxTemp, double RH, double MinRH, double pcp24, double WS, double fMC1, double fMC10, double fMC100, double fMC1000, double fuelTemp, bool SnowDay/* = false*/);
@@ -197,9 +152,9 @@ class NFDR2016Calc
 		bool GetMxdHumid();
 		double GetFuelTemperature();
 		double GetXDaysPrecipitation(int nDays);
-		bool ReadState(string fileName);
-		bool SaveState(string fileName);
-		bool LoadState(NFDR2016CalcState state);
+		bool ReadState(std::string fileName);
+		bool SaveState(std::string fileName);
+		bool LoadState(NFDRS4State state);
 		const int nPrecipQueueDays = 90;
         const int nHoursPerDay = 24;
         double GetMinTemp();
@@ -240,11 +195,7 @@ class NFDR2016Calc
 		double FuelTemperature;
 		double m_GSI;
 		int nConsectiveSnowDays;
-       // ofstream debug;
-		//time_t lastObsTime;
-        //list<double> prcp;
         int m_regObsHour;
-		//time_t lastUpdateTime;
         time_t utcHourDiff;
         utctime::UTCTime lastUtcUpdateTime;
         utctime::UTCTime lastDailyUpdateTime;

@@ -10,6 +10,8 @@
 #include "FireFilterDialog.h"
 #include "afxwin.h"
 #include "updialog2.h"
+#include <vector>
+#include <string>
 
 class CFireplusDoc;
 
@@ -100,8 +102,8 @@ protected:
 
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-	INT_PTR RunFW13Import(vector<string> importFileNames, FILE *errLog, int *nErrors);
-	INT_PTR RunFWXImport(vector<string> importFileNames, FILE *errLog, int *nErrors);
+	INT_PTR RunFW13Import(std::vector<std::string> importFileNames, FILE *errLog, int *nErrors);
+	INT_PTR RunFWXImport(std::vector<std::string> importFileNames, FILE *errLog, int *nErrors);
 public:
 	CUPDUPDATA* pCUPDUPData;
 	CButton m_genericFireButton;

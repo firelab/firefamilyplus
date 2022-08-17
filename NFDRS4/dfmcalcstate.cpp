@@ -1,4 +1,4 @@
-#include "DFMCalcState.h"
+#include "dfmcalcstate.h"
 #include "fstream"
 
 using namespace std;

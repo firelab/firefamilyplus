@@ -146,7 +146,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\.;.\UGInclude;.\NFDRS2016;.\CNFDRS;.\RunNFDRS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;.\UGInclude;.\NFDRS4;.\CNFDRS;.\RunNFDRS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -168,7 +168,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;odbc32.lib;CNFDRS2016.lib;CNFDRS.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;odbc32.lib;NFDRS4.lib;CNFDRS.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>.\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -250,7 +250,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>.\UGInclude;.\CNFDRS;.\NFDRS2016;.\RunNFDRS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\UGInclude;.\CNFDRS;.\NFDRS4;.\RunNFDRS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -272,7 +272,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;odbc32.lib;CNFDRS.lib;CNFDRS2016.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib;odbc32.lib;CNFDRS.lib;NFDRS4.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>.\Release;%(AdditionalLibraryDirectories);$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
@@ -1530,7 +1530,7 @@
     <ClCompile Include="NFDRS2016WxFrame.cpp" />
     <ClCompile Include="NFDRS2016WxSet.cpp" />
     <ClCompile Include="NFDRS2016WxView.cpp" />
-    <ClCompile Include="NFDRS2016\utctime.cpp" />
+    <ClCompile Include="NFDRS4\time64.c" />
     <ClCompile Include="NoWxDialog.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -2647,7 +2647,10 @@
     <ClInclude Include="NFDRS2016WxFrame.h" />
     <ClInclude Include="NFDRS2016WxSet.h" />
     <ClInclude Include="NFDRS2016WxView.h" />
-    <ClInclude Include="NFDRS2016\utctime.h" />
+    <ClInclude Include="NFDRS4\time64.h" />
+    <ClInclude Include="NFDRS4\time64_config.h" />
+    <ClInclude Include="NFDRS4\time64_limits.h" />
+    <ClInclude Include="NFDRS4\utctime.h" />
     <ClInclude Include="NoWxDialog.h" />
     <ClInclude Include="NumSpinCtrl.h" />
     <ClInclude Include="ObsAgySet.h" />

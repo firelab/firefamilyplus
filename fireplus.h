@@ -6,7 +6,7 @@
 
 
 #include "CNFDRS.h"
-#include "NFDRS2016.h"
+#include "NFDRS4.h"
 #include "CTimeZones.h"
 
 class CSIGStationSet;
@@ -164,7 +164,7 @@ public:
 	//CNfdrs m_NFDRS;
 	//CDNFDRS4 m_NFDRS;
 	CNFDRS m_NFDRS;
-	NFDR2016Calc m_NFDRS2016;
+	NFDRS4 m_NFDRS2016;
 	BOOL m_ForceNFDRS2016Recompute;
 	BOOL m_UseDailyExtremes;
 	int maxMissingWx;

@@ -1,5 +1,5 @@
 /**
-\mainpage The United States National Fire Danger Rating System, version 2016 (NFDRS2016)
+\mainpage The United States National Fire Danger Rating System, version 4 (NFDRS4)
 
 */
 // Note: Moved IC calculation into CalcIndex 15 Apr 2016
@@ -14,10 +14,8 @@
 #include <math.h>
 #include <float.h>
 #include <algorithm>
-#include "nfdrs2016.h"
-#include "station.h"
+#include "nfdrs4.h"
 #include <time.h>
-#include "NFDR2016CalcState.h"
 
 #define SNOWDAYS_TRIGGER 5
 const double NORECORD = -999.0;
@@ -44,7 +42,7 @@ using namespace utctime;
 #define USE_CDB_METHOD
 //#undef USE_CDB_METHOD
 
-NFDR2016Calc::NFDR2016Calc()
+NFDRS4::NFDRS4()
 {
 	CTA = 0.0459137;
 	NFDRSVersion = 16;                                          // NFDRS Model Version
@@ -64,11 +62,11 @@ NFDR2016Calc::NFDR2016Calc()
 }
 
 
-// Constructor for the NFDRS 2016 Calculator Class
+// Constructor for the NFDRS4 Calculator Class
 // inLat: Latitude (degrees)
 // FuelModel: Fuel Model (char)
 //
-NFDR2016Calc::NFDR2016Calc(double inLat, char FuelModel,int inSlopeClass, double inAvgAnnPrecip,bool LT,bool Cure, bool IsAnnual)
+NFDRS4::NFDRS4(double inLat, char FuelModel,int inSlopeClass, double inAvgAnnPrecip,bool LT,bool Cure, bool IsAnnual)
 {
 	StartKBDI = 100;
 	Init(inLat, FuelModel, inSlopeClass, inAvgAnnPrecip, LT, Cure, IsAnnual, 100);// , 1.0, 0.5);
@@ -100,12 +98,12 @@ NFDR2016Calc::NFDR2016Calc(double inLat, char FuelModel,int inSlopeClass, double
 
 }
 
-NFDR2016Calc::~NFDR2016Calc()
+NFDRS4::~NFDRS4()
 {
 
 }
 
-void NFDR2016Calc::Init(double inLat, char iFuelModel, int inSlopeClass, double inAvgAnnPrecip, bool LT, bool Cure, bool isAnnual, int kbdiThreshold, int RegObsHour/* = 13*/)//, double fMaxGSI , double fGSIGreenupThreshold )
+void NFDRS4::Init(double inLat, char iFuelModel, int inSlopeClass, double inAvgAnnPrecip, bool LT, bool Cure, bool isAnnual, int kbdiThreshold, int RegObsHour/* = 13*/)//, double fMaxGSI , double fGSIGreenupThreshold )
 {
 	CTA = 0.0459137;
 	NFDRSVersion = 16;                                          // NFDRS Model Version
@@ -139,10 +137,10 @@ void NFDR2016Calc::Init(double inLat, char iFuelModel, int inSlopeClass, double 
 	HundredHourFM.setMaximumLocalMoisture(0.35);
 	ThousandHourFM.setMaximumLocalMoisture(0.35);
 
-    OneHourFM.setMoisture(0.2);
-    TenHourFM.setMoisture(0.2);
-    HundredHourFM.setMoisture(0.2);
-    ThousandHourFM.setMoisture(0.2);
+    OneHourFM.setMoisture(0.2f);
+    TenHourFM.setMoisture(0.2f);
+    HundredHourFM.setMoisture(0.2f);
+    ThousandHourFM.setMoisture(0.2f);
     
     //iSetFuelModel(FuelModel);                                   // Set the Fuel model
 	UseLoadTransfer = LT;                                       // Use Load Transfer? (bool)
@@ -175,17 +173,17 @@ void NFDR2016Calc::Init(double inLat, char iFuelModel, int inSlopeClass, double 
     utcHourDiff = utctime::get_hour_diff();
 }
 
-void NFDR2016Calc::SetSCMax(int maxSC)
+void NFDRS4::SetSCMax(int maxSC)
 {
 	SCM = maxSC;
 }
 
-int NFDR2016Calc::GetSCMax()
+int NFDRS4::GetSCMax()
 {
 	return SCM;
 }
 
-void NFDR2016Calc::SetMxdHumid(bool isHumid)
+void NFDRS4::SetMxdHumid(bool isHumid)
 {
 	mxdHumid = isHumid;
 	if (isHumid)
@@ -214,13 +212,13 @@ void NFDR2016Calc::SetMxdHumid(bool isHumid)
 	}
 }
 
-bool NFDR2016Calc::GetMxdHumid()
+bool NFDRS4::GetMxdHumid()
 {
 	return mxdHumid;
 }
 
 
-double NFDR2016Calc::GetFuelTemperature()
+double NFDRS4::GetFuelTemperature()
 {
 	return FuelTemperature;
 }
@@ -229,7 +227,7 @@ double NFDR2016Calc::GetFuelTemperature()
 *
 *
 ***************************************************************************/
-int NFDR2016Calc::iSetFuelMoistures (double fMC1, double fMC10,double fMC100, double fMC1000, double fMCWood, double fMCHerb, double fuelTempC)
+int NFDRS4::iSetFuelMoistures (double fMC1, double fMC10,double fMC100, double fMC1000, double fMCWood, double fMCHerb, double fuelTempC)
 {
    MC1 = fMC1;
    MC10 = fMC10;
@@ -261,8 +259,8 @@ int CalcJulianDay(int year, int month, int day)
     return dayOfYear;
 }
 
-//void NFDR2016Calc::Update(int Year, int Month, int Day, int Hour, int Julian, double Temp, double MinTemp, double MaxTemp, double RH, double PPTAcc, double PPTAmt, double SolarRad, double WS, bool SnowDay, int RegObsHr)
-void NFDR2016Calc::Update(int Year, int Month, int Day, int Hour, int Julian, double Temp, double MinTemp, double MaxTemp, double RH, double MinRH, double PPTAmt, double pcp24, double SolarRad, double WS, bool SnowDay, int RegObsHr)
+//void NFDRS4::Update(int Year, int Month, int Day, int Hour, int Julian, double Temp, double MinTemp, double MaxTemp, double RH, double PPTAcc, double PPTAmt, double SolarRad, double WS, bool SnowDay, int RegObsHr)
+void NFDRS4::Update(int Year, int Month, int Day, int Hour, int Julian, double Temp, double MinTemp, double MaxTemp, double RH, double MinRH, double PPTAmt, double pcp24, double SolarRad, double WS, bool SnowDay, int RegObsHr)
 {
     int tJulian = CalcJulianDay(Year, Month - 1, Day);
     if (Julian != tJulian)
@@ -414,7 +412,7 @@ void NFDR2016Calc::Update(int Year, int Month, int Day, int Hour, int Julian, do
     lastUtcUpdateTime = thisUtcTime;
 }
 
-void NFDR2016Calc::Update(int Year, int Month, int Day, int Hour, double Temp, double RH, double PPTAmt, double SolarRad, double WS, bool SnowDay)
+void NFDRS4::Update(int Year, int Month, int Day, int Hour, double Temp, double RH, double PPTAmt, double SolarRad, double WS, bool SnowDay)
 {
     int Julian = CalcJulianDay(Year, Month - 1, Day);
     if (PrevYear > 0 && YesterdayJDay > 0)
@@ -596,7 +594,7 @@ void NFDR2016Calc::Update(int Year, int Month, int Day, int Hour, double Temp, d
     lastUtcUpdateTime = thisUtcTime;
 }
 
-void NFDR2016Calc::UpdateDaily(int Year, int Month, int Day, int Julian, double Temp, double MinTemp, 
+void NFDRS4::UpdateDaily(int Year, int Month, int Day, int Julian, double Temp, double MinTemp, 
 	double MaxTemp, double RH, double MinRH, double pcp24, double WS,
 	double fMC1, double fMC10, double fMC100, double fMC1000, double fuelTemp,bool SnowDay)
 {
@@ -674,7 +672,7 @@ void NFDR2016Calc::UpdateDaily(int Year, int Month, int Day, int Julian, double 
     lastUtcUpdateTime = lastUtcUpdateTime = thisUtcTime;
 }
 
-void NFDR2016Calc::Update(Wx wxRec)
+/*void NFDRS4::Update(Wx wxRec)
 {
     // "old" method of determining daily obs -   Type 'O', or 1300hr
     int RegObsHr=13;
@@ -685,10 +683,10 @@ void NFDR2016Calc::Update(Wx wxRec)
 	//Update(wxRec.m_Year, wxRec.m_Month, wxRec.m_Day, wxRec.m_Hour, wxRec.m_JDay, wxRec.m_Temp, wxRec.m_TmpMin, wxRec.m_TmpMax, wxRec.m_RH, wxRec.m_PPTACC, wxRec.m_PPTAMT24, wxRec.m_SolarRadiation, wxRec.m_WS, wxRec.m_SnowDay, 13);
 	Update(wxRec.m_Year, wxRec.m_Month, wxRec.m_Day, wxRec.m_Hour, wxRec.m_JDay, wxRec.m_Temp, wxRec.m_TmpMin, wxRec.m_TmpMax, wxRec.m_RH, wxRec.m_RHMin, wxRec.m_PPTAMT, wxRec.m_PPTAMT24, wxRec.m_SolarRadiation, wxRec.m_WS, wxRec.m_SnowDay, 13);
 
-}
+}*/
 
 
-void NFDR2016Calc::iSetFuelModel (char cFM)
+void NFDRS4::iSetFuelModel (char cFM)
 {
 
     SG1 = 2000;
@@ -803,14 +801,14 @@ void NFDR2016Calc::iSetFuelModel (char cFM)
 
 }
 
-// Calculates all Components and Indices for NFDRS2016
+// Calculates all Components and Indices for NFDRS4
 // iWS: Windspeed (mph)
 // iSlopeCls: Slope Class (1-5 or actual in degrees)
 // fSC: Spread Component (dim)
 // fERC: Energy Release Component (dim)
 // fBI: Burning Index (dim)
 // fIC: Ignition Component (dim)
-int NFDR2016Calc::iCalcIndexes (int iWS, int iSlopeCls,double* fSC,double* fERC, double* fBI, double *fIC, double fGSI, double fKBDI)
+int NFDRS4::iCalcIndexes (int iWS, int iSlopeCls,double* fSC,double* fERC, double* fBI, double *fIC, double fGSI, double fKBDI)
 {
 
     double STD = .0555, STL = .0555;
@@ -1139,7 +1137,7 @@ int NFDR2016Calc::iCalcIndexes (int iWS, int iSlopeCls,double* fSC,double* fERC,
 *
 *
 ************************************************************************/
-int NFDR2016Calc::iCalcKBDI (double fPrecipAmt, int iMaxTemp,
+int NFDRS4::iCalcKBDI (double fPrecipAmt, int iMaxTemp,
                 double fCummPrecip, int iYKBDI, double fAvgPrecip)
 {
     int net = 0, idq = 0;
@@ -1186,8 +1184,8 @@ int NFDR2016Calc::iCalcKBDI (double fPrecipAmt, int iMaxTemp,
 *
 *
 ***************************************************************************/
-//double NFDR2016Calc::Cure(double fMCHerb, double fGSI, double fGreenupThreshold, double fGSIMax)
-double NFDR2016Calc::Cure(double fGSI, double fGreenupThreshold, double fGSIMax)
+//double NFDRS4::Cure(double fMCHerb, double fGSI, double fGreenupThreshold, double fGSIMax)
+double NFDRS4::Cure(double fGSI, double fGreenupThreshold, double fGSIMax)
 {
    double GreenupThreshold,MaxGSI,MinLFMVal,MaxLFMVal;
     
@@ -1217,12 +1215,12 @@ double NFDR2016Calc::Cure(double fGSI, double fGreenupThreshold, double fGSIMax)
 *
 *
 ***************************************************************************/
-//int NFDR2016Calc::iCalcIC (int iTemp, int iSOW,CHANGED SB
+//int NFDRS4::iCalcIC (int iTemp, int iSOW,CHANGED SB
  //        double fMC1, int iSC, int* iIC)
 // iFuelTemp: Fuel surface temperature (C)
 // fMC1: Fuel Moisture Content
 //
-/*int NFDR2016Calc::iCalcIC (int iFuelTemp, double fMC1, double fSC, int* iIC)
+/*int NFDRS4::iCalcIC (int iFuelTemp, double fMC1, double fSC, int* iIC)
 {
    double tfact = 0.0, TMPPRM = 0.0;
    double PNORM1 = 0.00232, PNORM2 = 0.99767;//, PNORM3 = 0.0000185;
@@ -1266,7 +1264,7 @@ double NFDR2016Calc::Cure(double fGSI, double fGreenupThreshold, double fGSIMax)
 
    return (1);
 }*/
-void NFDR2016Calc::SetGSIParams(double MaxGSI, double GreenupThreshold, double TminMin /*= -2.0*/, double TminMax /*= 5.0*/, double VPDMin /*= 900 */, double VPDMax /*= 4100 */,
+void NFDRS4::SetGSIParams(double MaxGSI, double GreenupThreshold, double TminMin /*= -2.0*/, double TminMax /*= 5.0*/, double VPDMin /*= 900 */, double VPDMax /*= 4100 */,
 	double DaylMin /*= 36000*/, double DaylMax /*= 39600*/, unsigned int MAPeriod/* = 21U*/, bool UseVPDAvg, unsigned int nPrecipDays/* = 30*/, double rtPrecipMin /*= 0.5*/, 
     double rtPrecipMax /*= 1.5*/, bool UseRTPrecip /* = false*/)
 {
@@ -1278,7 +1276,7 @@ void NFDR2016Calc::SetGSIParams(double MaxGSI, double GreenupThreshold, double T
     GsiFM.SetUseRTPrecip(UseRTPrecip);
 }
 
-void NFDR2016Calc::SetHerbGSIparams(double MaxGSI, double GreenupThreshold, double TminMin /*= -2.0*/, double TminMax /*= 5.0*/ , double VPDMin /*= 900 */ , double VPDMax /*= 4100 */ ,
+void NFDRS4::SetHerbGSIparams(double MaxGSI, double GreenupThreshold, double TminMin /*= -2.0*/, double TminMax /*= 5.0*/ , double VPDMin /*= 900 */ , double VPDMax /*= 4100 */ ,
 	double DaylMin /*= 36000*/, double DaylMax /*= 39600*/, unsigned int MAPeriod/* = 21U*/, bool UseVPDAvg, unsigned int nPrecipDays/* = 30*/, double rtPrecipMin /*= 0.5*/, 
     double rtPrecipMax /*= 1.5*/, bool UseRTPrecip /* = false*/,
     double herbMin /*= 30.0*/, double herbMax/* = 250.0*/)
@@ -1295,7 +1293,7 @@ void NFDR2016Calc::SetHerbGSIparams(double MaxGSI, double GreenupThreshold, doub
         MCHERB = herbMax;
 }
 
-void NFDR2016Calc::SetWoodyGSIparams(double MaxGSI, double GreenupThreshold, double TminMin /*= -2.0*/ , double TminMax /*= 5.0*/ , double VPDMin /*= 900 */ , double VPDMax /*= 4100 */ ,
+void NFDRS4::SetWoodyGSIparams(double MaxGSI, double GreenupThreshold, double TminMin /*= -2.0*/ , double TminMax /*= 5.0*/ , double VPDMin /*= 900 */ , double VPDMax /*= 4100 */ ,
 	double DaylMin /*= 36000*/, double DaylMax /*= 39600*/, unsigned int MAPeriod /* = 21U*/, bool UseVPDAvg, unsigned int nPrecipDays/* = 30*/, double rtPrecipMin /*= 0.5*/, 
     double rtPrecipMax /*= 1.5*/, bool UseRTPrecip /* = false*/,
     double woodyMin /*= 60.0*/, double woodyMax /*= 200.0*/)
@@ -1312,7 +1310,7 @@ void NFDR2016Calc::SetWoodyGSIparams(double MaxGSI, double GreenupThreshold, dou
         MCWOOD = woodyMax;
 }
 
-void NFDR2016Calc::SetOneHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
+void NFDRS4::SetOneHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
 {
     Set1HourRadius(radius);
     Set1HourAdsorptionRate(adsorptionRate);
@@ -1320,7 +1318,7 @@ void NFDR2016Calc::SetOneHourParams(double radius, double adsorptionRate, double
     Set1HourMaxLocalMoisture(maxLocalMoisture);
     Set1HourDesorptionRate(desorptionRate);
 }
-void NFDR2016Calc::SetTenHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
+void NFDRS4::SetTenHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
 {
     Set10HourRadius(radius);
     Set10HourAdsorptionRate(adsorptionRate);
@@ -1328,7 +1326,7 @@ void NFDR2016Calc::SetTenHourParams(double radius, double adsorptionRate, double
     Set10HourMaxLocalMoisture(maxLocalMoisture);
     Set10HourDesorptionRate(desorptionRate);
 }
-void NFDR2016Calc::SetHundredHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
+void NFDRS4::SetHundredHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
 {
     Set100HourRadius(radius);
     Set100HourAdsorptionRate(adsorptionRate);
@@ -1336,7 +1334,7 @@ void NFDR2016Calc::SetHundredHourParams(double radius, double adsorptionRate, do
     Set100HourMaxLocalMoisture(maxLocalMoisture);
     Set100HourDesorptionRate(desorptionRate);
 }
-void NFDR2016Calc::SetThousandHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
+void NFDRS4::SetThousandHourParams(double radius, double adsorptionRate, double maxLocalMoisture, double stickDensity, double desorptionRate)
 {
     Set1000HourRadius(radius);
     Set1000HourAdsorptionRate(adsorptionRate);
@@ -1345,117 +1343,117 @@ void NFDR2016Calc::SetThousandHourParams(double radius, double adsorptionRate, d
     Set1000HourDesorptionRate(desorptionRate);
 }
 
-void NFDR2016Calc::Set1HourRadius(double radius)
+void NFDRS4::Set1HourRadius(double radius)
 {
     OneHourFM.initializeParameters(radius, "One Hour");
 }
 
-void NFDR2016Calc::Set1HourAdsorptionRate(double adsorptionRate)
+void NFDRS4::Set1HourAdsorptionRate(double adsorptionRate)
 {
     OneHourFM.setAdsorptionRate(adsorptionRate);
 }
 
-void NFDR2016Calc::Set1HourStickDensity(double stickDensity)
+void NFDRS4::Set1HourStickDensity(double stickDensity)
 {
     OneHourFM.setStickDensity(stickDensity);
 }
 
-void NFDR2016Calc::Set1HourMaxLocalMoisture(double maxLocalMoisture)
+void NFDRS4::Set1HourMaxLocalMoisture(double maxLocalMoisture)
 {
     OneHourFM.setMaximumLocalMoisture(maxLocalMoisture);
 }
 
-void NFDR2016Calc::Set1HourDesorptionRate(double desorptionRate)
+void NFDRS4::Set1HourDesorptionRate(double desorptionRate)
 {
     OneHourFM.setDesorptionRate(desorptionRate);
 }
 
-void NFDR2016Calc::Set10HourRadius(double radius)
+void NFDRS4::Set10HourRadius(double radius)
 {
     TenHourFM.initializeParameters(radius, "Ten Hour");
 }
 
-void NFDR2016Calc::Set10HourAdsorptionRate(double adsorptionRate)
+void NFDRS4::Set10HourAdsorptionRate(double adsorptionRate)
 {
     TenHourFM.setAdsorptionRate(adsorptionRate);
 }
 
-void NFDR2016Calc::Set10HourStickDensity(double stickDensity)
+void NFDRS4::Set10HourStickDensity(double stickDensity)
 {
     TenHourFM.setStickDensity(stickDensity);
 }
 
-void NFDR2016Calc::Set10HourMaxLocalMoisture(double maxLocalMoisture)
+void NFDRS4::Set10HourMaxLocalMoisture(double maxLocalMoisture)
 {
     TenHourFM.setMaximumLocalMoisture(maxLocalMoisture);
 }
 
-void NFDR2016Calc::Set10HourDesorptionRate(double desorptionRate)
+void NFDRS4::Set10HourDesorptionRate(double desorptionRate)
 {
     TenHourFM.setDesorptionRate(desorptionRate);
 }
 
-void NFDR2016Calc::Set100HourRadius(double radius)
+void NFDRS4::Set100HourRadius(double radius)
 {
     HundredHourFM.initializeParameters(radius, "Hundred Hour");
 }
 
-void NFDR2016Calc::Set100HourAdsorptionRate(double adsorptionRate)
+void NFDRS4::Set100HourAdsorptionRate(double adsorptionRate)
 {
     HundredHourFM.setAdsorptionRate(adsorptionRate);
 }
 
-void NFDR2016Calc::Set100HourStickDensity(double stickDensity)
+void NFDRS4::Set100HourStickDensity(double stickDensity)
 {
     HundredHourFM.setStickDensity(stickDensity);
 }
 
-void NFDR2016Calc::Set100HourMaxLocalMoisture(double maxLocalMoisture)
+void NFDRS4::Set100HourMaxLocalMoisture(double maxLocalMoisture)
 {
     HundredHourFM.setMaximumLocalMoisture(maxLocalMoisture);
 }
 
-void NFDR2016Calc::Set100HourDesorptionRate(double desorptionRate)
+void NFDRS4::Set100HourDesorptionRate(double desorptionRate)
 {
     HundredHourFM.setDesorptionRate(desorptionRate);
 }
 
-void NFDR2016Calc::Set1000HourRadius(double radius)
+void NFDRS4::Set1000HourRadius(double radius)
 {
     ThousandHourFM.initializeParameters(radius, "Thousand Hour");
 }
 
-void NFDR2016Calc::Set1000HourAdsorptionRate(double adsorptionRate)
+void NFDRS4::Set1000HourAdsorptionRate(double adsorptionRate)
 {
     ThousandHourFM.setAdsorptionRate(adsorptionRate);
 }
 
-void NFDR2016Calc::Set1000HourStickDensity(double stickDensity)
+void NFDRS4::Set1000HourStickDensity(double stickDensity)
 {
     ThousandHourFM.setStickDensity(stickDensity);
 }
 
-void NFDR2016Calc::Set1000HourMaxLocalMoisture(double maxLocalMoisture)
+void NFDRS4::Set1000HourMaxLocalMoisture(double maxLocalMoisture)
 {
     ThousandHourFM.setMaximumLocalMoisture(maxLocalMoisture);
 }
 
-void NFDR2016Calc::Set1000HourDesorptionRate(double desorptionRate)
+void NFDRS4::Set1000HourDesorptionRate(double desorptionRate)
 {
     ThousandHourFM.setDesorptionRate(desorptionRate);
 }
 
-void NFDR2016Calc::SetStartKBDI(int sKBDI)
+void NFDRS4::SetStartKBDI(int sKBDI)
 {
 	YKBDI = KBDI = StartKBDI = sKBDI;
 }
 
-int NFDR2016Calc::GetStartKBDI()
+int NFDRS4::GetStartKBDI()
 {
 	return StartKBDI;
 }
 
-double NFDR2016Calc::GetXDaysPrecipitation(int nDays)
+double NFDRS4::GetXDaysPrecipitation(int nDays)
 {
 	double startVal = 0.0, val = 0.0;
 	if (nDays >= qPrecip.size())
@@ -1472,22 +1470,22 @@ double NFDR2016Calc::GetXDaysPrecipitation(int nDays)
 	return val;
 }
 
-bool NFDR2016Calc::ReadState(string fileName)
+bool NFDRS4::ReadState(string fileName)
 {
-	NFDR2016CalcState state;
+	NFDRS4State state;
 	bool loadStatus = state.LoadState(fileName);
 	if(loadStatus)
 		return LoadState(state);
 	return loadStatus;
 }
 
-bool NFDR2016Calc::SaveState(string fileName)
+bool NFDRS4::SaveState(string fileName)
 {
-	NFDR2016CalcState state(this);
+	NFDRS4State state(this);
 	return state.SaveState(fileName);
 }
 
-bool NFDR2016Calc::LoadState(NFDR2016CalcState state)
+bool NFDRS4::LoadState(NFDRS4State state)
 {
 	NFDRSVersion = state.m_NFDRSVersion;
 	Lat = state.m_Lat;
@@ -1547,7 +1545,7 @@ bool NFDR2016Calc::LoadState(NFDR2016CalcState state)
 	return true;
 }
 
-double NFDR2016Calc::GetMinTemp()
+double NFDRS4::GetMinTemp()
 {
     double minTemp = NORECORD;
     for (auto it = qHourlyTemp.begin(); it != qHourlyTemp.end(); ++it)
@@ -1563,7 +1561,7 @@ double NFDR2016Calc::GetMinTemp()
     return minTemp;
 }
 
-double NFDR2016Calc::GetMaxTemp()
+double NFDRS4::GetMaxTemp()
 {
     double maxTemp = NORECORD;
     for (auto it = qHourlyTemp.begin(); it != qHourlyTemp.end(); ++it)
@@ -1578,7 +1576,7 @@ double NFDR2016Calc::GetMaxTemp()
     }
     return maxTemp;
 }
-double NFDR2016Calc::GetMinRH()
+double NFDRS4::GetMinRH()
 {
     double minRH = NORECORD;
     for (auto it = qHourlyRH.begin(); it != qHourlyRH.end(); ++it)
@@ -1593,7 +1591,7 @@ double NFDR2016Calc::GetMinRH()
     }
     return minRH;
 }
-double NFDR2016Calc::GetPcp24()
+double NFDRS4::GetPcp24()
 {
     double pcp24 = 0.0;
     for (auto it = qHourlyPrecip.begin(); it != qHourlyPrecip.end(); ++it)

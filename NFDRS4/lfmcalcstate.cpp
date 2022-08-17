@@ -1,4 +1,4 @@
-#include "LFMCalcState.h"
+#include "lfmcalcstate.h"
 
 
 
@@ -173,7 +173,7 @@ bool LFMCalcState::ReadState(FILE *in)
 
 bool LFMCalcState::SaveState(FILE *out)
 {
-	int nWrite = fwrite(&m_lastUpdateTime, sizeof(m_lastUpdateTime), 1, out);
+	size_t nWrite = fwrite(&m_lastUpdateTime, sizeof(m_lastUpdateTime), 1, out);
 	if (nWrite != 1)
 		return false;
 	nWrite = fwrite(&m_UseVPDAvg, sizeof(m_UseVPDAvg), 1, out);

@@ -1,5 +1,12 @@
 
 #include "csv_readrow.h"
+#include <string.h>
+#ifndef _MSC_VER
+//#include <unistd.h>
+#define _stricmp strcasecmp
+#define strnicmp strncasecmp
+//#define _access access
+#endif
 
 
 std::vector<std::string> csv_read_row(std::string &line, char delimiter)
@@ -54,11 +61,11 @@ int getColIndex(std::string colName, std::vector<std::string> colNames)
 {
 	//int colNum = -1;
 	char trgName[64], trgCols[64];
-	strcpy_s(trgName,trim(colName).data());
+	strcpy(trgName,trim(colName).data());
 	char *p = strchr(trgName, ' ');
 	for(int i=0, leng=colNames.size(); i<leng; i++)
 	{
-		strcpy_s(trgCols, trim(colNames[i]).data());
+		strcpy(trgCols, trim(colNames[i]).data());
 		if(_stricmp(trgName,trgCols) == 0)
 		//if(colNames[i].compare(colName) == 0)
 		{

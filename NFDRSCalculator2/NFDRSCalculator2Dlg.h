@@ -103,7 +103,7 @@ protected:
 	afx_msg void OnBnClickedCalculate();
 	DECLARE_MESSAGE_MAP()
 public:
-	NFDR2016Calc m_nfdrs2016;
+	NFDRS4 m_nfdrs2016;
 	CNFDRS m_nfdrs;
 	CStatic static1;
 	CStatic static2;

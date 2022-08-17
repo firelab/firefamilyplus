@@ -26,7 +26,7 @@
 #ifndef _DEADFUELMOISTURE_H_INCLUDED_
 #define _DEADFUELMOISTURE_H_INCLUDED_
 
-#include "DFMCalcState.h"
+#include "dfmcalcstate.h"
 // Standard include files
 #include <cmath>
 #include <iomanip>
@@ -35,12 +35,6 @@
 #include <string>
 #include <vector>
 #include <string.h>
-using std::istream;
-using std::ostream;
-using std::setfill;
-using std::setw;
-using std::string;
-using std::vector;
 
 // Custom include files
 #ifdef HAVE_CONFIG_H
@@ -351,13 +345,13 @@ static const int DFM_States = 11;
 
 // Friends
 public:
-    friend ostream &operator<<( ostream& output, const DeadFuelMoisture& r );
-    friend istream &operator>>( istream& input, DeadFuelMoisture& r );
+    friend std::ostream &operator<<(std::ostream& output, const DeadFuelMoisture& r );
+    friend std::istream &operator>>(std::istream& input, DeadFuelMoisture& r );
 
 // Public methods
 public:
     // Constructors
-    DeadFuelMoisture( double radius=0.64, const string& name="" ) ;
+    DeadFuelMoisture( double radius=0.64, const std::string& name="" ) ;
     // Virtual destructor permits subclassing
     virtual ~DeadFuelMoisture( void ) ;
     // Copy constructor
@@ -366,10 +360,10 @@ public:
     const DeadFuelMoisture& operator=( const DeadFuelMoisture& rhs ) ;
     const char* className( void ) const ;
     // Static convenience functions
-    static DeadFuelMoisture* createDeadFuelMoisture1( const string& name="" ) ;
-    static DeadFuelMoisture* createDeadFuelMoisture10( const string& name="" ) ;
-    static DeadFuelMoisture* createDeadFuelMoisture100( const string& name="" ) ;
-    static DeadFuelMoisture* createDeadFuelMoisture1000( const string& name="" ) ;
+    static DeadFuelMoisture* createDeadFuelMoisture1( const std::string& name="" ) ;
+    static DeadFuelMoisture* createDeadFuelMoisture10( const std::string& name="" ) ;
+    static DeadFuelMoisture* createDeadFuelMoisture100( const std::string& name="" ) ;
+    static DeadFuelMoisture* createDeadFuelMoisture1000( const std::string& name="" ) ;
     static double  deriveAdsorptionRate( double radius ) ;
     static int     deriveDiffusivitySteps( double radius ) ;
     static int     deriveMoistureSteps( double radius ) ;
@@ -435,7 +429,7 @@ public:
     // Methods to access update() results
     double elapsedTime( void ) const ;
     bool   initialized( void ) const ;
-    string name( void ) const ;
+    std::string name( void ) const ;
     double meanMoisture( void ) const ;
     double meanWtdMoisture( void ) const ;
 	double medianRadialMoisture(void) const;
@@ -481,7 +475,7 @@ public:
     void setWaterFilmContribution( double waterFilm=0.0 ) ;
 	void setMoisture(float initFM);
 	double eqmc(double fTemp, double fRH);
-	void initializeParameters( double radius, const string& name ) ;
+	void initializeParameters( double radius, const std::string& name ) ;
 	DFMCalcState GetState();
 	bool SetState(DFMCalcState state);
 // Protected methods
@@ -489,7 +483,7 @@ protected:
     void diffusivity( double bp ) ;
 
     void initializeParameters(
-            const string& name,
+            const std::string& name,
             double  radius,
             int     stickNodes,
             int     moistureSteps,
@@ -528,7 +522,7 @@ protected:
     int     m_dSteps;   //!< Number of diffusivity computation steps per observation.
     double  m_hc;       //!< Stick planar heat transfer rate (cal/cm2-h-C).
     double  m_length;   //!< Stick length (cm).
-    string  m_name;     //!< Stick name or other descriptive text.
+    std::string  m_name;     //!< Stick name or other descriptive text.
     int     m_nodes;    //!< Number of stick nodes in the radial direction.
     double  m_radius;   //!< Stick radius (cm).
     double  m_rai0;     //!< Rain runoff factor during the initial hour of rainfall (dl).
@@ -549,8 +543,8 @@ protected:
     // Intermediate stick variables derived in initializeStick()
     double  m_dx;       //!< Internodal radial distance (cm).
     double  m_wmax;     //!< Maximum possible stick moisture content (g water/g dry fuel).
-    vector<double> m_x; //!< Array of nodal radial distances from stick center (cm).
-    vector<double> m_v; //!< Array of nodal volume weighting fractions (cm3 node/cm3 stick).
+    std::vector<double> m_x; //!< Array of nodal radial distances from stick center (cm).
+    std::vector<double> m_v; //!< Array of nodal volume weighting fractions (cm3 node/cm3 stick).
 
     // Optimization factors derived in initializeStick()
     double  m_amlf;     //!< \a aml optimization factor.
@@ -591,19 +585,19 @@ protected:
     double  m_sem;      //!< Stick equilibrium moisture content (g water/g dry fuel).
     double  m_wfilm;    //!< Amount of water film (0 or \a m_wfilmk) (g water/g dry fuel).
     double  m_elapsed;  //!< Total simulation elapsed time (h).
-    vector<double> m_t; //!< Array of nodal temperatures (oC).
-    vector<double> m_s; //!< Array of nodal fiber saturation points (g water/g dry fuel).
-    vector<double> m_d; //!< Array of nodal bound water diffusivities (cm2/h).
-    vector<double> m_w; //!< Array of nodal moisture contents (g water/g dry fuel).
+    std::vector<double> m_t; //!< Array of nodal temperatures (oC).
+    std::vector<double> m_s; //!< Array of nodal fiber saturation points (g water/g dry fuel).
+    std::vector<double> m_d; //!< Array of nodal bound water diffusivities (cm2/h).
+    std::vector<double> m_w; //!< Array of nodal moisture contents (g water/g dry fuel).
     long    m_updates;  //!< Number of calls made to update().
     int m_state;  //!< Prevailing dead fuel moisture state.
     int     m_randseed; //!< If not zero, nodal temperature, saturation, and moisture contents are pertubated by some small amount. If < 0, uses system clock for seed.
-    vector<double> m_Ttold; //!< Temporary array of nodal temperatures (oC).
-    vector<double> m_Tsold; //!< Temporary array of nodal fiber saturation points (g water/g dry fuel).
-    vector<double> m_Twold; //!< Temporary array of nodal moisture contents (g water/g dry fuel).
-    vector<double> m_Tv;    //!< Temporary array used to redistribute nodal temperatures
-    vector<double> m_To;    //!< Temporary array used to redistribute moisture contents
-    vector<double> m_Tg;    //!< Temporary array of nodal free water transport coefficients
+    std::vector<double> m_Ttold; //!< Temporary array of nodal temperatures (oC).
+    std::vector<double> m_Tsold; //!< Temporary array of nodal fiber saturation points (g water/g dry fuel).
+    std::vector<double> m_Twold; //!< Temporary array of nodal moisture contents (g water/g dry fuel).
+    std::vector<double> m_Tv;    //!< Temporary array used to redistribute nodal temperatures
+    std::vector<double> m_To;    //!< Temporary array used to redistribute moisture contents
+    std::vector<double> m_Tg;    //!< Temporary array of nodal free water transport coefficients
 };
 
 

@@ -1244,7 +1244,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About FireFamily Plus"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LTEXT           "FireFamily Plus ",IDC_STATIC,154,7,119,8,SS_NOPREFIX
+    LTEXT           "FireFamily Plus  Research Edition",IDC_STATIC,154,7,155,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2000-2022",IDC_STATIC,154,27,119,8
     DEFPUSHBUTTON   "OK",IDOK,320,7,32,14,WS_GROUP
     LTEXT           "Version 5",IDC_VERSION_STRING,154,17,136,8
@@ -1286,7 +1286,7 @@ BEGIN
     GROUPBOX        "SIG/Station",IDC_STATIC,20,53,131,26
     GROUPBOX        "Analysis Period Length (Days)",IDC_STATIC,19,121,131,24
     LTEXT           "Grid",IDC_GRID,7,163,421,68,WS_BORDER
-    CONTROL         "Force NFDRS2016 Recompute",IDC_CHECK_FORCE_RECOMPUTE,
+    CONTROL         "Force NFDRS4 Recompute",IDC_CHECK_FORCE_RECOMPUTE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,284,121,115,10
     CONTROL         "Use Daily Extremes",IDC_CHECK_DAILY_EXTREMES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,284,136,77,10
 END
@@ -1618,7 +1618,7 @@ BEGIN
     LTEXT           "Regular Scheduled Obs Hour:",IDC_STATIC,191,157,96,8
     LTEXT           "NESDIS ID:",IDC_STATIC,249,171,39,8
     LTEXT           "WRCC ID:",IDC_STATIC,165,171,34,8
-    GROUPBOX        "NFDRS 2016 Specific",IDC_STATIC,388,10,107,127
+    GROUPBOX        "NFDRS4 Specific",IDC_STATIC,388,10,107,127
     LTEXT           "Fuel Model",IDC_STATIC,392,22,36,8
     LTEXT           "Max SC",IDC_STATIC,438,22,26,8
     LTEXT           "Humid",IDC_STATIC,467,22,21,8
@@ -3006,7 +3006,7 @@ BEGIN
     LTEXT           "Day",IDC_STATIC,249,15,14,8
     LTEXT           "SIG/Station Metadata:",IDC_STATIC_TABLELABEL,7,75,101,8
     LTEXT           "Grid",IDC_GRID,7,76,441,68,WS_BORDER
-    CONTROL         "Force NFDRS2016 Recompute",IDC_CHECK_FORCE_RECOMPUTE,
+    CONTROL         "Force NFDRS4 Recompute",IDC_CHECK_FORCE_RECOMPUTE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,312,44,115,10
     CONTROL         "Use Daily Extremes",IDC_CHECK_DAILY_EXTREMES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,312,58,76,10
 END
@@ -3971,7 +3971,7 @@ BEGIN
         BEGIN
             VALUE "Comments", "5.0.042"
             VALUE "CompanyName", "Fire Sciences Lab"
-            VALUE "FileDescription", "FireFamily Plus MFC Application"
+            VALUE "FileDescription", "FireFamily Plus MFC Application Research Version"
             VALUE "FileVersion", "5.0.0.42"
             VALUE "InternalName", "fireplus"
             VALUE "LegalCopyright", "Copyright (C)1998-2022"
@@ -6082,7 +6082,7 @@ BEGIN
     ID_OPTIONS_CAUSECODES   "USFS Statistical Cause Codes\nUSFS Statistical Cause Codes"
     ID_OPTIONS_CAUSECODES2  "DOI Statistical Cause Codes\nDOI Statistical Cause Codes"
     ID_VIEWOBSERVATIONS_NFDRS2016_INPUTS 
-                            "View Working Set NFDRS2016 Weather Inputs\nNFDRS2016 Weather Inputs"
+                            "View Working Set NFDRS4 Weather Inputs\nNFDRS2016 Weather Inputs"
     ID_UTILITIES_SNOWFLAG   "Manage Snow Flag\nSnow Flag"
     ID_SNOWFLAG_SETBYFILTER "Set SnowFlag by Annual Filter\nSet SnowFlag by Filter"
     ID_SNOWFLAG_FILLHOURLYFROMDAILY 
