@@ -24,7 +24,10 @@
     <ClCompile Include="..\RunNFDRS\csv_readrow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\NFDRS2016\utctime.cpp">
+    <ClCompile Include="..\NFDRS4\utctime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NFDRS4\time64.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,7 +38,16 @@
     <ClInclude Include="..\RunNFDRS\csv_readrow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\NFDRS2016\utctime.h">
+    <ClInclude Include="..\NFDRS4\utctime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NFDRS4\time64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NFDRS4\time64_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\NFDRS4\time64_limits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

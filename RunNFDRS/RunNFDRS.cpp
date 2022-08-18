@@ -1,17 +1,17 @@
 // RunNFDRS.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include "nfdrs2016.h"
+#include "nfdrs4.h"
 #include "RunNFDRSConfiguration.h"
 #include "NFDRSConfiguration.h"
 #include "CNFDRSParams.h"
-#include "NFDR2016CalcState.h"
+#include "NFDRS4CalcState.h"
 #include "fw21.h"
 #include <io.h>
 #include <stdlib.h>
 using namespace std;
 
-string FormatToISO8061Offset(tm inTm, int offset)
+string FormatToISO8061Offset(TM inTm, int offset)
 {
 	char buf[64];
 	sprintf(buf, "%04d-%02d-%02dT%02d:%02d:%02d%+03d:00", inTm.tm_year + 1900, inTm.tm_mon + 1,
@@ -117,14 +117,14 @@ int main(int argc, char* argv[])
 		}
 	}
 	//at this point we should have everything we need
-	NFDR2016Calc fw21Calc;
+	NFDRS4 fw21Calc;
 	//use NFDRSParams to initialize NFDR2016Calc object
 	//params.InitNFDRS(&thisCalc);
 	params.InitNFDRS(&fw21Calc);
 	//do we have a state file?
 	if (strlen(loadStateFileName) > 0)
 	{
-		NFDR2016CalcState state;
+		NFDRS4State state;
 		state.LoadState(loadStateFileName);
 		fw21Calc.LoadState(state);
 	}

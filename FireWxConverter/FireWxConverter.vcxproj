@@ -88,7 +88,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\RunNFDRS;..\NFDRS2016</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\RunNFDRS;..\NFDRS4</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -103,7 +104,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\RunNFDRS;..\NFDRS2016</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\RunNFDRS;..\NFDRS4</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,13 +146,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\NFDRS2016\utctime.cpp" />
+    <ClCompile Include="..\NFDRS4\time64.c" />
+    <ClCompile Include="..\NFDRS4\utctime.cpp" />
     <ClCompile Include="..\RunNFDRS\CFW21Data.cpp" />
     <ClCompile Include="..\RunNFDRS\csv_readrow.cpp" />
     <ClCompile Include="FireWxConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\NFDRS2016\utctime.h" />
+    <ClInclude Include="..\NFDRS4\time64.h" />
+    <ClInclude Include="..\NFDRS4\time64_config.h" />
+    <ClInclude Include="..\NFDRS4\time64_limits.h" />
+    <ClInclude Include="..\NFDRS4\utctime.h" />
     <ClInclude Include="..\RunNFDRS\CFW21Data.h" />
     <ClInclude Include="..\RunNFDRS\csv_readrow.h" />
   </ItemGroup>

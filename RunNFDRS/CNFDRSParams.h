@@ -93,7 +93,7 @@ public:
 	~CNFDRSParams();
 
 	//to initialize an NFDRS2016Calc object
-	void InitNFDRS(NFDR2016Calc* pNFDRS);
+	void InitNFDRS(NFDRS4* pNFDRS);
 	//getters
 	char getFuelModel() { return m_fuelModel; }
 	int getMaxSC() { return m_maxSC; }

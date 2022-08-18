@@ -2,6 +2,7 @@
 #include <string>
 #include <ctime>
 #include <vector>
+#include "time64.h"
 
 const int iNODATA = -999;
 const double dNODATA = -999.0;
@@ -14,7 +15,7 @@ public:
 	~FW21Record();
 
 	//accessors
-	tm GetDateTime() { return m_dateTime; }
+	TM GetDateTime() { return m_dateTime; }
 	int GetYear() { return m_dateTime.tm_year + 1900;}
 	int GetMonth() { return m_dateTime.tm_mon + 1;}
 	int GetDay() { return m_dateTime.tm_mday; }
@@ -32,7 +33,7 @@ public:
 	int GetGustAzimuth() { return m_gustAzimuth; }
 
 	//setters
-	void SetDateTime(tm dateTime) { m_dateTime = dateTime; }
+	void SetDateTime(TM dateTime) { m_dateTime = dateTime; }
 	void SetTemp(double temp) { m_temp = temp; }
 	void SetRH(double rh) { m_RH = rh; }
 	void SetPrecip(double pcp) { m_pcp = pcp; }
@@ -44,7 +45,7 @@ public:
 	void SetGustAzimuth(int azi) { m_gustAzimuth = azi; }
 	 
 private:
-	tm m_dateTime;
+	TM m_dateTime;
 	double m_temp;
 	double m_RH;
 	double m_pcp;
@@ -112,7 +113,7 @@ public:
 	NFDRSRec GetNFDRSRec(size_t recNum);//zero based! valid: 0->GetNumRecs() - 1
 	size_t GetNumRecs() { return m_recs.size(); }
 	bool TimeIsZulu() {return m_bTimeIsZulu; }
-	tm ParseISO8061(const std::string input);
+	TM ParseISO8061(const std::string input);
 	int AddRecord(FW21Record rec);
 	int WriteFile(const char* fw21FileName, int offsetHours);
 

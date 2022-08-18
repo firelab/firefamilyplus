@@ -117,7 +117,7 @@ CNFDRSParams::~CNFDRSParams()
 
 }
 
-void CNFDRSParams::InitNFDRS(NFDR2016Calc* pNFDRS)
+void CNFDRSParams::InitNFDRS(NFDRS4* pNFDRS)
 {
 	if (!pNFDRS)
 		return;

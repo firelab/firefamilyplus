@@ -10,9 +10,9 @@ using namespace std;
 using namespace utctime;
 
 
-tm CFW21Data::ParseISO8061(const string input)
+TM CFW21Data::ParseISO8061(const string input)
 {
-	tm thisTime = { 0 };
+	TM thisTime = { 0 };
 	//first, need to know if extended or basic ISO 8061 format, and if Zulu time or time zone offset, also if milliseconds are included(but we'll ignore them...)
 	bool isExtended = false;
 	bool isZulu = false;
@@ -248,7 +248,7 @@ int CFW21Data::LoadFile(const char *fw21FileName, int tzOffsetHours/* = 0*/)
 				m_bTimeIsZulu = true;
 			firstRec = false;
 		}
-		tm recTime = ParseISO8061(strDate);
+		TM recTime = ParseISO8061(strDate);
 		thisRec.SetDateTime(recTime);
 		strTemp = vFields[tmpIdx];
 		trim(strTemp);
@@ -379,15 +379,15 @@ NFDRSRec CFW21Data::GetNFDRSRec(size_t recNum)//zero based! valid: 0->GetNumRecs
 	}
 	rec = GetRec(recNum);
 	NFDRSRec goodRec(rec);
-	tm trgTime = rec.GetDateTime();
-	time_t trgTimet = mktime(&trgTime), thisTimet;
+	TM trgTime = rec.GetDateTime();
+	Time64_T trgTimet = mktime64(&trgTime), thisTimet;
 	double tMin = rec.GetTemp(), tMax = rec.GetTemp(), rhMin = rec.GetRH(), pcp = rec.GetPrecip();
 	__int64 checkRec = recNum - 1;
 	while (checkRec >= 0)
 	{
 		rec2 = GetRec(checkRec);
-		tm thisTime = rec2.GetDateTime();
-		thisTimet = mktime(&thisTime);
+		TM thisTime = rec2.GetDateTime();
+		thisTimet = mktime64(&thisTime);
 		if (difftime(trgTimet, thisTimet) >= SECS_PER_DAY)
 			break;
 		double thisTemp = rec2.GetTemp(), thisRH = rec2.GetRH(), thisPcp = rec2.GetPrecip();
@@ -436,7 +436,7 @@ int CFW21Data::AddRecord(FW21Record rec)
 	return 1;
 }
 
-string FormatTM(tm in, int offsetHours)
+string FormatTM(TM in, int offsetHours)
 {
 	char buf[64];
 	string ret = "";
