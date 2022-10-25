@@ -8,7 +8,7 @@
 #endif // _MSC_VER > 1000
 // FireSelDialog.h : header file
 //
-#include "FireEditSet.h"
+#include "CFiresSet.h"
 #include "fireselectdatasource.h"
 #include "ugctbutn.h"
 
@@ -35,7 +35,7 @@ class CFireSelDialog : public CDialog
 // Construction
 public:
 	long selRec;
-	CFireSelDialog(CWnd* pParent = NULL, CFireEditSet *_records = NULL);   // standard constructor
+	CFireSelDialog(CWnd* pParent = NULL, CFiresSet *_records = NULL);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CFireSelDialog)
@@ -55,7 +55,7 @@ protected:
 	void SetRowData(long Row);
 	long virRec;
 	long totalRecs;
-	CFireEditSet * records;
+	CFiresSet * records;
 	FireSelCUG m_grid;
 	// Generated message map functions
 	//{{AFX_MSG(CFireSelDialog)

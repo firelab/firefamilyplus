@@ -25,7 +25,7 @@
 #include "ImportDoneDialog.h"
 #include "GenericFireImportDialog.h"
 
-#include "FireSet.h"
+#include "CFiresSet.h"
 #include ".\genericfireimportdialog.h"
 
 #include "GenericFireFieldsSet.h"
@@ -42,7 +42,7 @@ extern CFireplusApp theApp;
 extern int curr_runID;
 
 
-#define FireFields  34
+#define FireFields  15
 //#define defaultFireFields 0  
 long GetFireRegion(CFireRegionSet *regs, long agencyID, char * find)
 {
@@ -233,30 +233,30 @@ char *FireColNames[FireFields] =
 	"Fire Name",
 	"Latitude",
 	"Longitude",
-	"State",
-	"County",
-	"Township",
-	"Range",
-	"Section",
-	"Subsection",
-	"Fire Type",
-	"Slope",
-	"Elevation",
-	"Aspect",
-	"Fuel Model",
+	//"State",
+	//"County",
+	//"Township",
+	//"Range",
+	//"Section",
+	//"Subsection",
+	//"Fire Type",
+	//"Slope",
+	//"Elevation",
+	//"Aspect",
+	//"Fuel Model",
 	"Discovery Time",
-	"First Attack Date",
-	"First Attack Time",
-	"General Cause",
-	"Specific Cause",
-	"Class of People",
-	"Cause Narrative",
+	//"First Attack Date",
+	//"First Attack Time",
+	//"General Cause",
+	//"Specific Cause",
+	//"Class of People",
+	//"Cause Narrative",
 	"Containment Date",
 	"Containment Time",
 	"Strategy Met Date",
 	"Strategy Met Time",
-	"Fire Out Date",
-	"Fire Out Time"
+	//"Fire Out Date",
+	//"Fire Out Time"
 
 };
 
@@ -272,30 +272,30 @@ char *FireFieldNames[FireFields] =
 	"FireName", //11
 	"Latitude", //21
 	"Longitude", //22
-	"State", //8
-	"County", //9
-	"Township", //17
-	"Range", //18
-	"Section", //19
-	"SubSection", //20
-	"FireType", //27
-	"Slope", //23
-	"Elevation", //24
-	"Aspect", //25
-	"FuelModel", //26
+	//"State", //8
+	//"County", //9
+	//"Township", //17
+	//"Range", //18
+	//"Section", //19
+	//"SubSection", //20
+	//"FireType", //27
+	//"Slope", //23
+	//"Elevation", //24
+	//"Aspect", //25
+	//"FuelModel", //26
 	"DiscoveryTime", //1
-	"FirstAttackDate", // 2
-	"FirstAttackTime", //3
-	"GeneralCause", //13
-	"SpecificCause", //14
-	"ClassPeople", //15
-	"CauseNarr", //16
+	//"FirstAttackDate", // 2
+	//"FirstAttackTime", //3
+	//"GeneralCause", //13
+	//"SpecificCause", //14
+	//"ClassPeople", //15
+	//"CauseNarr", //16
 	"ContainDate", //28
 	"ContainTime", //29
 	"StrategyMetDate", //30
 	"StrategyMetTime", //31
-	"FireOutDate", //32
-	"FireOutTime" //33
+	//"FireOutDate", //32
+	//"FireOutTime" //33
 };
 
 
@@ -382,7 +382,7 @@ char *FireFieldNames[FireFields] =
 /////////////////////////////////////////////////////////////////////////////
 // CGenericFireImportDialog dialog
 
-CGenericFireImportDialog::CGenericFireImportDialog(CWnd* pParent /*=NULL*/, CFireSet *_records /*=NULL*/, CDatabase *_pDB, long _agencyID)
+CGenericFireImportDialog::CGenericFireImportDialog(CWnd* pParent /*=NULL*/, CFiresSet *_records /*=NULL*/, CDatabase *_pDB, long _agencyID)
 	: CDialog(CGenericFireImportDialog::IDD, pParent),regSet(_pDB), unitSet(_pDB), subSet(_pDB)
 	, m_RejectDups(FALSE)
 {
@@ -863,7 +863,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 
 	long count = 0, updates = 0, rejects = 0;
     int lastRegionID = 0;
-	int lastFireID = 0;
+	//int lastFireID = 0;
     
     char line[MAX_INPUT_LINE];
    
@@ -885,7 +885,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 	}
    
 
-	if(pDoc->HasTempFires())
+	if(pDoc->HasTempFire())
 	{
 		try
 		{
@@ -899,16 +899,16 @@ void CGenericFireImportDialog::OnGenericFire(){
 		
 		//pDoc->m_pDB->DeleteTableDef("ffpTempFire");
 	}
-	pDoc->CreateTempFires();
+	pDoc->CreateTempFire();
 
     CList<CString, CString> staList;
 
-	CFireSet fires(pDB);
-	fires.m_strSort = "[FireID],[FireNumber]";
+	CFiresSet fires(pDB);
+	fires.m_strSort = "[FireNumber]";
 	fires.Open();
 
-	CFireSet tfires(pDB);
-	tfires.m_strSort = "[FireID],[FireNumber]";
+	CFiresSet tfires(pDB);
+	tfires.m_strSort = "[FireNumber]";
 	tfires.Open(CRecordset::dynaset, "ffpTempFire");
 
 
@@ -1270,15 +1270,15 @@ void CGenericFireImportDialog::OnGenericFire(){
 		// calculate fireID if necessary
 		
 
-		if (lastFireID > 0)
+		/*if (lastFireID > 0)
 		{
 			lastFireID ++;
 			//sprintf(sFireID,"%d",lastFireID);
 		} 
 		else 
 		{
-			CFireSet fires(pDB);
-			fires.m_strSort.Format("[FireID]");
+			CFiresSet fires(pDB);
+			//fires.m_strSort.Format("[FireID]");
 			fires.Open();
 			if (! fires.IsEOF())
 			{
@@ -1296,14 +1296,14 @@ void CGenericFireImportDialog::OnGenericFire(){
 		tfires.m_Year.Format("%d",y);
 
 		//if (strlen(sFireID) > 0)
-		tfires.m_FireID = lastFireID;//atol(sFireID);
+		tfires.m_FireID = lastFireID;//atol(sFireID);*/
 		//else
 			//tfires.SetFieldNull(&tfires.m_FireID);
 
 		tfires.m_Discovery = discoveryDate;
 
-		/* FirstAttack */
-		COleDateTime firstattackDate;  
+		/* FirstAttack 
+		//COleDateTime firstattackDate;  
 
 		if (strlen(sFirstAttackDate) > 0 ){
 
@@ -1456,7 +1456,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 
 		} else {
           tfires.SetFieldNull(&tfires.m_FirstAttack);
-		}
+		}*/
 
         tfires.SetFieldNull(&tfires.m_AgencyID);
 		tfires.SetFieldNull(&tfires.m_RegionID);
@@ -1620,7 +1620,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 				continue;
 		}
 
-		if (strlen(sState) > 0)
+		/*if (strlen(sState) > 0)
 		{
 			sState[2] = 0;//safety truncate!
 			tfires.m_State = sState;
@@ -1633,7 +1633,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 			tfires.m_County = atol(sCounty);
 		else
             tfires.SetFieldNull(&tfires.m_County);
-
+		*/
 		if (strlen(sTotalAcres) > 0)
 			tfires.m_TotalAcres = atof(sTotalAcres);
 		else
@@ -1680,7 +1680,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 				continue;
 		}
            
-		if (strlen(sGeneralCause) > 0)
+		/*if (strlen(sGeneralCause) > 0)
 			tfires.m_GeneralCause = atol(sGeneralCause);
 		else
             tfires.SetFieldNull(&tfires.m_GeneralCause);
@@ -1733,14 +1733,15 @@ void CGenericFireImportDialog::OnGenericFire(){
 		} 
 		else
             tfires.SetFieldNull(&tfires.m_SubSection);
-
+		*/
 		if (strlen(sLatitude) > 0)
 		{
-			int dd, mm, ss;
+			tfires.m_latitude = atof(sLatitude);
+			/*int dd, mm, ss;
 			DecimalDegree2DDMMSS(atof(sLatitude), &dd, &mm, &ss);
 			tfires.m_LatDD = dd;
 			tfires.m_LatMM = mm;
-			tfires.m_LatSS = ss;
+			tfires.m_LatSS = ss;*/
 		   /*tfires.m_LatDD = atoi(sLatitude);
 		   tfires.m_LatMM = (int) ((atof(sLatitude) + .000001 - (float) (tfires.m_LatDD)) * 60.0);
            tfires.m_LatSS = (int) ((atof(sLatitude) + .000001 - ((float) (tfires.m_LatDD) + 0.0000001) - (float) (tfires.m_LatMM) / 60.0) * 60.0);
@@ -1752,9 +1753,9 @@ void CGenericFireImportDialog::OnGenericFire(){
 		} 
 		else 
 		{
-			   tfires.SetFieldNull(&tfires.m_LatDD);
-			   tfires.SetFieldNull(&tfires.m_LatMM);
-			   tfires.SetFieldNull(&tfires.m_LatSS);
+			   tfires.SetFieldNull(&tfires.m_latitude);
+			   //tfires.SetFieldNull(&tfires.m_LatMM);
+			   //tfires.SetFieldNull(&tfires.m_LatSS);
 		}
 		
 
@@ -1762,11 +1763,12 @@ void CGenericFireImportDialog::OnGenericFire(){
 
 		if (strlen(sLongitude) > 0)
 		{
-			int dd, mm, ss;
+			tfires.m_longitude = atof(sLongitude);
+			/*int dd, mm, ss;
 			DecimalDegree2DDMMSS(atof(sLongitude), &dd, &mm, &ss);
 			tfires.m_LonDD = dd;
 			tfires.m_LonMM = mm;
-			tfires.m_LonSS = ss;
+			tfires.m_LonSS = ss;*/
 			/*tfires.m_LonDD = atoi(sLongitude);
 		    tfires.m_LonMM = (int) ((atof(sLongitude) + .000001 - (float) (tfires.m_LonDD)) * 60.0);
             tfires.m_LonSS = (int) ((atof(sLongitude) + .000001 - ((float) (tfires.m_LonDD) + 0.000001) - (float) (tfires.m_LonMM) / 60.0) * 60.0);
@@ -1778,13 +1780,13 @@ void CGenericFireImportDialog::OnGenericFire(){
 		} 
 		else 
 		{
-			   tfires.SetFieldNull(&tfires.m_LonDD);
-			   tfires.SetFieldNull(&tfires.m_LonMM);
-			   tfires.SetFieldNull(&tfires.m_LonSS);
+			   tfires.SetFieldNull(&tfires.m_longitude);
+			   //tfires.SetFieldNull(&tfires.m_LonMM);
+			   //tfires.SetFieldNull(&tfires.m_LonSS);
 		}
 		
 
-		if (strlen(sSlope) > 0)
+		/*if (strlen(sSlope) > 0)
 		{
 			sSlope[1] = 0;//safety truncate!
 			tfires.m_Slope = sSlope;
@@ -1822,7 +1824,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 			tfires.m_FireType = sFireType;
 			tfires.m_FireType.Trim();
 		} else
-            tfires.SetFieldNull(&tfires.m_FireType);
+            tfires.SetFieldNull(&tfires.m_FireType);*/
 
 	    /* contain */
 
@@ -2140,7 +2142,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 		}
 
 		/* end strategy met */
-        /* fire out */
+        /* fire out 
 
 		COleDateTime FireOutDate;  
 
@@ -2295,7 +2297,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 
 		} else {
           tfires.SetFieldNull(&tfires.m_FireOut);
-		}
+		}*/
 
 
 		//Region, Unit, Subunit check
@@ -2431,11 +2433,11 @@ void CGenericFireImportDialog::OnGenericFire(){
 				//   cd->Increment();
 
 				if(tfires.IsFieldNull(&tfires.m_UnitID))//no unitID, check for dups at region level
-					fires.m_strFilter.Format("[AgencyID]=%ld AND [RegionID]=%ld AND [Year]='%s' AND [FireNumber]='%s'", 
-						tfires.m_AgencyID, tfires.m_RegionID, tfires.m_Year, tfires.m_FireNumber);
+					fires.m_strFilter.Format("[AgencyID]=%ld AND [RegionID]=%ld AND [FireNumber]='%s'", 
+						tfires.m_AgencyID, tfires.m_RegionID, tfires.m_FireNumber);
 				else//check for dups at unit level
-					fires.m_strFilter.Format("[AgencyID]=%ld AND [RegionID]=%ld AND [UnitID]=%ld AND [Year]='%s' AND [FireNumber]='%s'", 
-						tfires.m_AgencyID, tfires.m_RegionID, tfires.m_UnitID, tfires.m_Year, tfires.m_FireNumber);
+					fires.m_strFilter.Format("[AgencyID]=%ld AND [RegionID]=%ld AND [UnitID]=%ld AND [FireNumber]='%s'", 
+						tfires.m_AgencyID, tfires.m_RegionID, tfires.m_UnitID, tfires.m_FireNumber);
 
 				fires.Requery();
 
@@ -2467,17 +2469,17 @@ void CGenericFireImportDialog::OnGenericFire(){
 					newRec = true;
 				}
 
-				if (newRec)
-					if (! tfires.IsFieldNull(&tfires.m_FireID))				
-						fires.m_FireID = tfires.m_FireID;
+				//if (newRec)
+					//if (! tfires.IsFieldNull(&tfires.m_FireID))				
+					//	fires.m_FireID = tfires.m_FireID;
 				
 				if (! tfires.IsFieldNull(&tfires.m_Discovery))
 					fires.m_Discovery = tfires.m_Discovery;
 
-				if (! tfires.IsFieldNull(&tfires.m_FirstAttack))
+				/*if (!tfires.IsFieldNull(&tfires.m_FirstAttack))
 					fires.m_FirstAttack = tfires.m_FirstAttack;
 				if(newRec && tfires.IsFieldNull(&tfires.m_FirstAttack))
-					fires.SetFieldNull(&fires.m_FirstAttack);
+					fires.SetFieldNull(&fires.m_FirstAttack);*/
 
 				if (! tfires.IsFieldNull(&tfires.m_AgencyID))
 					fires.m_AgencyID = tfires.m_AgencyID;
@@ -2494,10 +2496,10 @@ void CGenericFireImportDialog::OnGenericFire(){
 				if(newRec && tfires.IsFieldNull(&tfires.m_UnitID))
 					fires.SetFieldNull(&fires.m_UnitID);
 
-				if (! tfires.IsFieldNull(&tfires.m_Year))
+				/*if (!tfires.IsFieldNull(&tfires.m_Year))
 	   				fires.m_Year = tfires.m_Year;
 				if(newRec && tfires.IsFieldNull(&tfires.m_Year))
-					fires.SetFieldNull(&fires.m_Year);
+					fires.SetFieldNull(&fires.m_Year);*/
 
 				if (! tfires.IsFieldNull(&tfires.m_SubunitID))
 					fires.m_SubunitID = tfires.m_SubunitID;
@@ -2510,7 +2512,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 				if(newRec && tfires.IsFieldNull(&tfires.m_FireNumber))
 					fires.SetFieldNull(&fires.m_FireNumber);
 			
-				if (! tfires.IsFieldNull(&tfires.m_State))
+				/*if (!tfires.IsFieldNull(&tfires.m_State))
 					fires.m_State = tfires.m_State;
 				if(newRec && tfires.IsFieldNull(&tfires.m_State))
 					fires.SetFieldNull(&fires.m_State);
@@ -2518,7 +2520,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 				if (! tfires.IsFieldNull(&tfires.m_County))
    					fires.m_County = tfires.m_County;
 				if(newRec && tfires.IsFieldNull(&tfires.m_County))
-					fires.SetFieldNull(&fires.m_County);
+					fires.SetFieldNull(&fires.m_County);*/
 
 				if (! tfires.IsFieldNull(&tfires.m_TotalAcres))
 					fires.m_TotalAcres = tfires.m_TotalAcres;
@@ -2535,7 +2537,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 				if(newRec && tfires.IsFieldNull(&tfires.m_StatisticalCause))
 					fires.SetFieldNull(&fires.m_StatisticalCause);
 
-				if (! tfires.IsFieldNull(&tfires.m_GeneralCause))
+				/*if (!tfires.IsFieldNull(&tfires.m_GeneralCause))
 					fires.m_GeneralCause = tfires.m_GeneralCause;
 				if(newRec && tfires.IsFieldNull(&tfires.m_GeneralCause))
 					fires.SetFieldNull(&fires.m_GeneralCause);
@@ -2573,11 +2575,13 @@ void CGenericFireImportDialog::OnGenericFire(){
 				if (! tfires.IsFieldNull(&tfires.m_SubSection))
 					fires.m_SubSection = tfires.m_SubSection;
 				if(newRec && tfires.IsFieldNull(&tfires.m_SubSection))
-					fires.SetFieldNull(&fires.m_SubSection);
+					fires.SetFieldNull(&fires.m_SubSection);*/
 
-				if (! tfires.IsFieldNull(&tfires.m_LatDD))
-					fires.m_LatDD = tfires.m_LatDD;
-				if(newRec && tfires.IsFieldNull(&tfires.m_LatDD))
+				if (!tfires.IsFieldNull(&tfires.m_latitude))
+					fires.m_latitude = tfires.m_latitude;
+				else
+					fires.SetFieldNull(&fires.m_latitude);
+				/*if (newRec && tfires.IsFieldNull(&tfires.m_LatDD))
 					fires.SetFieldNull(&fires.m_LatDD);
 
 				if (! tfires.IsFieldNull(&tfires.m_LatMM))
@@ -2588,11 +2592,13 @@ void CGenericFireImportDialog::OnGenericFire(){
 				if (! tfires.IsFieldNull(&tfires.m_LatSS))
 					fires.m_LatSS = tfires.m_LatSS;
 				if(newRec && tfires.IsFieldNull(&tfires.m_LatSS))
-					fires.SetFieldNull(&fires.m_LatSS);
+					fires.SetFieldNull(&fires.m_LatSS);*/
 
-				if (! tfires.IsFieldNull(&tfires.m_LonDD))
-					fires.m_LonDD = tfires.m_LonDD;
-				if(newRec && tfires.IsFieldNull(&tfires.m_LonDD))
+				if (! tfires.IsFieldNull(&tfires.m_longitude))
+					fires.m_longitude = tfires.m_longitude;
+				else
+					fires.SetFieldNull(&fires.m_longitude);
+				/*if (newRec && tfires.IsFieldNull(&tfires.m_LonDD))
 					fires.SetFieldNull(&fires.m_LonDD);
 
 				if (! tfires.IsFieldNull(&tfires.m_LonMM))
@@ -2628,7 +2634,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 				if (! tfires.IsFieldNull(&tfires.m_FireType))
 					fires.m_FireType = tfires.m_FireType;
 				if(newRec && tfires.IsFieldNull(&tfires.m_FireType))
-					fires.SetFieldNull(&fires.m_FireType);
+					fires.SetFieldNull(&fires.m_FireType);*/
 
 				if (! tfires.IsFieldNull(&tfires.m_Contain))
 					fires.m_Contain = tfires.m_Contain;
@@ -2640,10 +2646,10 @@ void CGenericFireImportDialog::OnGenericFire(){
 				if(newRec && tfires.IsFieldNull(&tfires.m_StrategyMet))
 					fires.SetFieldNull(&fires.m_StrategyMet);
 
-				if (! tfires.IsFieldNull(&tfires.m_FireOut))
-					fires.m_FireOut = tfires.m_FireOut;
-				if(newRec && tfires.IsFieldNull(&tfires.m_FireOut))
-					fires.SetFieldNull(&fires.m_FireOut);
+				//if (! tfires.IsFieldNull(&tfires.m_FireOut))
+				//	fires.m_FireOut = tfires.m_FireOut;
+				//if(newRec && tfires.IsFieldNull(&tfires.m_FireOut))
+				//	fires.SetFieldNull(&fires.m_FireOut);
 
 
 
@@ -2838,7 +2844,7 @@ void CGenericFireImportDialog::OnGenericFire(){
 
 }
 
-void CGenericFireImportDialog::LogFireDataWarnings(FILE *logFile, CFireSet *fireSet)
+void CGenericFireImportDialog::LogFireDataWarnings(FILE *logFile, CFiresSet *fireSet)
 {
 	
 }

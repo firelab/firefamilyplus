@@ -47,7 +47,7 @@ long CFireDataSource::GetNumRows()
 
 int CFireDataSource::GetNumCols()
 {
-	return 15;
+	return 11;
 }
 
 int CFireDataSource::SetCell(int col,long row,CUGCell *cell)
@@ -80,7 +80,7 @@ int CFireDataSource::SetCell(int col,long row,CUGCell *cell)
 		if(str.GetLength() <= 0)
 		{
 			records->SetFieldNull(&records->m_StatisticalCause);
-		    records->SetFieldNull(&records->m_GeneralCause);
+		   // records->SetFieldNull(&records->m_GeneralCause);
 		} 
 		else
 		{
@@ -96,7 +96,7 @@ int CFireDataSource::SetCell(int col,long row,CUGCell *cell)
 					tCause = util.TranslateCauseToDOI(tCause, 1);
 				}
 			}
-			records->m_GeneralCause = records->m_StatisticalCause = tCause;
+			records->m_StatisticalCause = tCause;
 		}
 			break;
 	case 3:
@@ -113,45 +113,21 @@ int CFireDataSource::SetCell(int col,long row,CUGCell *cell)
 		break;
 	case 5:
 		if(str.GetLength() <= 0)
-			records->SetFieldNull(&records->m_LatDD);
+			records->SetFieldNull(&records->m_latitude);
 		else
-			records->m_LatDD = cell->GetNumber();
+			records->m_latitude = cell->GetNumber();
 		break;
 	case 6:
 		if(str.GetLength() <= 0)
-			records->SetFieldNull(&records->m_LatMM);
+			records->SetFieldNull(&records->m_longitude);
 		else
-			records->m_LatMM = cell->GetNumber();
+			records->m_longitude = cell->GetNumber();
 		break;
-	case 7:
-		if(str.GetLength() <= 0)
-			records->SetFieldNull(&records->m_LatSS);
-		else
-			records->m_LatSS = cell->GetNumber();
-		break;
-	case 8:
-		if(str.GetLength() <= 0)
-			records->SetFieldNull(&records->m_LonDD);
-		else
-			records->m_LonDD = cell->GetNumber();
-		break;
-	case 9:
-		if(str.GetLength() <= 0)
-			records->SetFieldNull(&records->m_LonMM);
-		else
-			records->m_LonMM = cell->GetNumber();
-		break;
-	case 10:
-		if(str.GetLength() <= 0)
-			records->SetFieldNull(&records->m_LonSS);
-		else
-			records->m_LonSS = cell->GetNumber();
-		break;
-	case 11:  // agency
+	case 7:  // agency
 
-	case 12: // region
-	case 13: // unit
-	case 14: // subunit
+	case 8: // region
+	case 9: // unit
+	case 10: // subunit
 		 break;
 	}
 	records->Update();
@@ -186,33 +162,21 @@ int	CFireDataSource::GetCell(int col,long row,CUGCell *cell)
 			cell->SetText("Fire Num");
 			return UG_SUCCESS;
 		case 5:
-			cell->SetText("Lat. (Deg)");
+			cell->SetText("Latitude");
 			return UG_SUCCESS;
 		case 6:
-			cell->SetText("(min)");
+			cell->SetText("Longitude");
 			return UG_SUCCESS;
 		case 7:
-			cell->SetText("(sec)");
-			return UG_SUCCESS;
-		case 8:
-			cell->SetText("Lon. (Deg)");
-			return UG_SUCCESS;
-		case 9:
-			cell->SetText("(min)");
-			return UG_SUCCESS;
-		case 10:
-			cell->SetText("(sec)");
-			return UG_SUCCESS;
-		case 11:
 			cell->SetText("Agency");
 			return UG_SUCCESS;
-		case 12:
+		case 8:
 			cell->SetText("Region");
 			return UG_SUCCESS;
-		case 13:
+		case 9:
 			cell->SetText("Unit");
 			return UG_SUCCESS;
-		case 14:
+		case 10:
 			cell->SetText("SubUnit");
 			return UG_SUCCESS;
 		default:
@@ -251,10 +215,7 @@ int	CFireDataSource::GetCell(int col,long row,CUGCell *cell)
 	case 2:
 		{
 			int tCause = 0;
-			if (! records->IsFieldNull(&records->m_GeneralCause) && (records->m_GeneralCause > 0))
-				//cell->SetNumber(records->m_GeneralCause);
-				tCause = records->m_GeneralCause;
-			else if(!records->IsFieldNull(&records->m_StatisticalCause))
+			if(!records->IsFieldNull(&records->m_StatisticalCause))
 				//cell->SetNumber(records->m_StatisticalCause);
 				tCause = records->m_StatisticalCause;
 			if(tCause > 0 && tCause <= 9)
@@ -286,42 +247,18 @@ int	CFireDataSource::GetCell(int col,long row,CUGCell *cell)
 		break;
 	
 	case 5:
-		if(!records->IsFieldNull(&records->m_LatDD))
-			cell->SetNumber(records->m_LatDD);
+		if(!records->IsFieldNull(&records->m_latitude))
+			cell->SetNumber(records->m_latitude);
 		else
 			cell->SetText("");
 		break;
 	case 6:
-		if(!records->IsFieldNull(&records->m_LatMM))
-			cell->SetNumber(records->m_LatMM);
+		if(!records->IsFieldNull(&records->m_longitude))
+			cell->SetNumber(records->m_longitude);
 		else
 			cell->SetText("");
 		break;
 	case 7:
-		if(!records->IsFieldNull(&records->m_LatSS))
-			cell->SetNumber(records->m_LatSS);
-		else
-			cell->SetText("");
-		break;
-	case 8:
-		if(!records->IsFieldNull(&records->m_LonDD))
-			cell->SetNumber(records->m_LonDD);
-		else
-			cell->SetText("");
-		break;
-	case 9:
-		if(!records->IsFieldNull(&records->m_LonMM))
-			cell->SetNumber(records->m_LonMM);
-		else
-			cell->SetText("");
-		break;
-	case 10:
-		if(!records->IsFieldNull(&records->m_LonSS))
-			cell->SetNumber(records->m_LonSS);
-		else
-			cell->SetText("");
-		break;
-	case 11:
 		if(!records->IsFieldNull(&records->m_AgencyID)){
 			CFireAgencySet agSet(records->m_pDatabase);
 			CString strFilter;
@@ -338,7 +275,7 @@ int	CFireDataSource::GetCell(int col,long row,CUGCell *cell)
 		} else
 			cell->SetText("");
 		break;
-	case 12:
+	case 8:
 		if(!records->IsFieldNull(&records->m_RegionID)){
 			CFireRegionSet regSet(records->m_pDatabase);
 			CString strFilter;
@@ -355,7 +292,7 @@ int	CFireDataSource::GetCell(int col,long row,CUGCell *cell)
 		} else
 			cell->SetText("");
 		break;
-	case 13:
+	case 9:
 		if(!records->IsFieldNull(&records->m_UnitID)){
 			CFireUnitSet unitSet(records->m_pDatabase);
 			CString strFilter;
@@ -372,7 +309,7 @@ int	CFireDataSource::GetCell(int col,long row,CUGCell *cell)
 		} else
 			cell->SetText("");
 		break;
-	case 14:
+	case 10:
 		if(!records->IsFieldNull(&records->m_SubunitID)){
 			CFireSubunitSet suSet(records->m_pDatabase);
 			CString strFilter;
@@ -396,7 +333,7 @@ int	CFireDataSource::GetCell(int col,long row,CUGCell *cell)
 	return UG_SUCCESS;
 }
 
-void CFireDataSource::SetRecords(CFireEditSet *_records)
+void CFireDataSource::SetRecords(CFiresSet *_records)
 {
 	records = _records;
 	records->Requery();
@@ -435,19 +372,15 @@ void CFireDataSource::SortAscending(int col)
 		records->m_strSort = "[FireNumber],[Discovery]";
 		break;
 	case 5:
+		records->m_strSort = "[Latitude]";
+		break;
 	case 6:
-	case 7:
-		records->m_strSort = "[LatDD],[LatMM],[LatSS]";
+		records->m_strSort = "[Longitude]";
 		break;
-	case 8:
-	case 9:
-	case 10:
-		records->m_strSort = "[LonDD],[LonMM],[LonSS]";
-		break;
-	case 11:  // agency
-	case 12: // region
-	case 13: // unit
-	case 14: // subunit
+	case 7:  // agency
+	case 8: // region
+	case 9: // unit
+	case 10: // subunit
 		records->m_strSort = "[AgencyID],[RegionID],[UnitID],[SubUnitID]";
 		break;
 
@@ -476,19 +409,15 @@ void CFireDataSource::SortDescending(int col)
 		records->m_strSort = "[FireNumber] DESC,[Discovery]";
 		break;
 	case 5:
-	case 6:
-	case 7:
-		records->m_strSort = "[LatDD] DESC,[LatMM] DESC,[LatSS] DESC";
+		records->m_strSort = "[Latitude] DESC";
 		break;
+	case 6:
+		records->m_strSort = "[Longitude] DESC";
+		break;
+	case 7:
 	case 8:
 	case 9:
-	case 10:
-		records->m_strSort = "[LonDD] DESC,[LonMM] DESC,[LonSS] DESC";
-		break;
-	case 11:
-	case 12:
-	case 13:
-	case 14: // subunit
+	case 10: // subunit
 		records->m_strSort = "[AgencyID]DESC ,[RegionID] DESC,[UnitID] DESC,[SubUnitID] DESC";
 		break;
 	}
@@ -509,28 +438,24 @@ void FiresCUG::OnSetup()
 	CRect rect;
 	GetClientRect(&rect);
 	SetCurrentCellMode(2);
-	SetNumberCols(15);
+	SetNumberCols(11);
 	SetUniformRowHeight(TRUE);
 	SetDoubleBufferMode(TRUE);
 	SetVScrollMode(UG_SCROLLTRACKING);
-	//	int wid = rect.Width() / 40;
+	//int wid = rect.Width() / 11;
 	int wid = 20;
-	SetColWidth(-1, wid * 3);
-	SetColWidth(0, wid * 5);
-	SetColWidth(1, wid * 3);
-	SetColWidth(2, wid * 3);
-	SetColWidth(3, wid * 7);
-	SetColWidth(4, wid * 4);
-	SetColWidth(5, wid * 4);
-	SetColWidth(6,wid * 2);
-	SetColWidth(7, wid * 2);
-	SetColWidth(8,wid * 4);
-	SetColWidth(9,wid * 2);
-	SetColWidth(10,wid * 2);
-	SetColWidth(11, wid* 3); // agency
-	SetColWidth(12, wid * 5); // region
-	SetColWidth(13, wid * 5); // unit
-	SetColWidth(14, wid * 5); // subunit
+	SetColWidth(-1, wid *3);
+	SetColWidth(0, wid * 6);
+	SetColWidth(1, wid * 4);
+	SetColWidth(2, wid * 6);
+	SetColWidth(3, wid * 10);
+	SetColWidth(4, wid * 10);
+	SetColWidth(5, wid * 5);
+	SetColWidth(6,wid * 5);
+	SetColWidth(7, wid * 4); // agency
+	SetColWidth(8, wid * 8); // region
+	SetColWidth(9, wid * 8); // unit
+	SetColWidth(10, wid * 8); // subunit
 
 	CUGCell cell;
 	GetColDefault( 0, &cell );
@@ -544,6 +469,14 @@ void FiresCUG::OnSetup()
 	cell.SetNumberDecimals(0);
 	cell.SetParam(USE_COXNUMBER);
 	SetColDefault( 2, &cell );
+	GetColDefault(5, &cell);
+	cell.SetNumberDecimals(4);
+	cell.SetParam(USE_COXNUMBER);
+	SetColDefault(5, &cell);
+	GetColDefault(6, &cell);
+	cell.SetNumberDecimals(4);
+	cell.SetParam(USE_COXNUMBER);
+	SetColDefault(6, &cell);
 	LockColumns(1);
 
 	int index = AddDataSource(&m_data); 
@@ -829,7 +762,7 @@ void CFiresView::OnUpdateDataPrint(CCmdUI *pCmdUI)
 	pCmdUI->Enable((m_grid.GetNumberRows() > 0) ? 1 : 0);
 }
 
-void CFiresView::SetRecords(CFireEditSet *_records, CFireplusSet *_fpSet)
+void CFiresView::SetRecords(CFiresSet *_records, CFireplusSet *_fpSet)
 {
 	records = _records;
 	fpSet = _fpSet;

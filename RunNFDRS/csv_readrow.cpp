@@ -51,16 +51,19 @@ std::vector<std::string> csv_read_row(std::istream &in, char delimiter)
         }
         else
         {
-            ss << c;
+            if(c >= 0 && c <= 255)
+                ss << c;
         }
     }
+    if (ss.str().size() > 0)
+        row.push_back(ss.str());
     return row;
 }
 
 int getColIndex(std::string colName, std::vector<std::string> colNames)
 {
 	//int colNum = -1;
-	char trgName[64], trgCols[64];
+	char trgName[640], trgCols[640];
 	strcpy(trgName,trim(colName).data());
 	char *p = strchr(trgName, ' ');
 	for(int i=0, leng=colNames.size(); i<leng; i++)

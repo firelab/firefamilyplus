@@ -14,7 +14,7 @@
 #include <direct.h>
 #include "climateSet.h"
 #include "SIGStationSet.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 
 

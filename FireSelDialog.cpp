@@ -103,7 +103,7 @@ int FireSelCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
 // CFireSelDialog dialog
 
 
-CFireSelDialog::CFireSelDialog(CWnd* pParent /*=NULL*/, CFireEditSet *_records /*= NULL*/)
+CFireSelDialog::CFireSelDialog(CWnd* pParent /*=NULL*/, CFiresSet *_records /*= NULL*/)
 	: CDialog(CFireSelDialog::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CFireSelDialog)

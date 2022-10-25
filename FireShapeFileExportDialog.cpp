@@ -25,8 +25,8 @@ extern CFireplusApp theApp;
 extern int curr_runID;
 
 
-#define defaultshapeFields 15
-#define shapeFields  23
+#define defaultshapeFields 9
+#define shapeFields  14
 
 char *shapefileColNames[shapeFields] = 
 {
@@ -34,28 +34,19 @@ char *shapefileColNames[shapeFields] =
 	"Year",
 	"Fire Number",
 	"Cause (USFS)",
-	"Size Class",
 	"Total Acres",
 	"Latitude (DD.DDDD)",
 	"Longitude (DD.DDDD)",
-	"Township",
-	"Range",
-	"Section",
-	"Subsection",
 	"Discovery Date",
-	"Fire ID",
 	"Fire Name",
 
 	// following are not selected by default
-	"County",
-	"State",
 	"Discovery Time",
 	"Agency Name",
 
 	"Region",
 	"Unit",
 	"Subunit",
-	"Cause (DOI)"
 };
 
 const char prjStr[] = "GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]";
@@ -63,7 +54,7 @@ const char prjStr[] = "GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_Americ
 /////////////////////////////////////////////////////////////////////////////
 // CFireShapeFileExportDialog dialog
 
-CFireShapeFileExportDialog::CFireShapeFileExportDialog(CWnd* pParent /*=NULL*/, CFireEditSet *_records /*=NULL*/, CFireplusSet *_fpSet )
+CFireShapeFileExportDialog::CFireShapeFileExportDialog(CWnd* pParent /*=NULL*/, CFiresSet *_records /*=NULL*/, CFireplusSet *_fpSet )
 	: CDialog(CFireShapeFileExportDialog::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CFireShapeFileExportDialog)
@@ -395,7 +386,7 @@ int CFireShapeFileExportDialog::ExportFires()
 	int entField = DBFAddField(dbf,"ENTITY", FTDouble, 20, 0);
     int latField = DBFAddField(dbf, "LATITUDE", FTDouble, 20, 4);
 	int lonField = DBFAddField(dbf, "LONGITUDE", FTDouble, 20, 4);
-	int fireIDField = DBFAddField(dbf, "FIREID", FTInteger, 20, 0);
+	int fireIDField = DBFAddField(dbf, "FIRENUMBER", FTString, 25, 0);
  
 
 
@@ -403,7 +394,7 @@ int CFireShapeFileExportDialog::ExportFires()
 	// optional fields
 	int regField, 
 		yearField,
-		firenumberField,
+		//firenumberField,
 		causeField,
 		sizeclassField,
 		totalacresField,
@@ -448,46 +439,29 @@ int CFireShapeFileExportDialog::ExportFires()
 			case 0:
 				 regField = DBFAddField(dbf,"REGUNITSUB",FTString,6,0); break;
 			case 1:
-				 yearField = DBFAddField(dbf,"YEAR",FTString,4,0); break;
+				 yearField = DBFAddField(dbf,"YEAR", FTInteger,4,0); break;
             case 2:
-				 firenumberField = DBFAddField(dbf,"FIRENUMBER",FTString,12,0); break;
+				break;
             case 3:
 				 causeField = DBFAddField(dbf,"CAUSE_USFS",FTInteger,1,0); break;
-			case 4:
-				 sizeclassField = DBFAddField(dbf,"SIZECLASS",FTString,1,0); break;
-            case 5:
+            case 4:
 				 totalacresField = DBFAddField(dbf,"TOTALACRES",FTDouble,10,1); break;
-            case 6: // lat/longitude already added by default
-			case 7: break;
-            case 8:
-				 townshipField = DBFAddField(dbf,"TOWNSHIP",FTString,5,0); break;
-			case 9:
-				 rangeField = DBFAddField(dbf,"RANGE",FTString,5,0); break;
-			case 10:
-				 sectionField = DBFAddField(dbf,"SECTION",FTInteger,2,0); break;
-            case 11:
-				 subsectionField = DBFAddField(dbf,"SUBSECTION",FTString,2,0); break;
-			case 12:
+            case 5: // lat/longitude already added by default
+			case 6: break;
+			case 7:
                  discoverydateField = DBFAddField(dbf,"DISCOVERYDATE",FTString,12,0); break;
-			case 13: break;// fireID added by default
-			case 14:
+			case 8:
 				 firenameField = DBFAddField(dbf,"FIRENAME",FTString,25,0); break;
-			case 15: 
-				 countyField = DBFAddField(dbf,"COUNTY",FTInteger,20,0); break;
-			case 16:
-				 stateField = DBFAddField(dbf,"STATE",FTString,2,0); break;
-			case 17:
+			case 9:
 				 discoverytimeField = DBFAddField(dbf,"DISCOVERYTIME",FTString,12,0); break;
-			case 18:
+			case 10:
 				 agencynameField = DBFAddField(dbf,"AGENCYNAME",FTString,25,0); break;
-			case 19:
+			case 11:
 				 regionField = DBFAddField(dbf,"REGION",FTString,40,0); break;
-			case 20:
+			case 12:
 				 unitField = DBFAddField(dbf,"UNIT",FTString,40,0); break;
-			case 21:
+			case 13:
 				 subunitField = DBFAddField(dbf,"SUBUNIT",FTString,40,0); break;
-			case 22:
-				 generalcauseField = DBFAddField(dbf,"CAUSE_DOI",FTInteger,1,0); break;
 			
 			default: break;
 			}
@@ -514,19 +488,14 @@ CRecordsetStatus recStatus;
 		
 
 		// skip records that don't have lat/long/ID
-	    if(records->IsFieldNull(&records->m_LatDD) ||
-			records->IsFieldNull(&records->m_LatMM) ||
-			records->IsFieldNull(&records->m_LatSS) ||
-		   records->IsFieldNull(&records->m_LonDD) ||
-		    records->IsFieldNull(&records->m_LonMM) ||
-			records->IsFieldNull(&records->m_LonSS) ||
-			records->IsFieldNull(&records->m_FireID)){
+	    if(records->IsFieldNull(&records->m_latitude) ||
+		   records->IsFieldNull(&records->m_longitude)){
 		        records->MoveNext();
 				skippedRecords++;
                 continue;
 			}
 
-		if (records->m_LatDD > 90 || records->m_LatDD < 1 || records->m_LatMM > 60 || records->m_LatSS > 60){
+		if (records->m_latitude > 90 || records->m_latitude < 1 ){
 			   records->MoveNext();
 				skippedRecords++;
 			   continue;
@@ -535,8 +504,10 @@ CRecordsetStatus recStatus;
 
 
         double padfX, padfY, padfZ;
-		DDMMSS2DecimalDegree(records->m_LatDD, records->m_LatMM, records->m_LatSS, &padfY);
-		DDMMSS2DecimalDegree(records->m_LonDD, records->m_LonMM, records->m_LonSS, &padfX);
+		padfY = records->m_latitude;
+		padfX = records->m_longitude;
+		//DDMMSS2DecimalDegree(records->m_LatDD, records->m_LatMM, records->m_LatSS, &padfY);
+		//DDMMSS2DecimalDegree(records->m_LonDD, records->m_LonMM, records->m_LonSS, &padfX);
         /*if (records->m_LatDD > 0)
     		padfY =  (records->m_LatDD) + (double) (records->m_LatMM)/60 + (double) (records->m_LatSS)/3600;
 		else
@@ -555,7 +526,8 @@ CRecordsetStatus recStatus;
         DBFWriteDoubleAttribute(dbf, entity, entField, (double)entity);
         DBFWriteDoubleAttribute(dbf, entity, latField, padfY);
         DBFWriteDoubleAttribute(dbf, entity, lonField, padfX);
-		DBFWriteIntegerAttribute(dbf, entity, fireIDField, records->m_FireID);
+		//DBFWriteIntegerAttribute(dbf, entity, fireIDField, records->m_FireNumber);
+		DBFWriteStringAttribute(dbf, entity, fireIDField, records->m_FireNumber);
 
         SHPDestroyObject(pShape);
 
@@ -574,8 +546,8 @@ CRecordsetStatus recStatus;
 
 				break;
 			case 1: // year
-			    if(!records->IsFieldNull(&records->m_Year))
-    				DBFWriteStringAttribute(dbf,entity,yearField,records->m_Year);
+			    if(!records->IsFieldNull(&records->m_Discovery))
+    				DBFWriteIntegerAttribute(dbf,entity,yearField,records->m_Discovery.GetYear());
 				else
                     DBFWriteStringAttribute(dbf,entity,yearField,"");
 			    break;
@@ -584,7 +556,7 @@ CRecordsetStatus recStatus;
 					temp.Format("%12.12s", records->m_FireNumber);
 				else
 					temp = "            ";
-				DBFWriteStringAttribute(dbf,entity,firenumberField,temp);
+				DBFWriteStringAttribute(dbf,entity, fireIDField,temp);
 				break;
             case 3://cause
 				
@@ -593,53 +565,19 @@ CRecordsetStatus recStatus;
 				else
 					DBFWriteIntegerAttribute(dbf,entity,causeField,0);
 				break;
-			case 4: // size class
-				if(!records->IsFieldNull(&records->m_SizeClass))
-    				temp.Format("%-1s",records->m_SizeClass);
-				else
-					temp = " ";
-				DBFWriteStringAttribute(dbf,entity,sizeclassField,temp);
-			    break;
-			case 5: // total acres
+			case 4: // total acres
                 if(!records->IsFieldNull(&records->m_TotalAcres))
 					DBFWriteDoubleAttribute(dbf,entity,totalacresField,records->m_TotalAcres);
 				else
 					DBFWriteDoubleAttribute(dbf,entity,totalacresField,0);
 				break;
-			case 6:  // Latitude DD already in
+			case 5:  // Latitude DD already in
              
 				break;
-			case 7: // Longitude DD already in
+			case 6: // Longitude DD already in
                 
 				break;
-			case 8: // township
-                if(!records->IsFieldNull(&records->m_Township))
-					temp.Format("%5s", records->m_Township);
-				else
-					temp = "     ";
-				DBFWriteStringAttribute(dbf,entity,townshipField,temp);
-				break;
-			case 9: // Range
-                if(!records->IsFieldNull(&records->m_Range))
-					temp.Format("%5s", records->m_Range);
-				else
-					temp = "";
-				DBFWriteStringAttribute(dbf,entity,rangeField,temp);
-				break;
-			case 10:  // section
-				if(!records->IsFieldNull(&records->m_Section))
-					DBFWriteIntegerAttribute(dbf,entity,sectionField,records->m_Section);
-				else
-					DBFWriteIntegerAttribute(dbf,entity,sectionField,0);
-				break;
-			case 11:  // subsection
-				if(!records->IsFieldNull(&records->m_SubSection))
-					temp.Format("%5s", records->m_SubSection);
-				else
-					temp = "";
-				DBFWriteStringAttribute(dbf,entity,subsectionField,temp);
-                break;
-			case 12: // discovery
+			case 7: // discovery
 				if(!records->IsFieldNull(&records->m_Discovery))
 				{
 					switch(dt)
@@ -687,30 +625,14 @@ CRecordsetStatus recStatus;
 				}
 				DBFWriteStringAttribute(dbf,entity,discoverydateField,temp);
 				break;
-			case 13: // fire ID - already in
-               break;
-			case 14: // fire name
+			case 8: // fire name
                 if(!records->IsFieldNull(&records->m_FireName))
 					temp.Format("%-25s", records->m_FireName.Trim());
 				else
 					temp = "";
 				DBFWriteStringAttribute(dbf,entity,firenameField,temp);
 				break;
-			case 15: // county
-                if(!records->IsFieldNull(&records->m_County))
-					DBFWriteIntegerAttribute(dbf,entity,countyField,records->m_County);
-				else
-					DBFWriteIntegerAttribute(dbf,entity,countyField,0);
-				break;
-			case 16: // state
-                if(!records->IsFieldNull(&records->m_State))
-					temp.Format("%s", records->m_State);
-				else
-					temp = "";
-				DBFWriteStringAttribute(dbf,entity,stateField,temp);
-				break;
-
-			case 17://time
+			case 9://time
 				if(!records->IsFieldNull(&records->m_Discovery))
 				{
 					switch(tt)
@@ -739,14 +661,14 @@ CRecordsetStatus recStatus;
 				}
 				DBFWriteStringAttribute(dbf,entity,discoverytimeField,temp);
 				break;
-		    case 18: // agency name
+		    case 10: // agency name
                 if(!records->IsFieldNull(&records->m_AgencyID))
 					temp.Format("%s", agencies[records->m_AgencyID - 1]);
 				else
 					temp = "";
 				DBFWriteStringAttribute(dbf,entity,agencynameField,temp);
 				break;
-			case 19:  // region name
+			case 11:  // region name
 				
 				if(!records->IsFieldNull(&records->m_RegionID)){
 					if (records->m_RegionID == lastRegionID){
@@ -771,7 +693,7 @@ CRecordsetStatus recStatus;
 			        temp = "";
 				 DBFWriteStringAttribute(dbf,entity,regionField,temp);
 				 break;
- 			case 20:  // unit name
+ 			case 12:  // unit name
 				if(!records->IsFieldNull(&records->m_UnitID)){
 			        CFireUnitSet unitSet(records->m_pDatabase);
 			        CString strFilter;
@@ -789,7 +711,7 @@ CRecordsetStatus recStatus;
 			        temp = "";
 				 DBFWriteStringAttribute(dbf,entity,unitField,temp);
 				 break;
- 			case 21:  // subunit name
+ 			case 13:  // subunit name
 				if(!records->IsFieldNull(&records->m_SubunitID)){
 			        CFireSubunitSet subunitSet(records->m_pDatabase);
 			        CString strFilter;
@@ -807,13 +729,6 @@ CRecordsetStatus recStatus;
 			        temp = "";
                  DBFWriteStringAttribute(dbf,entity,subunitField,temp);
                  break;
-		    case 22://doi cause
-		
-				if(!records->IsFieldNull(&records->m_StatisticalCause))
-					DBFWriteIntegerAttribute(dbf,entity,generalcauseField,util.TranslateCauseToDOI(records->m_StatisticalCause,records->m_AgencyID));
-				else
-					DBFWriteIntegerAttribute(dbf,entity,generalcauseField,0);
-				break;
 			default:
 				temp = "";
 			}
@@ -1018,44 +933,27 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
 			case 1:
 				 fprintf(out,"Year"); break;
             case 2:
-				 fprintf(out,"Fire#"); break;
+				 fprintf(out,"FireNumber"); break;
             case 3:
 				 fprintf(out,"Cause(USFS)"); break;
-			case 4:
-				 fprintf(out,"Size"); break;
-            case 5:
+            case 4:
 				 fprintf(out,"TotalAcres"); break;
-            case 6: fprintf(out,"Latitude");break;
-			case 7: fprintf(out,"Longitude");break;
-            case 8:
-				 fprintf(out,"Township"); break;
-			case 9:
-				 fprintf(out,"Range"); break;
-			case 10:
-				 fprintf(out,"Section"); break;
-            case 11:
-				 fprintf(out,"Subsection"); break;
-			case 12:
+            case 5: fprintf(out,"Latitude");break;
+			case 6: fprintf(out,"Longitude");break;
+			case 7:
                  fprintf(out,"DiscoveryDate"); break;
-			case 13: fprintf(out,"FireID");break;
-			case 14:
+			case 8:
 				 fprintf(out,"FireName"); break;
-			case 15: 
-				 fprintf(out,"County"); break;
-			case 16:
-				 fprintf(out,"State"); break;
-			case 17:
+			case 9:
 				 fprintf(out,"DiscoveryTime"); break;
-			case 18:
+			case 10:
 				 fprintf(out,"AgencyName"); break;
-			case 19:
+			case 11:
 				 fprintf(out,"Region"); break;
-			case 20:
+			case 12:
 				 fprintf(out,"Unit"); break;
-			case 21:
+			case 13:
 				 fprintf(out,"Subunit"); break;
-			case 22:
-				 fprintf(out,"Cause(DOI)"); break;
 			default: break;
 			}
 		}
@@ -1079,8 +977,8 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
 			    temp.Format("%02d%02d%02d",records->m_RegionID,records->m_UnitID,records->m_SubunitID);
 				break;
 			case 1: // year
-				if(!records->IsFieldNull(&records->m_Year))
-				   temp.Format("%s",records->m_Year);
+				if(!records->IsFieldNull(&records->m_Discovery))
+				   temp.Format("%d",records->m_Discovery.GetYear());
 				else
 				   temp = "";
 			    break;
@@ -1097,24 +995,17 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
 				else
 					temp = "";
 				break;
-			case 4: // size class
-				if(!records->IsFieldNull(&records->m_SizeClass))
-    				temp.Format("%-1s",records->m_SizeClass);
-				else
-					temp = "";
-			    break;
-			case 5: // total acres
+			case 4: // total acres
                 if(!records->IsFieldNull(&records->m_TotalAcres))
 					temp.Format("%10.1f", records->m_TotalAcres);
 				else
 					temp = "0.0";
 				break;
-			case 6:  // Latitude DD
-				if(!records->IsFieldNull(&records->m_LatDD) && !records->IsFieldNull(&records->m_LatMM)
-					&& !records->IsFieldNull(&records->m_LatSS))
+			case 5:  // Latitude DD
+				if(!records->IsFieldNull(&records->m_latitude))
 				{
-					double lat;
-					DDMMSS2DecimalDegree(records->m_LatDD, records->m_LatMM, records->m_LatSS, &lat);
+					double lat = records->m_latitude;
+					//DDMMSS2DecimalDegree(records->m_LatDD, records->m_LatMM, records->m_LatSS, &lat);
 					temp.Format("%8.4f", lat);
 			      /*if (records->m_LatDD > 0)
         			  temp.Format("%8.4f", (double) (records->m_LatDD) + (double) (records->m_LatMM)/60 + (double) (records->m_LatSS)/3600);
@@ -1124,12 +1015,11 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
 				else
 				  temp.Format("NA      ");
 				break;
-			case 7: // Longitude DD
-				if(!records->IsFieldNull(&records->m_LonDD) && !records->IsFieldNull(&records->m_LonMM)
-					&& !records->IsFieldNull(&records->m_LonSS))
+			case 6: // Longitude DD
+				if(!records->IsFieldNull(&records->m_longitude))
 				{
-					double lon;
-					DDMMSS2DecimalDegree(records->m_LonDD, records->m_LonMM, records->m_LonSS, &lon);
+					double lon = records->m_longitude;
+					//DDMMSS2DecimalDegree(records->m_LonDD, records->m_LonMM, records->m_LonSS, &lon);
 					temp.Format("%8.4f", lon);
 				} 
 				else
@@ -1142,32 +1032,8 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
 				} else
 			       temp.Format("0.0");*/
 				break;
-			case 8: // township
-                if(!records->IsFieldNull(&records->m_Township))
-					temp.Format("%s", records->m_Township);
-				else
-					temp = "";
-				break;
-			case 9: // Range
-                if(!records->IsFieldNull(&records->m_Range))
-					temp.Format("%s", records->m_Range);
-				else
-					temp = "";
-				break;
-			case 10:  // section
-				if(!records->IsFieldNull(&records->m_Section))
-					temp.Format("%2d", records->m_Section);
-				else
-					temp = "";
-				break;
-			case 11:  // subsection
-				if(!records->IsFieldNull(&records->m_SubSection))
-					temp.Format("%s", records->m_SubSection);
-				else
-					temp = "";
-				break;
 
-			case 12: // discovery
+			case 7: // discovery
 				if(!records->IsFieldNull(&records->m_Discovery))
 				{
 					switch(dt)
@@ -1198,32 +1064,13 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
 					temp = "";
 
 				break;
-			case 13: // fire ID
-                if(!records->IsFieldNull(&records->m_FireID))
-					temp.Format("%6d", records->m_FireID);
-				else
-					temp = "";
-				break;
-            case 14: // fire name
+            case 8: // fire name
                 if(!records->IsFieldNull(&records->m_FireName))
 					temp.Format("%s", records->m_FireName.Trim());
 				else
 					temp = "";
 				break;
-			case 15: // county
-                if(!records->IsFieldNull(&records->m_County))
-					temp.Format("%d", records->m_County);
-				else
-					temp = "";
-				break;
-			case 16: // state
-                if(!records->IsFieldNull(&records->m_State))
-					temp.Format("%s", records->m_State);
-				else
-					temp = "";
-				break;
-
-			case 17://time
+			case 9://time
 				if(!records->IsFieldNull(&records->m_Discovery))
 				{
 					switch(tt)
@@ -1241,14 +1088,14 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
 				else
 				   temp = "";
 				break;
-			case 18: // agency name
+			case 10: // agency name
                 if(!records->IsFieldNull(&records->m_AgencyID))
 					temp.Format("%s", agencies[records->m_AgencyID-1]);
 				else
 					temp = "";
 				
 				break;
-			case 19:  // region name
+			case 11:  // region name
 				if(!records->IsFieldNull(&records->m_RegionID)){
 					if (records->m_RegionID == lastRegionID)
 						temp.Format("%s",lastRegion);
@@ -1271,7 +1118,7 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
 		         } else
 			        temp = "";
 				 break;
- 			case 20:  // unit name
+ 			case 12:  // unit name
 				if(!records->IsFieldNull(&records->m_UnitID)){
 			        CFireUnitSet unitSet(records->m_pDatabase);
 			        CString strFilter;
@@ -1288,7 +1135,7 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
 		         } else
 			        temp = "";
 			      break;
- 			case 21:  // subunit name
+ 			case 13:  // subunit name
 				if(!records->IsFieldNull(&records->m_SubunitID)){
 			        CFireSubunitSet subunitSet(records->m_pDatabase);
 			        CString strFilter;
@@ -1305,13 +1152,6 @@ void CFireShapeFileExportDialog::OnExportTextFile(){
 		         } else
 			        temp = "";
                   break;
-		    case 22://DOI cause
-			
-				if(!records->IsFieldNull(&records->m_StatisticalCause))
-					temp.Format("%ld", util.TranslateCauseToDOI(records->m_StatisticalCause, records->m_AgencyID));
-				else
-					temp = "";
-				break;
 			default:
 				temp = "";
 			}

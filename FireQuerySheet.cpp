@@ -12,7 +12,7 @@
 #include "FireQueryPage.h"
 #include "YearsPage.h"
 #include "FireQuerySheet.h"
-#include "FireEditSet.h"
+#include "CFiresSet.h"
 #include "FiresDoc.h"
 #include "FiresView.h"
 #include "FiresFrame.h"
@@ -227,7 +227,7 @@ void CFireQuerySheet::OnEditButton()
 		query.Format("(%s) and (%s)", tQuery, baseQuery);
 	else
 		query = baseQuery;
-	CFireEditSet *fireEditSet = new CFireEditSet(associations.m_pDatabase);
+	CFiresSet *fireEditSet = new CFiresSet(associations.m_pDatabase);
 	fireEditSet->m_strFilter = query;
 	//fireEditSet.m_strFilter.Format("(%s) and (%s)", tQuery, query);
 	fireEditSet->m_strSort = "[Discovery]";

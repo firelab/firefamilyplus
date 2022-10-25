@@ -7,7 +7,7 @@
 // WthrPrintDialog.h : header file
 //
 #include "wxset.h"
-#include "FireEditSet.h"
+#include "CFiresSet.h"
 //#include "BrowseDialog.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -27,9 +27,9 @@ public:
 	CBitmapButton downButton;
 	CBitmapButton topButton;
 	CBitmapButton bottomButton;
-	CWthrPrintDialog(CWnd* pParent = NULL, CWxSet *_wxSet = NULL, CFireEditSet *_fireSet = NULL);   // standard constructor
+	CWthrPrintDialog(CWnd* pParent = NULL, CWxSet *_wxSet = NULL, CFiresSet *_fireSet = NULL);   // standard constructor
 	CWxSet *wxSet;
-	CFireEditSet *fireSet;
+	CFiresSet *fireSet;
 	void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
 	void OnPrint(CDC* pDC, CPrintInfo* pInfo);
 	void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);

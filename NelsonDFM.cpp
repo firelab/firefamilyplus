@@ -1869,7 +1869,7 @@ int CNelsonDFM::FillNelsonVals()
 	return ret;
 }
 
-void CNelsonDFM::GetLogitArraySizesQuick(CFireSumSet *firesSet, CFireOptionsSet *fireOptsSet, int vID,
+void CNelsonDFM::GetLogitArraySizesQuick(CFiresSet *firesSet, CFireOptionsSet *fireOptsSet, int vID,
 		long *nV, long *nFD, long *nLFD, long *nMFD, long *_discards, long *madeUps)
 {
 	//need to populate fires arrays

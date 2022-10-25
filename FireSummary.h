@@ -31,7 +31,7 @@ public:
 	long sizeClasses[NSIZECLASSES + 1];
 	long causeClasses[NCAUSECLASSES + 1];
 	long nPerDay[NDAYVALS + 1];
-	int TranslateCauseToUSFS(int cause, int agency);
+	//int TranslateCauseToUSFS(int cause, int agency);
 	CFireplusSet *m_pFpSet;
 	CDatabase *m_pDB;
 	double sizePcnts[100];

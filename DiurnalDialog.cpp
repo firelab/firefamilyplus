@@ -15,7 +15,7 @@
 #include "FireDay.h"
 #include "perioddoc.h"
 #include "splitterframe.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 #include "CustomInitSet.h"
 #include "ReportOptionsSet.h"

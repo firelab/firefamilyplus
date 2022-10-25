@@ -10,7 +10,7 @@
 #include "SIGStationSet.h"
 #include "FireDay.h"
 #include "perioddoc.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 #include ".\climateview.h"
 #include "RunSave.h"

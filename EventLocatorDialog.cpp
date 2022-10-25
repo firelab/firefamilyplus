@@ -10,7 +10,7 @@
 #include "FireDay.h"
 #include "perioddoc.h"
 #include "splitterframe.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "FFPOptsSet.h"
 #include "ClimAnalysis.h"
 #include "EventLocatorDialog.h"

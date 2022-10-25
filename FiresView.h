@@ -1,5 +1,5 @@
 #pragma once
-#include "FireEditSet.h"
+#include "CFiresSet.h"
 #include "ugctrl.h"
 #include "UTEdit.h"
 
@@ -15,7 +15,7 @@ public:
 	CFireDataSource(void);
 	~CFireDataSource(void);
 	
-	CFireEditSet *records;
+	CFiresSet *records;
 	// a few basics needed...
 	virtual long GetNumRows();
 	virtual int GetNumCols();
@@ -23,7 +23,7 @@ public:
 	virtual int	SetCell(int col,long row,CUGCell *cell);
 	void SortAscending(int col);
 	void SortDescending(int col);
-	void SetRecords(CFireEditSet *_records);
+	void SetRecords(CFiresSet *_records);
 	long totalRecs;
 	long virRec;
 
@@ -68,7 +68,7 @@ public:
 	//void SetRowData(long Row);
 	long virRec;
 	long totalRecs;
-	CFireEditSet *records;
+	CFiresSet *records;
 	FiresCUG m_grid;
 	//CGridCtrl m_Grid;
     CFireplusSet *fpSet;
@@ -84,7 +84,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	void SetRecords(CFireEditSet *_records, CFireplusSet *_fpSet);
+	void SetRecords(CFiresSet *_records, CFireplusSet *_fpSet);
 	virtual void OnInitialUpdate();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnDataExport();

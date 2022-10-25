@@ -16,9 +16,8 @@
 #include "FireDay.h"
 #include "perioddoc.h"
 #include "splitterframe.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
-#include "FireSumSet.h"
 #include "LogitDialog.h"
 #include "firestats.h"
 #include "firestatdoc.h"
@@ -282,7 +281,7 @@ void CFireAnalysisDialog::OnOK()
 	fpSet->m_PeriodLength = "1";
 	fpSet->Update();
 	//now make sure there's fire data
-	CFireSumSet fires(fpSet->m_pDatabase);
+	CFiresSet fires(fpSet->m_pDatabase);
 	fires.Open();
 	int cause = 0;
 	if(optionsSet.m_Lightning)

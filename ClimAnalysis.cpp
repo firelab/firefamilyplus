@@ -12,7 +12,7 @@
 #include "FireDay.h"
 #include "perioddoc.h"
 #include "splitterframe.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 #include "canada.h"
 #include "stationInSIGSet.h"
@@ -873,7 +873,7 @@ int CClimAnalysis::Analyze(int *_varIDs, int _nVarIDs, CFireplusSet *_fpSet, boo
 		fires = new CFireDay *[fireYears];
 		for(int y = 0; y < fireYears; y++)
 			fires[y] = new CFireDay [numPeriods];
-		CFireSumSet fireSet(fpSet->m_pDatabase);
+		CFiresSet fireSet(fpSet->m_pDatabase);
 		fireSet.Open();
 		//have query for fires, need to process and put into fires structure
 		//note that will still have to treat fires by individual days,
@@ -4195,7 +4195,7 @@ CString CClimAnalysis::DailyListing(ListingOptions *listOpts, bool createDoc /*=
 	FILE *stream = fopen(fName, "wt");
 	//output header
 	bool hasFires = true;
-	CFireSumSet fireSet(fpSet->m_pDatabase);
+	CFiresSet fireSet(fpSet->m_pDatabase);
 	fireSet.Open();
 	if(listOpts->fires || listOpts->largeFires || listOpts->acres || listOpts->numPerClass)
 	{
@@ -5370,7 +5370,7 @@ void CClimAnalysis::CreateLogitFilesQuick(CFireOptionsSet *fireOptsSet,
 	*madeUps = madeCnt;
 }
 
-void CClimAnalysis::CreateLogitFiles(CFireSumSet *fires, int lFire, int mfDay,
+void CClimAnalysis::CreateLogitFiles(CFiresSet *fires, int lFire, int mfDay,
 									 CString varName, BOOL conditional, long *nV, long *nFD, long *nLFD,
 									 long *nMFD, long *_discards, long *madeUps)
 {
@@ -6965,12 +6965,12 @@ int CClimAnalysis::AnalyzeBatchItem(CWnd *_caller, int *_varIDs, int _nVarIDs, C
 	else {
 	//is a SIG - multiple stations
 		// 09/2012 ljs added fix for 'R' records
-		CString temp2;
+		//CString temp2;
 	
-		if (!isNFDRS2016(staSet.m_NFDRSFM[0])) // new NFDRS2016 calc needs hourly data
-		   temp2.Format(" AND [DailyObs] = 1");
+		//if (!isNFDRS2016(staSet.m_NFDRSFM[0])) // new NFDRS2016 calc needs hourly data
+		//   temp2.Format(" AND [DailyObs] = 1");
 
-	    query += temp2;
+	   // query += temp2;
 
 		ret = AnalyzeBatchSIG(query, isFPA);
 	}
@@ -7001,7 +7001,7 @@ int CClimAnalysis::AnalyzeBatchItem(CWnd *_caller, int *_varIDs, int _nVarIDs, C
 		int y;
 		for(y = 0; y < fireYears; y++)
 			fires[y] = new CFireDay [numPeriods];
-		CFireSumSet fireSet(fpSet->m_pDatabase);
+		CFiresSet fireSet(fpSet->m_pDatabase);
 		fireSet.Open();
 		//have query for fires, need to process and put into fires structure
 		//note that will still have to treat fires by individual days,
@@ -11645,7 +11645,7 @@ int CClimAnalysis::Analyze2(int* _varIDs, int _nVarIDs, CFireplusSet* _fpSet, bo
 		fires = new CFireDay * [fireYears];
 		for (int y = 0; y < fireYears; y++)
 			fires[y] = new CFireDay[numPeriods];
-		CFireSumSet fireSet(fpSet->m_pDatabase);
+		CFiresSet fireSet(fpSet->m_pDatabase);
 		fireSet.Open();
 		//have query for fires, need to process and put into fires structure
 		//note that will still have to treat fires by individual days,

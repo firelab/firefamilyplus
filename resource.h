@@ -506,14 +506,14 @@
 #define IDC_FWX                         1177
 #define IDC_PCHAFWX                     1178
 #define IDC_FWSTXT                      1178
-#define IDC_FW21                        1184
-#define IDC_CAUSES                      1183
 #define IDC_GWI                         1179
 #define IDC_USEALL                      1180
 #define IDC_WFMI                        1180
 #define IDC_USESELECTED                 1181
 #define IDC_GENERICFIRE                 1181
 #define IDC_WRCCRAWS                    1182
+#define IDC_CAUSES                      1183
+#define IDC_FW21                        1184
 #define IDC_RADIO3                      1185
 #define IDC_RADIO4                      1186
 #define IDC_RADIO5                      1187
@@ -1069,6 +1069,8 @@
 #define IDC_CAUSE_10                    1620
 #define IDC_NASF_CSV                    1621
 #define IDC_WXSFILEBUTTON               1622
+#define IDC_NASF_CSV2                   1622
+#define IDC_INFORMS_CSV                 1622
 #define IDC_WXSEDIT                     1623
 #define IDC_EDIT_MAXSC_V                1624
 #define IDC_SPIN_MAXSC_V                1625

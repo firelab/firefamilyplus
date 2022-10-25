@@ -10,7 +10,7 @@
 #include "line.h"
 #include "climateSet.h"
 #include "SIGStationSet.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 #include "FFPOverlaysSet.h"
 #include "RunSave.h"

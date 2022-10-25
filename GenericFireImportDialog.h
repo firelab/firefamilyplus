@@ -7,7 +7,7 @@
 // GenericFireImportDialog.h : header file
 //
 
-#include "FireSet.h"
+#include "CFiresSet.h"
 #include "afxwin.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ class CGenericFireImportDialog : public CDialog
 {
 // Construction
 public:
-	CGenericFireImportDialog(CWnd* pParent = NULL, CFireSet *_records = NULL, CDatabase *_pDB = NULL, long _agencyID = -1);   // standard constructor
+	CGenericFireImportDialog(CWnd* pParent = NULL, CFiresSet *_records = NULL, CDatabase *_pDB = NULL, long _agencyID = -1);   // standard constructor
    
 // Dialog Data
 	//{{AFX_DATA(CGenericFireImportDialog)
@@ -72,7 +72,7 @@ protected:
 	CString inFileName;
 	DateType dt;
 	TimeType tt;
-	CFireSet *records;
+	CFiresSet *records;
 	CBitmapButton upButton;
 	CBitmapButton downButton;
 	CBitmapButton topButton;
@@ -100,7 +100,7 @@ protected:
     void OnGenericFire();
 
 	//int ImportGenericFire();
-    void LogFireDataWarnings(FILE *logFile, CFireSet *fireSet);
+    void LogFireDataWarnings(FILE *logFile, CFiresSet *fireSet);
 
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()

@@ -13,7 +13,7 @@
 #include "SIGStationSet.h"
 #include "FireDay.h"
 #include "perioddoc.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 //#include "climdialog.h"
 #include "climdoc.h"

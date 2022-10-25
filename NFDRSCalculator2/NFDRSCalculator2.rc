@@ -217,8 +217,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1,0,14
- PRODUCTVERSION 2,1,0,14
+ FILEVERSION 2,1,0,15
+ PRODUCTVERSION 2,1,0,15
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -236,12 +236,12 @@ BEGIN
             VALUE "Comments", "Includes NFDRS4, and uses CNFDRS.dll, the C++ National Fire Danger Rating System DLL"
             VALUE "CompanyName", "Fire Sciences Lab"
             VALUE "FileDescription", "National Fire Danger Rating System Calculator"
-            VALUE "FileVersion", "2.1.0.14"
+            VALUE "FileVersion", "2.1.0.15"
             VALUE "InternalName", "NFDRSCalculator2.exe"
-            VALUE "LegalCopyright", "Copyright (c) 2011-2021. USDA Forest Service. All rights reserved."
+            VALUE "LegalCopyright", "Copyright (c) 2011-2022. USDA Forest Service. All rights reserved."
             VALUE "OriginalFilename", "NFDRSCalculator2.exe"
             VALUE "ProductName", "NFDRS Calculator 2.1"
-            VALUE "ProductVersion", "2.1.0.14"
+            VALUE "ProductVersion", "2.1.0.15"
         END
     END
     BLOCK "VarFileInfo"

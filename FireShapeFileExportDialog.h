@@ -7,7 +7,7 @@
 // FireShapeFileExportDialog.h : header file
 //
 
-#include "FireEditSet.h"
+#include "CFiresSet.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CFireShapeFileExportDialog dialog
@@ -19,7 +19,7 @@ class CFireShapeFileExportDialog : public CDialog
 // Construction
 public:
 	int ExportFires();
-	CFireShapeFileExportDialog(CWnd* pParent = NULL, CFireEditSet *_records = NULL,CFireplusSet *_fpSet = NULL);   // standard constructor
+	CFireShapeFileExportDialog(CWnd* pParent = NULL, CFiresSet *_records = NULL,CFireplusSet *_fpSet = NULL);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CFireShapeFileExportDialog)
@@ -50,7 +50,7 @@ protected:
 	CString outFileName;
 	DateType dt;
 	TimeType tt;
-	CFireEditSet *records;
+	CFiresSet *records;
 	CBitmapButton upButton;
 	CBitmapButton downButton;
 	CBitmapButton topButton;

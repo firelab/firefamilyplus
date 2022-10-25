@@ -30,8 +30,8 @@ char *fireColFormats[firePrnFields] =
 	"%5.5s",
 	"%10.1f",
 	"%5ld",
-	"%20.20s",
-	"%8.8s",
+	"%50.50s",
+	"%25.25s",
 };
 
 int fireWidths[firePrnFields] = 
@@ -156,7 +156,7 @@ int widths[prnFields] =
 };
 
 
-CWthrPrintDialog::CWthrPrintDialog(CWnd* pParent, CWxSet *_wxSet, CFireEditSet *_fireSet)
+CWthrPrintDialog::CWthrPrintDialog(CWnd* pParent, CWxSet *_wxSet, CFiresSet *_fireSet)
 	: CDialog(CWthrPrintDialog::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CWthrPrintDialog)
@@ -763,7 +763,7 @@ void CWthrPrintDialog::OnPrint(CDC* pDC, CPrintInfo* pInfo)
 			recPos++;
 		}
 	}
-	else//fireSet
+	else//firesSet
 	{
 		while(!fireSet->IsEOF() && x + sz.cy < pInfo->m_rectDraw.bottom)
 		{

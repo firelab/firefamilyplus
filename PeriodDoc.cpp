@@ -13,7 +13,7 @@
 #include "SIGStationSet.h"
 #include "ClimateSet.h"
 #include "fireplusSet.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 #include "ReportOptionsSet.h"
 #include <afxrich.h>

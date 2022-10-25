@@ -151,7 +151,7 @@ public:
 	int fireYears;
 	void LocateEvents(QueryRow *qRows, int rows, int days);
 	void KillFires();
-	void CreateLogitFiles(CFireSumSet *fires, int lFire, int mfDay, CString varName, BOOL conditional,
+	void CreateLogitFiles(CFiresSet*fires, int lFire, int mfDay, CString varName, BOOL conditional,
 		long *nV, long *nFD, long *nLFD, long *nMFD, long *_discards, long *madeUps);
 	void CreateLogitFilesQuick(CFireOptionsSet *fireOptsSet,
 		long *nV, long *nFD, long *nLFD, long *nMFD, long *_discards, long *madeUps);

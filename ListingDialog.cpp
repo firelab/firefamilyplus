@@ -11,7 +11,7 @@
 #include "ListingDialog.h"
 #include "FireDay.h"
 #include "perioddoc.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "FFPOptsSet.h"
 #include "ClimAnalysis.h"
 #include "DiurnalDoc.h"

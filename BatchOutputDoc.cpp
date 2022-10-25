@@ -10,7 +10,7 @@
 #include "FireDay.h"
 #include "perioddoc.h"
 #include "splitterframe.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 #include "BatchOutputDoc.h"
 #include "FireStats.h"
@@ -1050,7 +1050,7 @@ void CRawClim::GetFires()
 	int y;
 	for(y = 0; y < m_nYears; y++)
 		m_fires[y] = new CFireDay [366];
-	CFireSumSet fireSet(m_pDB);
+	CFiresSet fireSet(m_pDB);
 	fireSet.Open();
 	if(fireSet.FilterToWorkingSet(m_fpSet, 0, 0,false))//has fires
 	{

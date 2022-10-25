@@ -10,7 +10,7 @@
 #include "FireDay.h"
 #include "perioddoc.h"
 #include "splitterframe.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "climAnalysis.h"
 #include "PProbDialog.h"
 #include "fireplusView.h"

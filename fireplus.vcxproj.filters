@@ -364,9 +364,6 @@
     <ClCompile Include="FireDay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FireEditSet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FireFilterDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -431,9 +428,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FireSummary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FireSumSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FireSumView.cpp">
@@ -913,6 +907,7 @@
     <ClCompile Include="NFDRS4\time64.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CFiresSet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UGInclude\ExtCheckBox.h">
@@ -1284,9 +1279,6 @@
     <ClInclude Include="FireCauseFilterDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FireEditSet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FireFilterDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1351,9 +1343,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FireSummary.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FireSumSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FireSumView.h">
@@ -1854,6 +1843,7 @@
     <ClInclude Include="NFDRS4\time64_limits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CFiresSet.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

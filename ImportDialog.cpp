@@ -8,7 +8,7 @@
 #include "FireRegionSet.h"
 #include "FireUnitSet.h"
 #include "FireSubunitSet.h"
-#include "FireSet.h"
+//#include "FireSet.h"
 #include "FireAgencySet.h"
 #include "ImportDialog.h"
 #include "CustomFireSet.h"
@@ -36,7 +36,10 @@
 
 #include "DOIunitSet.h"
 #include "CFW21ImportDlg.h"
+#include "csv_readrow.h"
 //#include "updialog2.h"
+#include <unordered_map>
+#include <set>
 
 using namespace std;  // needed for stream stuff.... std::<whatever> won't work :(
 
@@ -253,7 +256,7 @@ INT_PTR CImportDialog::RunFWXImport(vector<string> importFileNames, FILE *errLog
 
 CImportDialog::CImportDialog(CWnd* pParent /*=NULL*/, CDatabase *_pDB)
 : CDialog(CImportDialog::IDD, pParent),
-regs(_pDB), units(_pDB), subs(_pDB), fireSet(_pDB)
+regs(_pDB), units(_pDB), subs(_pDB), firesSet(_pDB)
 {
 	//{{AFX_DATA_INIT(CImportDialog)
 	// NOTE: the ClassWizard will add member initialization here
@@ -261,8 +264,9 @@ regs(_pDB), units(_pDB), subs(_pDB), fireSet(_pDB)
 	regs.Open();
 	units.Open();
 	subs.Open();
-	fireSet.Open();
+	firesSet.Open();
 	pDoc = ((CFireplusView *)pParent)->GetDocument();
+	m_GACC_Agency_ID = 7;//this is the default, but will be checked/changed in OnInitDialog()
 }
 
 void CImportDialog::DoDataExchange(CDataExchange* pDX)
@@ -276,6 +280,7 @@ void CImportDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_GENERICFIRE, m_genericFireButton);
 	DDX_Control(pDX, IDC_NASF_CSV, m_nasfFireButton);
 	DDX_Control(pDX, IDC_WFMI, m_WFMIbutton);
+	DDX_Control(pDX, IDC_INFORMS_CSV, m_btnINFORMS);
 }
 
 BEGIN_MESSAGE_MAP(CImportDialog, CDialog)
@@ -291,10 +296,11 @@ BEGIN_MESSAGE_MAP(CImportDialog, CDialog)
 	ON_BN_CLICKED(IDC_WFMI,OnWFMI)
 	ON_BN_CLICKED(IDC_GENERICFIRE, OnGenericFires)
 	ON_BN_CLICKED(IDC_NASF_CSV, OnNASFFires)
-	ON_BN_CLICKED(IDC_WRCCRAWS,OnWRCCRAWS)
+	//ON_BN_CLICKED(IDC_WRCCRAWS,OnWRCCRAWS)
 	//ON_BN_CLICKED(IDC_WFMI, OnWFMICodes)
 	//}}AFX_MSG_MAP
 	ON_BN_CLICKED(IDC_FW21, &CImportDialog::OnBnClickedFw21)
+	ON_BN_CLICKED(IDC_INFORMS_CSV, &CImportDialog::OnBnClickedInformsCsv)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -431,7 +437,7 @@ void CImportDialog::OnGenericWx()
 		{
 			fileName = dlg.GetNextPathName( filenamePosition );
 			//tErrors = ImportGenericWx(fileName, logFile);
-			CGenericWxImportDialog gwd(this,NULL,fireSet.m_pDatabase);
+			CGenericWxImportDialog gwd(this,NULL,firesSet.m_pDatabase);
 			gwd.fileName.Format("%s",fileName);
 			gwd.errLog = logFile;
 			gwd.pDoc = pDoc;
@@ -485,96 +491,6 @@ void CImportDialog::OnGenericWx()
 	chdir(theApp.dbDir);
 }
 
-void CImportDialog::OnWRCCRAWS()
-{
-	chdir(theApp.userDir);
-	CSIGStationSet stations(fireSet.m_pDatabase);
-	stations.m_strSort = "[StationID]";
-	stations.Open();
-	CSelStationDialog sd(NULL, &stations);
-	int stares = sd.DoModal();
-	stations.Close();
-	if (stares != IDOK)
-		return;
-
-	CString sStationID;
-	sStationID = sd.selectedID;
-
-	CFileDialog	dlg (TRUE, _T("WRCC RAWS"), NULL, OFN_HIDEREADONLY | OFN_FILEMUSTEXIST |
-		OFN_PATHMUSTEXIST | OFN_ALLOWMULTISELECT,
-		_T("WRCC RAWS Format (.dat or .txt) |*.dat;*.txt|All Files (*.*)|*.*||"), this);
-	char *mfBuf = new char[MF_BUFSIZE];
-	mfBuf[0] = 0;
-	dlg.m_ofn.lpstrFile = mfBuf;
-	dlg.m_ofn.nMaxFile = MF_BUFSIZE;
-	int res = dlg.DoModal();
-
-	if (res == IDOK)
-	{
-		CWaitCursor wait;
-		long errors = 0;
-		// Get the position of the first filename
-		char *logFileName = GetTempFileName();
-		FILE * logFile = fopen(logFileName, "wt");
-		COleDateTime dateTime = COleDateTime::GetCurrentTime();
-		fprintf(logFile, "FireFamily Plus WRCC RAWS File Import Log\nStarted: %s\n\n", dateTime.Format("%m/%d/%Y at %H:%M:%S"));
-		POSITION filenamePosition = dlg.GetStartPosition();
-		CString fileName;
-
-		// Open each file selected
-		int tErrors;
-		while ( filenamePosition != NULL )
-		{
-			fileName = dlg.GetNextPathName( filenamePosition );
-			//tErrors = ImportGenericWx(fileName, logFile);
-			tErrors = ImportWRCCRAWS(fileName, logFile,sStationID);
-
-			if(tErrors >= 0)
-				errors += tErrors;
-			else
-			{//user cancelled
-				errors = -1;
-				break;
-			}
-		}
-		//if(errors >= 0)
-		//{
-		if (res == IDCANCEL){
-			fclose(logFile);
-			delete[] logFileName;
-		} else {
-			dateTime = COleDateTime::GetCurrentTime();
-			CString strMsg;
-			if(errors >= 0)
-			{
-				fprintf(logFile, "\nImport Completed: %s\n%ld errors were encountered.", dateTime.Format("%m/%d/%Y at %H:%M:%S"), errors);
-				strMsg.Format("Import Complete.\n%ld errors were encountered.", errors);
-			}
-			else
-			{
-				fprintf(logFile, "\n****** Import Cancelled by user. **********\n");
-				strMsg.Format("Import cancelled. Some data may have been imported.\nPlease check the log file for complete information.");
-			}
-			fclose(logFile);
-			CImportDoneDialog idd(this);
-			idd.statusStr = strMsg;
-			idd.logFileName = logFileName;
-			delete[] logFileName;
-			idd.DoModal();
-			theApp.SetUserDir(dlg.GetPathName());
-		}
-	}
-	else if(res == IDCANCEL)
-	{
-		int err = CommDlgExtendedError();
-		if(err == FNERR_BUFFERTOOSMALL)
-		{
-			AfxMessageBox("File Name buffer overrun, select fewer files.");
-		}
-	}
-	delete[] mfBuf;
-	chdir(theApp.dbDir);
-}
 
 // NASF CSV import:
 // new 2014
@@ -617,7 +533,7 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 
 
 	
-	if(pDoc->HasTempFires())
+	if(pDoc->HasTempFire())
 		{
 			try
 			{
@@ -629,7 +545,7 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 			}
 			//pDoc->m_pDB->DeleteTableDef("ffpTempFire");
 		}
-	pDoc->CreateTempFires();
+	pDoc->CreateTempFire();
 	
 	
 	ifstream stream;
@@ -640,7 +556,7 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 		return -1;
 
 
-	long count = 0, updates = 0, rejects = 0;
+	long updates = 0, rejects = 0;
     int lastRegionID = 0;
 	int lastFireID = 0;
     
@@ -661,18 +577,18 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 
     CList<CString, CString> staList;
 
-	CFireSet fires(pDoc->m_pDB);
-	fires.m_strSort = "[FireID],[FireNumber]";
+	CFiresSet fires(pDoc->m_pDB);
+	fires.m_strSort = "[FireNumber]";
 	fires.Open();
 
-	CFireSet tfires(pDoc->m_pDB);
-	tfires.m_strSort = "[FireID],[FireNumber]";
+	CFiresSet tfires(pDoc->m_pDB);
+	tfires.m_strSort = "[FireNumber]";
 	tfires.Open(CRecordset::dynaset, "ffpTempFire");
 
 	int iDiscoveryDate = -1,
 		iDiscoveryTime = -1,
-		iFirstAttackDate = -1,
-		iFirstAttackTime = -1,
+		//iFirstAttackDate = -1,
+		//iFirstAttackTime = -1,
 		iRegionID =-1,
 		iUnitID = -1,
 		iNASFID = -1,   // NASF reporting unit
@@ -687,8 +603,8 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 		iStatisticalCause = -1,
 		iGeneralCause = -1,
 		iSpecificCause = -1,
-		iClassPeople = -1,
-		iCauseNarr = -1,
+		//iClassPeople = -1,
+		//iCauseNarr = -1,
 		iTownship = -1,
 		iRange = -1,
 		iSection = -1,
@@ -698,7 +614,7 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 		iSlope= -1,
 		iElevation= -1,
 		iAspect= -1,
-		iFuelModel= -1,
+		//iFuelModel= -1,
 		iFireType= -1,
 		iContainDate= -1,
 		iContainTime= -1,
@@ -714,10 +630,454 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 	int iField = 0;
 	
 	
+	int lineNo = 1;
 
 	stream.getline(line,MAX_INPUT_LINE); 
-    stream2 << line;
-	stream2.getline(temp,MAX_FIELD_LEN,delim); 
+	string line2 = line;
+	vector<string> vColNames = csv_read_row(line2, ',');;
+	while (stream.good())
+	{
+		iFireNumber = getColIndex("Local Incident ID", vColNames);
+		if (iFireNumber >= 0)
+			break;
+		stream.getline(line, MAX_INPUT_LINE);
+		line2 = line;
+		vColNames = csv_read_row(line2, ',');
+		lineNo++;
+
+	}
+	iFireNumber = getColIndex("Local Incident ID", vColNames);
+	iDiscoveryDate = getColIndex("Fire Discovery Date", vColNames);
+	if(iDiscoveryDate < 0)
+		iDiscoveryDate = getColIndex("Fire Date", vColNames);
+	iFireName = getColIndex("Incident Name", vColNames);
+	iDiscoveryTime = getColIndex("Fire Discovery Time", vColNames);
+	iContainDate = getColIndex("Fire Containment Date", vColNames);
+	if(iContainDate < 0)
+		iContainDate = getColIndex("Containment Date", vColNames);
+	iContainTime = getColIndex("Fire Containment Time", vColNames);
+	if(iContainTime < 0)
+		iContainTime = getColIndex("Containment Time", vColNames);
+	iNASFID = getColIndex("Fire Reporting Agency Unit ID", vColNames);
+	iSubunitID = getColIndex("District", vColNames);
+	iLatitude = getColIndex("Latitude", vColNames);
+	iLongitude = getColIndex("Longitude", vColNames);
+	iStatisticalCause = getColIndex("Cause Code", vColNames);
+	if(iStatisticalCause < 0)
+		iStatisticalCause = getColIndex("Statistical Cause Code", vColNames);
+	iTotalAcres = getColIndex("Total Acres Burned", vColNames);
+	if(iTotalAcres < 0)
+		iTotalAcres = getColIndex("Final Fire Acre Quantity", vColNames);
+	iState = getColIndex("State", vColNames);
+	iStateID = getColIndex("State FIPS", vColNames);
+	iCounty = getColIndex("County", vColNames);
+	iCountyID = getColIndex("County FIPS", vColNames);
+
+	if (iFireNumber < 0 || iDiscoveryDate < 0 || iFireName < 0 || iDiscoveryTime < 0
+		|| iContainDate < 0 || iContainTime < 0 || iNASFID < 0 || iSubunitID < 0
+		|| iLatitude < 0 || iLongitude < 0 || iStatisticalCause < 0 || iTotalAcres < 0)
+	{
+		if (iFireNumber < 0)
+			fprintf(errLog, "Error, field Local Incident ID not found in header\n");
+		if (iDiscoveryDate < 0)
+			fprintf(errLog, "Error, field Fire Discovery Date nor Fire Date not found in header\n");
+		if (iDiscoveryTime < 0)
+			fprintf(errLog, "Error, field Fire Discovery Time not found in header\n");
+		if (iContainDate < 0)
+			fprintf(errLog, "Error, field Fire Containment Date nor Containment Date not found in header\n");
+		if (iContainTime < 0)
+			fprintf(errLog, "Error, field Fire Containment Time nor Containment Time not found in header\n");
+		if (iNASFID < 0)
+			fprintf(errLog, "Error, field Fire Reporting Agency Unit ID not found in header\n");
+		if (iSubunitID < 0)
+			fprintf(errLog, "Error, field District not found in header\n");
+		if (iLatitude < 0)
+			fprintf(errLog, "Error, field Latitude not found in header\n");
+		if (iLongitude < 0)
+			fprintf(errLog, "Error, field Longitude not found in header\n");
+		if (iStatisticalCause < 0)
+			fprintf(errLog, "Error, field Cause Code nor Statistical Cause Code not found in header\n");
+		if (iTotalAcres < 0)
+			fprintf(errLog, "Error, field Total Acres Burned nor Final Fire Acre Quantity not found in header\n");
+		if (iState < 0)
+			fprintf(errLog, "Error, field State not found in header\n");
+		if (iStateID < 0)
+			fprintf(errLog, "Error, field State FIPS not found in header\n");
+		if (iCounty < 0)
+			fprintf(errLog, "Error, field County not found in header\n");
+		if (iCountyID < 0)
+			fprintf(errLog, "Error, field County FIPS not found in header\n");
+		stream.close();
+		return -2;
+	}
+	int maxID = iFireNumber;
+	maxID = max(maxID, iDiscoveryDate);
+	maxID = max(maxID, iDiscoveryTime);
+	maxID = max(maxID, iContainDate);
+	maxID = max(maxID, iContainTime);
+	maxID = max(maxID, iNASFID);
+	maxID = max(maxID, iSubunitID);
+	maxID = max(maxID, iLatitude);
+	maxID = max(maxID, iLongitude);
+	maxID = max(maxID, iStatisticalCause);
+	maxID = max(maxID, iTotalAcres);
+	maxID = max(maxID, iState);
+	maxID = max(maxID, iStateID);
+	maxID = max(maxID, iCounty);
+	maxID = max(maxID, iCountyID);
+	string strLine;
+	vector<string> vFields;
+	while (stream.good())
+	{
+		stream.getline(line, MAX_INPUT_LINE);
+		lineNo++;
+		strLine = line;
+		vFields = csv_read_row(strLine, ',');
+		if (vFields.size() <= maxID)
+		{
+			fprintf(errLog, "Warning, line %d has too few fields, skipping record\n", lineNo);
+			continue;
+		}
+		tfires.AddNew();
+		COleDateTime dt;
+		dt.ParseDateTime(vFields[iDiscoveryDate].c_str());
+		if(dt.GetStatus() != COleDateTime::valid)
+		{
+			fprintf(errLog, "\tRecord Number %d, Discovery date is not valid.\n", lineNo);
+			rejects++;
+			continue;
+		}
+		int hour = 0, minute = 0;
+		if (vFields[iDiscoveryTime].size() > 0)
+		{
+			if (vFields[iDiscoveryTime].size() <= 2)//hour only
+			{
+				hour = atoi(vFields[iDiscoveryTime].c_str());
+			}
+			else if (vFields[iDiscoveryTime].size() == 3 || vFields[iDiscoveryTime].size() > 5) {
+				hour = 0;
+			}
+			else {   // normal format
+				// HHMM
+				char tdate[3];
+				tdate[0] = vFields[iDiscoveryTime][0];
+				tdate[1] = vFields[iDiscoveryTime][1];
+				tdate[2] = '\0';
+				hour = atoi(tdate);
+
+				tdate[0] = vFields[iDiscoveryTime][2];
+				tdate[1] = vFields[iDiscoveryTime][3];
+				tdate[2] = '\0';
+				minute = atoi(tdate);
+			}
+		}
+		if (hour < 0 || hour > 23) {
+			hour = 13;
+		}
+		if (minute < 0 || minute > 59) {
+			minute = 0;
+		}
+		tfires.m_Discovery.SetDateTime(dt.GetYear(), dt.GetMonth(), dt.GetDay(), hour, minute, 0);
+		COleDateTime today;
+		today = COleDateTime::GetCurrentTime();
+		if (tfires.m_Discovery > today)
+		{
+			fprintf(errLog, "\tRecord Number %ld, Discovery Date/Time is not valid (future): %d/%d/%04d\n", lineNo, dt.GetMonth(), dt.GetDay(), dt.GetYear());
+			rejects++;
+
+			continue;
+		}
+		if (strlen(vFields[iTotalAcres].c_str()) > 0)
+			tfires.m_TotalAcres = atof(vFields[iTotalAcres].c_str());
+		else
+		{//error, Total Acres is required
+			fprintf(errLog, "\tRecord Number %d, Missing required field: Final Fire Acre Quantity.\n", lineNo);
+			rejects++;
+			continue;
+		}
+		if (strlen(vFields[iFireName].c_str()) > 0)
+		{
+			char sFireName[MAX_FIELD_LEN];
+			strcpy(sFireName, vFields[iFireName].c_str());
+			sFireName[25] = 0;//safety truncate!
+
+			// if we've replaced commas with semicolons, change them back
+			for (int i = 0; i < strlen(sFireName); i++)
+				if (sFireName[i] == ';')
+					sFireName[i] = ',';
+
+
+			tfires.m_FireName = sFireName;
+			tfires.m_FireName.Trim();
+		}
+		else
+			tfires.SetFieldNull(&tfires.m_FireName);
+		if (strlen(vFields[iStatisticalCause].c_str()) > 0)
+		{
+			long testVal = atol(vFields[iStatisticalCause].c_str());
+			if (testVal >= 10 && testVal <= 13)
+				testVal = 9;//assign to misc
+			if (testVal < 1 || testVal > 9)
+			{
+				fprintf(errLog, "\tRecord Number %d, Invalid field: Statistical Cause Code'%s'.\n", lineNo, vFields[iStatisticalCause].c_str());
+				rejects++;
+				continue;
+
+			}
+			else
+				tfires.m_StatisticalCause = testVal;
+		}
+		else
+		{
+			//error, cause is required
+			fprintf(errLog, "\tRecord Number %d, Missing required field: Statistical Cause Code.\n", lineNo);
+			rejects++;
+			continue;
+		}
+		if (strlen(vFields[iLatitude].c_str()) > 0)
+			tfires.m_latitude = atof(vFields[iLatitude].c_str());
+		else
+			tfires.SetFieldNull(&tfires.m_latitude);
+		if (strlen(vFields[iLongitude].c_str()) > 0)
+			tfires.m_longitude = atof(vFields[iLongitude].c_str());
+		else
+			tfires.SetFieldNull(&tfires.m_longitude);
+
+		COleDateTime containDt;
+		if (strlen(vFields[iContainDate].c_str()) > 0)
+		{
+			containDt.ParseDateTime(vFields[iContainDate].c_str());
+			if (containDt.GetStatus() != COleDateTime::valid)
+			{
+				fprintf(errLog, "\tRecord Number %d, Fire Containment Date is not valid.\n", lineNo);
+				rejects++;
+				continue;
+			}
+			int hour = 0, minute = 0;
+			if (vFields[iContainTime].size() > 0)
+			{
+				if (vFields[iContainTime].size() <= 2)//hour only
+				{
+					hour = atoi(vFields[iContainTime].c_str());
+				}
+				else if (vFields[iContainTime].size() == 3 || vFields[iContainTime].size() > 5) {
+					hour = 0;
+				}
+				else {   // normal format
+					// HHMM
+					char tdate[3];
+					tdate[0] = vFields[iContainTime][0];
+					tdate[1] = vFields[iContainTime][1];
+					tdate[2] = '\0';
+					hour = atoi(tdate);
+
+					tdate[0] = vFields[iContainTime][2];
+					tdate[1] = vFields[iContainTime][3];
+					tdate[2] = '\0';
+					minute = atoi(tdate);
+				}
+			}
+			if (hour < 0 || hour > 23) {
+				hour = 13;
+			}
+			if (minute < 0 || minute > 59) {
+				minute = 0;
+			}
+			tfires.m_Contain.SetDateTime(containDt.GetYear(), containDt.GetMonth(), containDt.GetDay(), hour, minute, 0);
+			COleDateTime today;
+			today = COleDateTime::GetCurrentTime();
+			if (tfires.m_Discovery > today)
+			{
+				fprintf(errLog, "\tRecord Number %ld, Fire Containment Date/Time is not valid (future): %d/%d/%04d\n", lineNo, containDt.GetMonth(), containDt.GetDay(), containDt.GetYear());
+				rejects++;
+
+				continue;
+			}
+			tfires.m_StrategyMet = tfires.m_Contain;
+		}
+		else
+		{
+			tfires.SetFieldNull(&tfires.m_Contain);
+			tfires.SetFieldNull(&tfires.m_StrategyMet);
+		}
+
+		tfires.SetFieldNull(&tfires.m_AgencyID);
+		tfires.SetFieldNull(&tfires.m_RegionID);
+		tfires.SetFieldNull(&tfires.m_UnitID);
+		tfires.SetFieldNull(&tfires.m_SubunitID);
+
+
+		if (strlen(vFields[iFireNumber].c_str()) > 0)
+		{
+			//first we need to find reginID and unitID, and add if necessary
+			int agencyID = 6;
+			int regionID = -1, unitID = -1;
+			if (vFields[iCountyID].size() < 1 && vFields[iCounty].size() < 1)
+			{
+				fprintf(errLog, "\tRecord Number %ld, Missing County and County FIPS\n", lineNo);
+				rejects++;
+				continue;
+			}
+			if (vFields[iState].size() < 1)
+			{
+				fprintf(errLog, "\tRecord Number %ld, Invalid state\n", lineNo);
+				rejects++;
+
+				continue;
+			}
+			char sState[MAX_FIELD_LEN];
+			char sRegionID[MAX_FIELD_LEN];
+			if (vFields[iState].size() < 3)
+			{
+				CStateSet stateSet(pDoc->m_pDB);
+				stateSet.m_strFilter.Format("[State] = '%s'", vFields[iState].c_str());
+				stateSet.Open();
+				if (!stateSet.IsEOF())
+				{
+
+					sprintf(sState, "%s", stateSet.m_StateName);
+
+				}
+				stateSet.Close();
+			}
+			else
+				strcpy(sState, vFields[iState].c_str());
+			// get NASF regionID based on state
+
+			CFireRegionSet regSet(pDoc->m_pDB);
+			if (strlen(sState) > 2)
+				regSet.m_strFilter.Format("[AgencyID]=6 AND [Name] LIKE '%% %s%%'", sState);
+			else
+				regSet.m_strFilter.Format("[AgencyID]=6 AND [Name] LIKE '%s %%'", sState);
+			regSet.Open();
+			if (!regSet.IsEOF()) 
+			{
+				sprintf(sRegionID, "%d", regSet.m_RegionID);
+				lastRegionID = regSet.m_RegionID;
+			}
+			regSet.Close();
+			if (strlen(sRegionID) < 1)
+			{
+				fprintf(errLog, "\tRecord Number %ld, Invalid Region for state: %s\n", lineNo, sState);
+				rejects++;
+				continue;
+			}
+			CFireUnitSet unitSet(pDoc->m_pDB);
+			// first search for the county
+			// reduce the county name to its first word
+			// to eliminate problems with "Lewis and Clark" vs. "Lewis & Clark", etc.
+			//
+			char sCounty[MAX_FIELD_LEN];
+			char sCountyID[MAX_FIELD_LEN];
+			if (vFields[iCounty].size() > 0)
+				strcpy(sCounty, vFields[iCounty].c_str());
+			else
+				sCounty[0] = 0;
+			if (vFields[iCountyID].size() > 0)
+			{
+				if (vFields[iCountyID].size() == 3 && vFields[iCountyID][0] == '0')//strip it
+				{
+					sCountyID[0] = vFields[iCountyID][1];
+					sCountyID[1] = vFields[iCountyID][2];
+					sCountyID[2] = 0;
+					if (sCountyID[0] == '0')
+					{
+						sCountyID[0] = sCountyID[1];
+						sCountyID[1] = 0;
+						if (sCountyID[0] == '0')
+							sCounty[0] = 0;
+					}
+					//strcpy(sCountyID, vFields[iCountyID].)
+				}
+				else
+					strcpy(sCountyID, vFields[iCountyID].c_str());
+			}
+			else
+				sCountyID[0] = 0;
+			char county1[80];
+			sprintf(county1, "%s", sCounty);
+			for (int i = 0; i < strlen(county1); i++)
+				if (county1[i] == ' ' || county1[i] == '\'')
+					county1[i] = '\0';
+
+
+			if (strlen(sCountyID) > 0 && strlen(sCounty) > 0)
+				unitSet.m_strFilter.Format("[Name] LIKE '%s %s%%'", sCountyID, county1); //,sCountyID,sCounty);
+			else if (strlen(sCounty) > 0)
+				unitSet.m_strFilter.Format("[RegionID] = %s AND [Name] LIKE '%% %s%%'", sRegionID, county1);
+
+			unitSet.Open();
+			char sUnitID[MAX_FIELD_LEN];
+			bool unitFound = false;
+			if (!unitSet.IsEOF()) {
+
+				sprintf(sUnitID, "%d", unitSet.m_UnitID);
+
+				lastRegionID = unitSet.m_RegionID;
+
+				unitFound = true;
+			}
+			else if (strlen(sCountyID) > 0)
+			{
+
+				unitSet.Close();
+				unitSet.m_strFilter.Format("[RegionID] = %s AND [Name] LIKE '%s %%'", sRegionID, sCountyID);
+				unitSet.Open();
+
+				if (!unitSet.IsEOF()) {
+
+					sprintf(sUnitID, "%d", unitSet.m_UnitID);
+					lastRegionID = unitSet.m_RegionID;
+					unitFound = true;
+				}
+
+
+			}
+			unitSet.Close();
+			if (!unitFound || strlen(sUnitID) < 1)
+			{
+				fprintf(errLog, "\tRecord Number %ld, Invalid County (%s) or FIPS (%s)\n", lineNo, sCounty, sCountyID);
+				//fprintf(errLog, "\tRecord Number %ld, Invalid County or FIPS for '%s'\n", count, sNASFID);
+				rejects++;
+
+				continue;
+			}
+			unitID = atoi(sUnitID);
+			regionID = atoi(sRegionID);
+
+
+			char sFireNumber[MAX_FIELD_LEN];
+
+			strcpy(sFireNumber, vFields[iFireNumber].c_str());
+			sFireNumber[25] = 0;//safety truncate!
+			tfires.m_FireNumber.Format("%d%02d%02d-%ld-%ld-%ld-0-%s", dt.GetYear(), dt.GetMonth(), dt.GetDay(), agencyID, regionID, unitID, sFireNumber);// = str;
+			tfires.m_FireNumber.Trim();
+			if (tfires.m_FireNumber.GetLength() > 50)
+				tfires.m_FireNumber.SetAt(50, 0);
+			tfires.m_RegionID = (long)regionID;
+			tfires.m_AgencyID = (long)agencyID;
+			tfires.m_UnitID = (long)unitID;
+			tfires.m_SubunitID = 0;
+			tfires.SetFieldNull(&tfires.m_SubunitID);
+		}
+		else
+		{//error, Fire number is required
+			fprintf(errLog, "\tRecord Number %d, Missing required field: Local Incident ID.\n", lineNo);
+			rejects++;
+			continue;
+		}
+		tfires.Update();
+
+	}
+		// stream2 << line;
+	//stream2.getline(temp,MAX_FIELD_LEN,delim); 
+	//test for BOM dammit
+	/*if (temp[0] < 0)
+	{
+		std::string s1 = temp;
+		std::string s = ltrim(s1);
+		strcpy(temp, s.c_str());
+	}
 	while (temp[0] > 0 && temp[0] != '\n')
 	{
 		
@@ -770,45 +1130,45 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 		
 
 	}
-	int numFields = iField;
+	int numFields = iField;*/
 
 	// subsequent lines are comma-separated data
 	// '#' denotes a commented line to be skipped
-	while (stream.good())// && (!cd || ! cd->Abort()))
+/*	while (stream.good())// && (!cd || ! cd->Abort()))
 	{
 
 		 
 	   	char sDiscoveryDate[MAX_FIELD_LEN] = "",
 		   sDiscoveryTime[MAX_FIELD_LEN] = "",
-		   sFirstAttackDate[MAX_FIELD_LEN] = "",
-		   sFirstAttackTime[MAX_FIELD_LEN] = "",
+		   //sFirstAttackDate[MAX_FIELD_LEN] = "",
+		   //sFirstAttackTime[MAX_FIELD_LEN] = "",
 		   //sAgencyID[MAX_FIELD_LEN] = "",
 		   sRegionID[MAX_FIELD_LEN] = "",
 		   sUnitID[MAX_FIELD_LEN] = "",
 		   sSubunitID[MAX_FIELD_LEN] = "",
 		   sNASFID[MAX_FIELD_LEN] = "",
 		   sFireNumber[MAX_FIELD_LEN] = "",
-		   sState[MAX_FIELD_LEN] = "",
-		   sCounty[MAX_FIELD_LEN] = "",
-		   sStateID[MAX_FIELD_LEN] = "",
-		   sCountyID[MAX_FIELD_LEN] = "",
+		  // sState[MAX_FIELD_LEN] = "",
+		  // sCounty[MAX_FIELD_LEN] = "",
+		  // sStateID[MAX_FIELD_LEN] = "",
+		  // sCountyID[MAX_FIELD_LEN] = "",
 		   sTotalAcres[MAX_FIELD_LEN] = "",
 		   sFireName[MAX_FIELD_LEN] = "",
 		   sStatisticalCause[MAX_FIELD_LEN] = "",
 		   sGeneralCause[MAX_FIELD_LEN] = "",
 		   sSpecificCause[MAX_FIELD_LEN] = "",
-		   sClassPeople[MAX_FIELD_LEN] = "",
-		   sCauseNarr[MAX_FIELD_LEN] = "",
-		   sTownship[MAX_FIELD_LEN] = "",
-		   sRange[MAX_FIELD_LEN] = "",
-		   sSection[MAX_FIELD_LEN] = "",
-		   sSubSection[MAX_FIELD_LEN] = "",
+		  // sClassPeople[MAX_FIELD_LEN] = "",
+		   //sCauseNarr[MAX_FIELD_LEN] = "",
+		   //sTownship[MAX_FIELD_LEN] = "",
+		   //sRange[MAX_FIELD_LEN] = "",
+		   //sSection[MAX_FIELD_LEN] = "",
+		   //sSubSection[MAX_FIELD_LEN] = "",
 		   sLatitude[MAX_FIELD_LEN] = "",
 		   sLongitude[MAX_FIELD_LEN] = "",
-		   sSlope[MAX_FIELD_LEN] = "",
-		   sElevation[MAX_FIELD_LEN] = "",
-		   sAspect[MAX_FIELD_LEN] = "",
-		   sFuelModel[MAX_FIELD_LEN] = "",
+		   //sSlope[MAX_FIELD_LEN] = "",
+		   //sElevation[MAX_FIELD_LEN] = "",
+		   //sAspect[MAX_FIELD_LEN] = "",
+		   //sFuelModel[MAX_FIELD_LEN] = "",
 		   sFireType[MAX_FIELD_LEN] = "",
 		   sContainDate[MAX_FIELD_LEN] = "",
 		   sContainTime[MAX_FIELD_LEN] = "",
@@ -857,10 +1217,10 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				sprintf(sDiscoveryDate,"%s",temp);
 			else if (iDiscoveryTime == iField)
 				sprintf(sDiscoveryTime,"%s",temp);
-			else if (iFirstAttackDate == iField)
-                sprintf(sFirstAttackDate,"%s",temp);
-			else if (iFirstAttackTime == iField)
-		        sprintf(sFirstAttackTime,"%s",temp);
+			//else if (iFirstAttackDate == iField)
+            //    sprintf(sFirstAttackDate,"%s",temp);
+			//else if (iFirstAttackTime == iField)
+		    //    sprintf(sFirstAttackTime,"%s",temp);
 			else if (iRegionID == iField)
                 sprintf(sRegionID,"%s",temp);
 			else if (iUnitID == iField)
@@ -871,26 +1231,12 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				sprintf(sSubunitID,"%s",temp);
 			else if (iFireNumber == iField)
 				sprintf(sFireNumber,"%s",temp);
-		    else if (iState == iField)
-				sprintf(sState,"%s",temp);
-		    else if (iCounty == iField)
-				sprintf(sCounty,"%s",temp);
-			else if (iStateID == iField)
-				sprintf(sStateID,"%s",temp);
-		    else if (iCountyID == iField)
-			{
-				sprintf(sCountyID,"%s",temp);
-				while (sCountyID[0]=='0')
-				{  
-					// remove leading zero from county ID
-					int ii  = 1;
-					sprintf(temp,"%s",sCountyID);
-					for (; ii < strlen(temp);ii++)
-						sCountyID[ii-1] = temp[ii];
-					sCountyID[ii-1] = '\0';
-
-				}
-			}
+		    //else if (iState == iField)
+			//	sprintf(sState,"%s",temp);
+		    //else if (iCounty == iField)
+			//	sprintf(sCounty,"%s",temp);
+			//else if (iStateID == iField)
+			//	sprintf(sStateID,"%s",temp);
 		    else if (iTotalAcres == iField)
 				sprintf(sTotalAcres,"%s",temp);
 		    else if (iFireName == iField)
@@ -901,30 +1247,6 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				sprintf(sGeneralCause,"%s",temp);
 		    else if (iSpecificCause == iField)
 				sprintf(sSpecificCause,"%s",temp);
-		    else if (iClassPeople == iField)
-				sprintf(sClassPeople,"%s",temp);
-		    else if (iCauseNarr == iField)
-				sprintf(sCauseNarr,"%s",temp);
-		    else if (iTownship == iField)
-				sprintf(sTownship,"%s",temp);
-		    else if (iRange == iField)
-				sprintf(sRange,"%s",temp);
-		    else if (iSection == iField)
-				sprintf(sSection,"%s",temp);
-			else if (iSubSection == iField)
-				sprintf(sSubSection,"%s",temp);
-			else if (iLatitude == iField)
-				sprintf(sLatitude,"%s",temp);
-			else if (iLongitude == iField)
-				sprintf(sLongitude,"%s",temp);
-		    else if (iSlope == iField)
-				sprintf(sSlope,"%s",temp);
-		    else if (iElevation == iField)
-				sprintf(sElevation,"%s",temp);
-		    else if (iAspect == iField)
-				sprintf(sAspect,"%s",temp);
-			else if (iFuelModel == iField)
-				sprintf(sFuelModel,"%s",temp);
 		    else if (iFireType == iField)
 				sprintf(sFireType,"%s",temp);
 		    else if (iContainDate == iField)
@@ -1078,141 +1400,14 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 		// calculate fireID if necessary
 		
 
-		if (lastFireID > 0)
-		{
-			lastFireID ++;
-			//sprintf(sFireID,"%d",lastFireID);
-		} 
-		else 
-		{
-			CFireSet fires(pDoc->m_pDB);
-			fires.m_strSort.Format("[FireID]");
-			fires.Open();
-			if (! fires.IsEOF())
-			{
-				fires.MoveLast();
-				lastFireID = fires.m_FireID + 1;
-				//sprintf(sFireID,"%d",fires.m_FireID + 1);
-			} 
-			else 
-			{
-				//sprintf(sFireID,"1");
-				lastFireID = 1;
-			}
-            fires.Close();
-		}
-		tfires.m_Year.Format("%d",y);
+		//tfires.m_Year.Format("%d",y);
 
 		//if (strlen(sFireID) > 0)
-		tfires.m_FireID = lastFireID;//atol(sFireID);
+		//tfires.m_FireID = lastFireID;//atol(sFireID);
 		//else
 			//tfires.SetFieldNull(&tfires.m_FireID);
 
 		tfires.m_Discovery = discoveryDate;
-
-		/* FirstAttack */
-		COleDateTime firstattackDate;  
-
-		if (strlen(sFirstAttackDate) > 0 ){
-
-		   // format date & time properly
-           int y=0,
-			m=0,
-			d=0,
-			hr=13,
-			min=0;
-
-
-           char tdate[5];
-		 
- // MM/DD/YYYY
-			COleDateTime discDT;
-			discDT.ParseDateTime(sDiscoveryDate);
-			if(discDT.GetStatus() != COleDateTime::valid)
-			{
-				fprintf(errLog, "\tRecord Number %d, FirstAttack date is not valid.\n", count );
-				rejects ++;
-				continue;
-			}
-			m = discDT.GetMonth();//atoi(tdate);
-			d = discDT.GetDay();//atoi(tdate);
-			y = discDT.GetYear();//atoi(tdate);
-		
-
-
-		if (y < 1900 || y > 2100){
-            fprintf(errLog, "\tRecord Number %d, FirstAttack date is not valid (bad year).\n", count );
-			rejects ++;
-			continue;
-		}
-		if (m < 1 || m > 12){
-            fprintf(errLog, "\tRecord Number %d, FirstAttack date is not valid (bad month).\n", count );
-			rejects ++;
-			continue;
-		}
-		if (d < 1 || d > 31){
-            fprintf(errLog, "\tRecord Number %d, FirstAttack date is not valid (bad day).\n", count );
-			rejects ++;
-			continue;
-		}
-
-		if (strlen(sFirstAttackTime)==3)
-		{
-			 sprintf(temp,"0%s",sFirstAttackTime);
-			 sprintf(sFirstAttackTime,temp);
-		}
-
-		if (strlen(sFirstAttackTime) > 0){
-           if (strlen(sFirstAttackTime) <= 2)
-			   hr = atoi(sFirstAttackTime);
-		   else if (strlen(sFirstAttackTime)==3 || strlen(sFirstAttackTime) > 5) {
-              hr = 13;
-		   } else {   // normal format
-			 // HHMM
-                  tdate[0] = sFirstAttackTime[0];
-		          tdate[1] = sFirstAttackTime[1];
-                  tdate[2] = '\0';
-		          hr = atoi(tdate);
-
-				  tdate[0] = sFirstAttackTime[2];
-		          tdate[1] = sFirstAttackTime[3];
-                  tdate[2] = '\0';
-		          min = atoi(tdate);
-		      
-		   }
-
-		}
-		if (hr < 0 || hr > 23){
-               hr = 13;
-		}
-		if (min < 0 || min > 59){
-		     min = 0;
-		}
-
-	
-		firstattackDate.SetDateTime(y, m, d, hr, min, 0);  
-
-		if(firstattackDate.GetStatus() != 0 || y < 1900)
-		{
-			fprintf(errLog, "\tRecord Number %ld, FirstAttack Date/Time is not valid: %d/%d/%04d\n", count ,  m, d, y);
-			rejects ++;
-			
-			continue;
-		}
-		COleDateTime today;
-		today = COleDateTime::GetCurrentTime();
-		if(firstattackDate > today)
-		{
-			fprintf(errLog, "\tRecord Number %ld, FirstAttack Date/Time is not valid (future): %d/%d/%04d\n", count,  m, d, y);
-			rejects ++;
-			
-			continue;
-		}
-		  tfires.m_FirstAttack = firstattackDate;
-
-		} else {
-          tfires.SetFieldNull(&tfires.m_FirstAttack);
-		}
 
         tfires.SetFieldNull(&tfires.m_AgencyID);
 		tfires.SetFieldNull(&tfires.m_RegionID);
@@ -1358,14 +1553,15 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 		tfires.m_AgencyID  = (long) agencyID;
 		tfires.m_UnitID = (long) unitID;
 		tfires.m_SubunitID = (long) subunitID;
-
+		tfires.SetFieldNull(&tfires.m_SubunitID);
      
 
 		
 		if (strlen(sFireNumber) > 0)
 		{
-			sFireNumber[12] = 0;//safety truncate!
-			tfires.m_FireNumber = sFireNumber;
+			sFireNumber[25] = 0;//safety truncate!
+			tfires.m_FireNumber.Format("%d%02d%02d-%ld-%ld-%ld-0-%s", discoveryDate.GetYear(), discoveryDate.GetMonth(), discoveryDate.GetDay(), agencyID, regionID, unitID, sFireNumber);// = str;
+			//tfires.m_FireNumber = sFireNumber;
 			tfires.m_FireNumber.Trim();
 		} 
 		else
@@ -1388,7 +1584,7 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 			tfires.m_County = atol(sCountyID);
 		else
             tfires.SetFieldNull(&tfires.m_County);
-
+		
 		if (strlen(sTotalAcres) > 0)
 			tfires.m_TotalAcres = atof(sTotalAcres);
 		else
@@ -1435,81 +1631,15 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				continue;
 		}
            
-		if (strlen(sGeneralCause) > 0)
-			tfires.m_GeneralCause = atol(sGeneralCause);
-		else
-            tfires.SetFieldNull(&tfires.m_GeneralCause);
-
-		if (strlen(sSpecificCause) > 0)
-			tfires.m_SpecificCause = atol(sSpecificCause);
-		else
-            tfires.SetFieldNull(&tfires.m_SpecificCause);
-
-		if (strlen(sClassPeople) > 0)
-			tfires.m_ClassPeople = atol(sClassPeople);
-		else
-            tfires.SetFieldNull(&tfires.m_ClassPeople);
-
-		if (strlen(sCauseNarr) > 0)
-		{
-			sCauseNarr[50] = 0;//safety truncate!
-			tfires.m_CauseNarr = sCauseNarr;
-			tfires.m_CauseNarr.Trim();
-		} 
-		else
-            tfires.SetFieldNull(&tfires.m_CauseNarr);
-
-		if (strlen(sTownship) > 0)
-		{
-			sTownship[5] = 0;//safety truncate!
-			tfires.m_Township = sTownship;
-			tfires.m_Township.Trim();
-		} else
-            tfires.SetFieldNull(&tfires.m_Township);
-
-		if (strlen(sRange) > 0)
-		{
-			sRange[5] = 0;//safety truncate!
-			tfires.m_Range = sRange;
-			tfires.m_Range.Trim();
-		} else
-            tfires.SetFieldNull(&tfires.m_Range);
-
-		if (strlen(sSection) > 0)
-			tfires.m_Section = atol(sSection);
-		else
-            tfires.SetFieldNull(&tfires.m_Section);
-
-		if (strlen(sSubSection) > 0)
-		{
-			sSubSection[4] = 0;//safety truncate!
-			tfires.m_SubSection = sSubSection;
-			tfires.m_SubSection.Trim();
-		} 
-		else
-            tfires.SetFieldNull(&tfires.m_SubSection);
-
 		if (strlen(sLatitude) > 0)
 		{
-			int dd, mm, ss;
-			DecimalDegree2DDMMSS(atof(sLatitude), &dd, &mm, &ss);
-			tfires.m_LatDD = dd;
-			tfires.m_LatMM = mm;
-			tfires.m_LatSS = ss;
-		   /*tfires.m_LatDD = atoi(sLatitude);
-		   tfires.m_LatMM = (int) ((atof(sLatitude) + .000001 - (float) (tfires.m_LatDD)) * 60.0);
-           tfires.m_LatSS = (int) ((atof(sLatitude) + .000001 - ((float) (tfires.m_LatDD) + 0.0000001) - (float) (tfires.m_LatMM) / 60.0) * 60.0);
-
-           if (tfires.m_LatMM < 0)
-		    	tfires.m_LatMM = 0 - tfires.m_LatMM;
-		   if (tfires.m_LatSS < 0)
-			   tfires.m_LatSS = 0 - tfires.m_LatSS;*/
+			tfires.m_latitude = atof(sLatitude);
 		} 
 		else 
 		{
-			   tfires.SetFieldNull(&tfires.m_LatDD);
-			   tfires.SetFieldNull(&tfires.m_LatMM);
-			   tfires.SetFieldNull(&tfires.m_LatSS);
+			   tfires.SetFieldNull(&tfires.m_latitude);
+			  // tfires.SetFieldNull(&tfires.m_LatMM);
+			  // tfires.SetFieldNull(&tfires.m_LatSS);
 		}
 		
 
@@ -1517,69 +1647,15 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 
 		if (strlen(sLongitude) > 0)
 		{
-			int dd, mm, ss;
-			DecimalDegree2DDMMSS(atof(sLongitude), &dd, &mm, &ss);
-			tfires.m_LonDD = dd;
-			tfires.m_LonMM = mm;
-			tfires.m_LonSS = ss;
-			/*tfires.m_LonDD = atoi(sLongitude);
-		    tfires.m_LonMM = (int) ((atof(sLongitude) + .000001 - (float) (tfires.m_LonDD)) * 60.0);
-            tfires.m_LonSS = (int) ((atof(sLongitude) + .000001 - ((float) (tfires.m_LonDD) + 0.000001) - (float) (tfires.m_LonMM) / 60.0) * 60.0);
-
-		    if (tfires.m_LonMM < 0)
-			    tfires.m_LonMM = 0 - tfires.m_LonMM;
-		    if (tfires.m_LonSS < 0)
-			    tfires.m_LonSS = 0 - tfires.m_LonSS;*/
+			tfires.m_longitude = atof(sLongitude);
 		} 
 		else 
 		{
-			   tfires.SetFieldNull(&tfires.m_LonDD);
-			   tfires.SetFieldNull(&tfires.m_LonMM);
-			   tfires.SetFieldNull(&tfires.m_LonSS);
+			   tfires.SetFieldNull(&tfires.m_longitude);
 		}
 		
 
-		if (strlen(sSlope) > 0)
-		{
-			sSlope[1] = 0;//safety truncate!
-			tfires.m_Slope = sSlope;
-			tfires.m_Slope.Trim();
-		} else
-            tfires.SetFieldNull(&tfires.m_Slope);
 
-		if (strlen(sElevation) > 0)
-		{
-			sElevation[1] = 0;////safety truncate! Ask Larry about this hoooey
-			tfires.m_Elevation = sElevation;
-			tfires.m_Elevation.Trim();
-		} else
-            tfires.SetFieldNull(&tfires.m_Elevation);
-
-		if (strlen(sAspect) > 0)
-		{
-			sAspect[1] = 0;//safety truncate! Ask Larry about this hoooey
-			tfires.m_Aspect = sAspect;
-			tfires.m_Aspect.Trim();
-		} else
-            tfires.SetFieldNull(&tfires.m_Aspect);
-
-		if (strlen(sFuelModel) > 0)
-		{
-			sFuelModel[1] = 0;//safety truncate! Ask Larry about this hoooey
-			tfires.m_FuelModel = sFuelModel;
-			tfires.m_FuelModel.Trim();
-		} else
-            tfires.SetFieldNull(&tfires.m_FuelModel);
-
-		if (strlen(sFireType) > 0)
-		{
-			sFireType[1] = 0;//safety truncate! Ask Larry about this hoooey
-			tfires.m_FireType = sFireType;
-			tfires.m_FireType.Trim();
-		} else
-            tfires.SetFieldNull(&tfires.m_FireType);
-
-	    /* contain */
 
 		COleDateTime containDate;  
 
@@ -1692,8 +1768,6 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 		}
 		}
 
-		/* end contain */
-        /* strategy met */
 
 		COleDateTime StrategyMetDate;  
 
@@ -1797,125 +1871,17 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
           tfires.SetFieldNull(&tfires.m_StrategyMet);
 		}
 
-		/* end strategy met */
-        /* fire out */
-
-		COleDateTime FireOutDate;  
-
-		if (strlen(sFireOutDate) > 0 ){
-
-		   // format date & time properly
-           int y=0,
-			m=0,
-			d=0,
-			hr=13,
-			min=0;
-
-
-           char tdate[5];
-		
-
-
-		  // MM/DD/YYYY
-			COleDateTime discDT;
-			discDT.ParseDateTime(sDiscoveryDate);
-			if(discDT.GetStatus() != COleDateTime::valid)
-			{
-				fprintf(errLog, "\tRecord Number %d, FireOut date is not valid.\n", count );
-				rejects ++;
-				continue;
-			}
-			m = discDT.GetMonth();//atoi(tdate);
-			d = discDT.GetDay();//atoi(tdate);
-			y = discDT.GetYear();//atoi(tdate);
-		
-
-
-		if (y < 1900 || y > 2100){
-            fprintf(errLog, "\tRecord Number %d, FireOut date is not valid (bad year).\n", count );
-			rejects ++;
-			continue;
-		}
-		if (m < 1 || m > 12){
-            fprintf(errLog, "\tRecord Number %d, FireOut date is not valid (bad month).\n", count );
-			rejects ++;
-			continue;
-		}
-		if (d < 1 || d > 31){
-            fprintf(errLog, "\tRecord Number %d, FireOut date is not valid (bad day).\n", count );
-			rejects ++;
-			continue;
-		}
-
-		if (strlen(sFireOutTime) > 0){
-           if (strlen(sFireOutTime) <= 2)
-			   hr = atoi(sFireOutTime);
-		   else if (strlen(sFireOutTime)==3 || strlen(sFireOutTime) > 5) {
-               fprintf(errLog, "\tRecord Number %d, FireOutTime is not valid (bad format).\n", count );
-			   rejects ++;
-			   continue;
-		   } else {   // normal format
-			  
-                  tdate[0] = sFireOutTime[0];
-		          tdate[1] = sFireOutTime[1];
-                  tdate[2] = '\0';
-		          hr = atoi(tdate);
-
-				  tdate[0] = sFireOutTime[2];
-		          tdate[1] = sFireOutTime[3];
-                  tdate[2] = '\0';
-		          min = atoi(tdate);
-		       
-		   }
-
-		}
-		if (hr < 0 || hr > 23){
-               fprintf(errLog, "\tRecord Number %d, FireOut time is not valid (bad hour).\n", count );
-			   rejects ++;
-			   continue;
-		}
-		if (min < 0 || min > 59){
-		       fprintf(errLog, "\tRecord Number %d, FireOut time is not valid (bad minute).\n", count );
-			   rejects ++;
-			   continue;
-		}
-
-	
-		FireOutDate.SetDateTime(y, m, d, hr, min, 0); 
-
-		if(FireOutDate.GetStatus() != 0 || y < 1900)
-		{
-			fprintf(errLog, "\tRecord Number %ld, FireOut Date/Time is not valid: %d/%d/%04d\n", count ,  m, d, y);
-			rejects ++;
-			
-			continue;
-		}
-		COleDateTime today;
-		today = COleDateTime::GetCurrentTime();
-		if(FireOutDate > today)
-		{
-			fprintf(errLog, "\tRecord Number %ld, FireOut Date/Time is not valid (future): %d/%d/%04d\n", count,  m, d, y);
-			rejects ++;
-			
-			continue;
-		}
-		   tfires.m_FireOut = FireOutDate;
-
-		} else {
-          tfires.SetFieldNull(&tfires.m_FireOut);
-		}
 
 
 		
 		
 	
-		/* end fire out */
 		//tfires.m_FireID = lastFireID;
 		tfires.Update();	
 		
     
 	}
-	
+	*/
 		
 	
 
@@ -1923,16 +1889,8 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 	
 	 long appends = 0, edits = 0;
 
-	 
-	//if (!cd || ! cd->Abort())
-	//{
-    	COleDateTime lastDay;
-	   //CTime lastDay;  long edits = 0, appends = 0;
-	   /*if (cd)
-	   {
-   	      cd->Reset();
-	      cd->SetStatusString("Updating Database");	
-	   }*/
+	 count = 0;
+   	COleDateTime lastDay;
 	   if(tfires.IsBOF() && tfires.IsEOF())
 	   {//error, no valid fires
 			fprintf(errLog, "\tNo valid fires to import!\n");
@@ -1945,15 +1903,14 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 			
 			while(!tfires.IsEOF())// && (!cd || !cd->Abort()))
 			{
-				//if (cd)
-				 //  cd->Increment();
+				count++;
 
 				if(tfires.IsFieldNull(&tfires.m_UnitID))//no unitID, check for dups at region level
-					fires.m_strFilter.Format("[AgencyID]=%ld AND [RegionID]=%ld AND [Year]='%s' AND [FireNumber]='%s'", 
-						tfires.m_AgencyID, tfires.m_RegionID, tfires.m_Year, tfires.m_FireNumber);
+					fires.m_strFilter.Format("[AgencyID]=%ld AND [RegionID]=%ld AND [FireNumber]='%s'", 
+						tfires.m_AgencyID, tfires.m_RegionID, tfires.m_FireNumber);
 				else//check for dups at unit level
-					fires.m_strFilter.Format("[AgencyID]=%ld AND [RegionID]=%ld AND [UnitID]=%ld AND [Year]='%s' AND [FireNumber]='%s'", 
-						tfires.m_AgencyID, tfires.m_RegionID, tfires.m_UnitID, tfires.m_Year, tfires.m_FireNumber);
+					fires.m_strFilter.Format("[AgencyID]=%ld AND [RegionID]=%ld AND [UnitID]=%ld AND [FireNumber]='%s'", 
+						tfires.m_AgencyID, tfires.m_RegionID, tfires.m_UnitID, tfires.m_FireNumber);
 
 				fires.Requery();
 
@@ -1987,16 +1944,16 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				}
 
 				if (newRec)
-					if (! tfires.IsFieldNull(&tfires.m_FireID))				
-						fires.m_FireID = tfires.m_FireID;
+					//if (! tfires.IsFieldNull(&tfires.m_FireID))				
+					//	fires.m_FireID = tfires.m_FireID;
 				
 				if (! tfires.IsFieldNull(&tfires.m_Discovery))
 					fires.m_Discovery = tfires.m_Discovery;
 
-				if (! tfires.IsFieldNull(&tfires.m_FirstAttack))
-					fires.m_FirstAttack = tfires.m_FirstAttack;
-				if(newRec && tfires.IsFieldNull(&tfires.m_FirstAttack))
-					fires.SetFieldNull(&fires.m_FirstAttack);
+				//if (! tfires.IsFieldNull(&tfires.m_FirstAttack))
+				//	fires.m_FirstAttack = tfires.m_FirstAttack;
+				//if(newRec && tfires.IsFieldNull(&tfires.m_FirstAttack))
+					//fires.SetFieldNull(&fires.m_FirstAttack);
 
 				if (! tfires.IsFieldNull(&tfires.m_AgencyID))
 					fires.m_AgencyID = tfires.m_AgencyID;
@@ -2013,10 +1970,10 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				if(newRec && tfires.IsFieldNull(&tfires.m_UnitID))
 					fires.SetFieldNull(&fires.m_UnitID);
 
-				if (! tfires.IsFieldNull(&tfires.m_Year))
-	   				fires.m_Year = tfires.m_Year;
-				if(newRec && tfires.IsFieldNull(&tfires.m_Year))
-					fires.SetFieldNull(&fires.m_Year);
+				//if (! tfires.IsFieldNull(&tfires.m_Year))
+	   			//	fires.m_Year = tfires.m_Year;
+				//if(newRec && tfires.IsFieldNull(&tfires.m_Year))
+				//	fires.SetFieldNull(&fires.m_Year);
 
 				if (! tfires.IsFieldNull(&tfires.m_SubunitID))
 					fires.m_SubunitID = tfires.m_SubunitID;
@@ -2029,7 +1986,7 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				if(newRec && tfires.IsFieldNull(&tfires.m_FireNumber))
 					fires.SetFieldNull(&fires.m_FireNumber);
 			
-				if (! tfires.IsFieldNull(&tfires.m_State))
+				/*if (!tfires.IsFieldNull(&tfires.m_State))
 					fires.m_State = tfires.m_State;
 				if(newRec && tfires.IsFieldNull(&tfires.m_State))
 					fires.SetFieldNull(&fires.m_State);
@@ -2037,7 +1994,7 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				if (! tfires.IsFieldNull(&tfires.m_County))
    					fires.m_County = tfires.m_County;
 				if(newRec && tfires.IsFieldNull(&tfires.m_County))
-					fires.SetFieldNull(&fires.m_County);
+					fires.SetFieldNull(&fires.m_County);*/
 
 				if (! tfires.IsFieldNull(&tfires.m_TotalAcres))
 					fires.m_TotalAcres = tfires.m_TotalAcres;
@@ -2054,7 +2011,15 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				if(newRec && tfires.IsFieldNull(&tfires.m_StatisticalCause))
 					fires.SetFieldNull(&fires.m_StatisticalCause);
 
-				if (! tfires.IsFieldNull(&tfires.m_GeneralCause))
+				if (!tfires.IsFieldNull(&tfires.m_latitude))
+					fires.m_latitude = tfires.m_latitude;
+				if (newRec && tfires.IsFieldNull(&tfires.m_latitude))
+					fires.SetFieldNull(&fires.m_latitude);
+				if (!tfires.IsFieldNull(&tfires.m_longitude))
+					fires.m_longitude = tfires.m_longitude;
+				if (newRec && tfires.IsFieldNull(&tfires.m_longitude))
+					fires.SetFieldNull(&fires.m_longitude);
+				/*if (!tfires.IsFieldNull(&tfires.m_GeneralCause))
 					fires.m_GeneralCause = tfires.m_GeneralCause;
 				if(newRec && tfires.IsFieldNull(&tfires.m_GeneralCause))
 					fires.SetFieldNull(&fires.m_GeneralCause);
@@ -2147,7 +2112,7 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				if (! tfires.IsFieldNull(&tfires.m_FireType))
 					fires.m_FireType = tfires.m_FireType;
 				if(newRec && tfires.IsFieldNull(&tfires.m_FireType))
-					fires.SetFieldNull(&fires.m_FireType);
+					fires.SetFieldNull(&fires.m_FireType);*/
 
 				if (! tfires.IsFieldNull(&tfires.m_Contain))
 					fires.m_Contain = tfires.m_Contain;
@@ -2159,16 +2124,17 @@ int CImportDialog::ImportNASFFire(CString fileName, FILE *errLog)
 				if(newRec && tfires.IsFieldNull(&tfires.m_StrategyMet))
 					fires.SetFieldNull(&fires.m_StrategyMet);
 
-				if (! tfires.IsFieldNull(&tfires.m_FireOut))
+				/*if (!tfires.IsFieldNull(&tfires.m_FireOut))
 					fires.m_FireOut = tfires.m_FireOut;
 				if(newRec && tfires.IsFieldNull(&tfires.m_FireOut))
-					fires.SetFieldNull(&fires.m_FireOut);
+					fires.SetFieldNull(&fires.m_FireOut);*/
 
 
 
 				fires.Update();
 				//LogFireDataWarnings(errLog, &tfires);
 				tfires.MoveNext();
+
 			}
 		}
 	/*	if(!cd.Abort())
@@ -2415,7 +2381,7 @@ void CImportDialog::OnGenericFires()
 		{
 			fileName = dlg.GetNextPathName( filenamePosition );
 			//tErrors = ImportGenericWx(fileName, logFile);
-			CGenericFireImportDialog gwd(this,NULL,fireSet.m_pDatabase, agencyID);
+			CGenericFireImportDialog gwd(this,NULL,firesSet.m_pDatabase, agencyID);
 			gwd.fileName.Format("%s",fileName);
 			gwd.errLog = logFile;
 			gwd.pDoc = pDoc;
@@ -2477,7 +2443,7 @@ void CImportDialog::OnWFMI()
 	/* FIXME LJS TEMPORARY CODE HERE to populate the DOI unit codes table
 	*/
 
-	CDOIUnitSet doiSet(fireSet.m_pDatabase);
+	CDOIUnitSet doiSet(firesSet.m_pDatabase);
 	doiSet.Open();
 	if (doiSet.IsEOF()){  // 8/2006 - should not get here, as the ffp v4 upgrade routine now populates the refDOIUnits table....
 		AfxMessageBox("This database does not contain any DOI unit codes. \nUnit codes must be imported from a text file.\nPlease contact the FFP helpdesk for further assistance.");
@@ -2710,1020 +2676,6 @@ void CImportDialog::OnFw9()
 	chdir(theApp.dbDir);
 }
 
-int CImportDialog::ImportWRCCRAWS(CString fileName, FILE *errLog,CString sStationID){
-	enum { INPUT_PRE, INPUT_HEADER1, INPUT_HEADER2, INPUT_HEADER3, INPUT_DATA };
-
-	enum { FIELD_DATE, FIELD_PRECIP, FIELD_WINDSPEED, FIELD_WINDDIR, FIELD_AIRTEMP, FIELD_FUELTEMP, FIELD_HUMIDITY, FIELD_VOLTAGE, FIELD_GUSTSPEED, FIELD_FUELMOISTURE,FIELD_GUSTDIR, FIELD_SOLAR };
-
-	enum { SOLAR_LY, SOLAR_WM2};
-
-	int errors = 0,warnings = 0;
-
-	CWaitCursor wait;
-
-	fprintf(errLog, "**************************************************\nImport File Name: %s\n", fileName);
-	// EnableWindow(FALSE);
-
-	/*CCancelDialog *cd = NULL;
-
-	cd = new CCancelDialog();
-
-	if (cd != NULL)
-	{
-		BOOL ret = cd->Create(IDD_CANCELDIALOG,this);
-
-      if (!ret)   //Create failed.
-      {
-        
-		 cd = 0;
-      } else
-	  {
-	     cd->Reset();
-         cd->ShowWindow(SW_SHOW);
-	     cd->SetStatusString("Reading: " + fileName);
-		 cd->SetTitle("Importing WRCC RAWS Data");
-	  }
-	}*/
-	
-	
-
-	// unit types for solar radiation vary between WRCC formats :(
-
-	int solar_units = SOLAR_LY;
-
-	ifstream stream;
-
-	stream.open(fileName);
-
-	count = 0;
-
-	long updates = 0, rejects = 0,iRow = 0;
-	
-	int lastRegionID = 0;
-
-	char line[MAX_INPUT_LINE];
-	char temp[MAX_INPUT_LINE];
-
-#define MAX_WRCC_FIELDS 30
-
-	int fields[MAX_WRCC_FIELDS];   /* holds field order */
-
-	int regHour = 13;
-
-	CString temp2, temp3;
-
-	char delim = ' ';
-
-	if(pDoc->HasTempWx())
-	{
-		try
-		{
-			CString strSql = "DROP TABLE [ffpTempWx]";
-			fireSet.m_pDatabase->ExecuteSQL(strSql);
-		}
-		catch(CDBException* e)
-		{
-			e->Delete();
-		}
-
-		//pDoc->m_pDB->DeleteTableDef("ffpTempWx");
-	}
-	pDoc->CreateTempWx();
-
-	CWxSet wxObs(fireSet.m_pDatabase);
-	wxObs.m_strSort = "[ObsDate]";
-	wxObs.Open();
-
-	CWxSet twxObs(fireSet.m_pDatabase);
-	twxObs.m_strSort = "[ObsDate]";
-	twxObs.Open(CRecordset::dynaset, "ffpTempWx");
-
-	//twxObs.m_pDatabase->BeginTrans();
-
-	double precipCounter = 999999;
-	double currPrecip = 0;
-
-	bool delimiter_found = false;
-	int input_state = INPUT_PRE;
-
-
-
-	while (stream.good())// && (!cd || ! cd->Abort()))
-	{
-		stringstream stream1,stream2,stream3;
-		iRow ++;
-
-		CString line1;
-
-		stringstream streamd;
-
-		stream.getline(line,MAX_INPUT_LINE,'\n');
-
-		// check for changes in input state
-		switch (input_state){
-			case INPUT_PRE:
-
-				line1.Format("%s",line);
-				if (line1[0] == ':')
-					input_state = INPUT_HEADER1;
-				break;
-			case INPUT_HEADER1:
-
-				line1.Format("%s",line);
-				if (line1[0] == ' ')
-					input_state = INPUT_HEADER1;
-				else if (line1[0] == ':')
-					input_state = INPUT_HEADER2;
-				else
-					input_state = INPUT_DATA;
-				break;
-			case INPUT_HEADER2:
-
-				line1.Format("%s",line);
-
-				if (line1[0] == ':')
-					input_state = INPUT_HEADER3;
-				else
-					input_state = INPUT_DATA;
-				break;
-			case INPUT_HEADER3:
-				input_state = INPUT_DATA;
-				break;
-			case INPUT_DATA:   // check for a new header set
-
-				line1.Format("%s",line);
-				if (line1[0]==':')
-					input_state = INPUT_HEADER1;
-				else if (strlen(line1) < 2)
-					input_state = INPUT_PRE;
-				else if (line1[0] == ' ' || (strlen(line1) > 0 && atoi(line1) ==0 && line1[0]!='0'))
-					input_state = INPUT_PRE;
-				break;
-		}
-
-		// now handle appropriate input state
-		switch (input_state){
-		   case INPUT_PRE:
-			   break;      // skip any junk prior to 3-line header;
-		   case INPUT_HEADER1:
-			   // initialize field order
-			   for (int i=0;i < MAX_WRCC_FIELDS;i++)
-				   fields[i] = -1;
-
-			   // figure out delimiter if necessary
-
-			   line1.Format("%s",line);
-
-			   if (! delimiter_found){
-				   for (int i=0; i < line1.GetLength(); i++)
-					   /* figure out delimiter */
-					   if (line[i] == ',' || line[i]=='\t' || line[i]==';'){
-						   delim = line[i];
-						   break;
-					   }
-
-					   delimiter_found = true;
-			   }
-			   // figure out columns
-
-			   // note: to prevent 2-word tokens from being split into two tokens (example "Av Air"),
-			   // replace single spaces with dashes
-			   for (int i = 1; i < (strlen(line)-1); i++){
-				   if (line[i-3]=='D' && line[i-2]=='e' && line[i-1]=='g')
-					   if ((line[i] == ' ') && (line[i-1]!=' ') && line[i+1]!= ' ')
-						   line[i] = '-';
-			   }
-
-			   stream1 << line;
-
-			   for (int i = 0 ; i < MAX_WRCC_FIELDS; i++){
-				   char tempfield[MAX_FIELD_LEN];
-				   if (delim == ' '){
-					   stream1 >>  tempfield;
-					   // get rid of leading ':'
-					   if (strlen(tempfield)==1 && tempfield[0]==':')
-						   stream1 >> tempfield;
-				   } else {
-					   stream1.getline(tempfield,MAX_FIELD_LEN,delim);
-					   if (strlen(tempfield)==1 && tempfield[0]==':')
-						   stream1.getline(tempfield,MAX_FIELD_LEN,delim);
-				   }
-				   if (strlen(tempfield) < 1)
-					   break;
-
-				   if ( strstr(tempfield,"LST"))
-					   fields[i] = FIELD_DATE;
-				   else if (strstr(tempfield,"in") && !strstr(tempfield,"in.Hg"))
-					   fields[i] = FIELD_PRECIP;
-				   else if (strstr(tempfield,"volts"))
-					   fields[i] = FIELD_VOLTAGE;
-				   else if (strstr(tempfield,"ly")){
-					   fields[i] = FIELD_SOLAR;
-					   solar_units = SOLAR_LY;
-				   } else if (strstr(tempfield,"w/m2") || strstr(tempfield,"W/m2")){
-					   fields[i] = FIELD_SOLAR;
-					   solar_units = SOLAR_WM2;
-				   }
-			   }
-
-			   break;
-		   case INPUT_HEADER2:
-
-			   line1.Format("%s",line);
-			   // figure out delimiter if necessary
-			   if (! delimiter_found){
-				   for (int i=0; i < line1.GetLength(); i++)
-					   /* figure out delimiter */
-					   if (line[i] == ',' || line[i]=='\t' || line[i]==';'){
-						   delim = line[i];
-						   break;
-					   }
-
-					   delimiter_found = true;
-			   }
-			   // figure out columns
-
-			   // note: to prevent 2-word tokens from being split into two tokens (example "Av Air"),
-			   // replace single spaces with dashes
-			   for (int i = 1; i < (strlen(line)-1); i++){
-				   if ((line[i-2]=='A' && line[i-1]=='v') || (line[i-2]=='M' && line[i-1]=='x'))
-					   if ((line[i] == ' ') && (line[i-1]!=' ') && line[i+1]!= ' ')
-						   line[i] = '-';
-			   }
-
-			   stream2 << line;
-
-			   for (int i = 0 ; i < MAX_WRCC_FIELDS; i++){
-				   char tempfield[MAX_FIELD_LEN];
-				   if (delim == ' '){
-					   stream2 >>  tempfield;
-					   if (strlen(tempfield)==1 && tempfield[0]==':')
-						   stream2 >> tempfield;
-				   } else {
-					   stream2.getline(tempfield,MAX_FIELD_LEN,delim);
-					   if (strlen(tempfield)==1 && tempfield[0]==':')
-						   stream2.getline(tempfield,MAX_FIELD_LEN,delim);
-				   }
-
-				   if (strlen(tempfield) < 1)
-					   break;
-
-				   if ( strstr(tempfield,"Date/Time"))
-					   fields[i] = FIELD_DATE;
-				   else if (strstr(tempfield,"Precip"))
-					   fields[i] = FIELD_PRECIP;
-				   else if (strstr(tempfield,"Barom"))//ignoring barometric pressure
-					   fields[i] = FIELD_VOLTAGE;
-				   else if (strstr(tempfield,"Battery"))
-					   fields[i] = FIELD_VOLTAGE;
-				   else if (strstr(tempfield,"Wind"))
-					   fields[i] = FIELD_WINDSPEED;  // note - could be wind dir as well... figure that out in header3
-				   else if (strstr(tempfield,"Av-Air"))
-					   fields[i] = FIELD_AIRTEMP;
-				   else if (strstr(tempfield,"Fuel"))
-					   fields[i] = FIELD_FUELTEMP;   // note - could be fuel moisture as well... figure that out in header3
-				   else if (strstr(tempfield,"Rel"))
-					   fields[i] = FIELD_HUMIDITY;
-				   else if (strstr(tempfield,"Dir"))
-					   fields[i] = FIELD_GUSTDIR;
-				   else if (strstr(tempfield,"Mx-Gust"))
-					   fields[i] = FIELD_GUSTSPEED;
-			   }
-
-			   break;
-		   case INPUT_HEADER3:
-
-			   line1.Format("%s",line);
-
-			   // figure out delimiter if necessary
-			   if (! delimiter_found){
-				   for (int i=0; i < line1.GetLength(); i++)
-					   /* figure out delimiter */
-					   if (line[i] == ',' || line[i]=='\t' || line[i]==';'){
-						   delim = line[i];
-						   break;
-					   }
-
-					   delimiter_found = true;
-			   }
-			   // figure out columns
-
-			   stream3 << line;
-
-			   for (int i = 0 ; i < MAX_WRCC_FIELDS; i++){
-				   char tempfield[MAX_FIELD_LEN];
-				   if (delim == ' ') {
-					   stream3 >>  tempfield;
-					   if (strlen(tempfield)==1 && tempfield[0]==':')
-						   stream3 >> tempfield;
-				   } else {
-					   stream3.getline(tempfield,MAX_FIELD_LEN,delim);
-					   if (strlen(tempfield)==1 && tempfield[0]==':')
-						   stream3.getline(tempfield,MAX_FIELD_LEN,delim);
-				   }
-				   if (strlen(tempfield) < 1)
-					   break;
-
-				   if ( strstr(tempfield,"YYMMDDhhmm"))
-					   fields[i] = FIELD_DATE;
-				   else if (strstr(tempfield,"HumidtyVoltage")){
-					   i++;
-				   } else if (strstr(tempfield,"Direc")){
-					   if (delim == ' ')
-						   fields[i+1] = FIELD_WINDDIR;
-					   else
-						   fields[i] = FIELD_WINDDIR;
-				   } else if (strstr(tempfield,"Moistur")){
-					   if (delim == ' ')
-						   fields[i+1] = FIELD_FUELMOISTURE;
-					   else
-						   fields[i] = FIELD_FUELMOISTURE;
-				   } else if (strstr(tempfield,"MxGust")){
-					   if (delim == ' ')
-						   fields[i+1] = FIELD_GUSTDIR;
-					   else
-						   fields[i] = FIELD_GUSTDIR;
-				   }
-			   }
-
-			   break;
-		   case INPUT_DATA:
-
-			   char
-				   sObsDate[MAX_FIELD_LEN] = "",
-				   sPrecipCounter[MAX_FIELD_LEN] = "",
-				   sTemp[MAX_FIELD_LEN] = "",
-				   sRH[MAX_FIELD_LEN] = "",
-				   sWDir[MAX_FIELD_LEN] = "",
-				   sWS[MAX_FIELD_LEN] = "",
-
-				   sFuelTemp[MAX_FIELD_LEN] = "",
-				   sBatteryVolts[MAX_FIELD_LEN] = "",
-				   sFuelMoisture[MAX_FIELD_LEN] = "",
-				   sSolarRadiation[MAX_FIELD_LEN] = "",
-				   sGustDir[MAX_FIELD_LEN] = "",
-				   sGustSpd[MAX_FIELD_LEN] = "";
-
-			   streamd << line;
-
-			   // get fields in correct order
-
-			   for (int i = 0 ; i  < MAX_WRCC_FIELDS; i++){
-				   char tempfield[MAX_FIELD_LEN];
-
-				   //if (fields[i] < 0)
-				   //	 continue;
-
-				   if (delim == ' ')
-					   streamd >> tempfield;
-				   else
-					   streamd.getline(tempfield,MAX_FIELD_LEN,delim);
-				   if (fields[i] >= 0)
-					   switch (fields[i]){
-		   case FIELD_DATE:
-			   sprintf(sObsDate,"%s",tempfield); break;
-		   case FIELD_PRECIP:
-			   sprintf(sPrecipCounter,"%s",tempfield); break;
-		   case FIELD_WINDSPEED:
-			   sprintf(sWS,"%s",tempfield);break;
-		   case FIELD_HUMIDITY:
-			   sprintf(sRH,"%s",tempfield);break;
-		   case FIELD_WINDDIR:
-			   sprintf(sWDir,"%s",tempfield); break;
-		   case FIELD_AIRTEMP:
-			   sprintf(sTemp,"%s",tempfield); break;
-		   case FIELD_FUELTEMP:
-			   sprintf(sFuelTemp,"%s",tempfield); break;
-		   case FIELD_VOLTAGE:
-			   sprintf(sBatteryVolts,"%s",tempfield); break;
-		   case FIELD_GUSTSPEED:
-			   sprintf(sGustSpd,"%s",tempfield); break;
-		   case FIELD_FUELMOISTURE:
-			   sprintf(sFuelMoisture,"%s",tempfield); break;
-		   case FIELD_GUSTDIR:
-			   sprintf(sGustDir,"%s",tempfield); break;
-		   case FIELD_SOLAR:
-			   sprintf(sSolarRadiation,"%s",tempfield); break;
-				   }
-			   }
-
-			   COleDateTime obsDate;
-
-			   count ++;
-			   //if (cd)
-				//   cd->Increment();
-
-			   if (strlen(sStationID) < 1){
-				   fprintf(errLog, "\tRecord Number %d, no StationID\n", count );
-				   rejects ++;
-				   continue;
-			   }
-
-			   if (strlen(sObsDate) < 1){
-				   fprintf(errLog, "\tRecord Number %d, no ObsDate\n", count );
-				   rejects ++;
-				   continue;
-			   }
-
-			   if (strlen(sObsDate) < 10){ // using default WRCC format: YYMMDDhhmm
-				   fprintf(errLog, "\tRecord Number %d, ObsDate is not valid.\n", count );
-				   rejects ++;
-				   continue;
-			   }
-			   /* 09/2012 add functionality to set DailyObs field */
-			   CSIGStationSet stnSet(fireSet.m_pDatabase);
-			   stnSet.Open();
-			   // look for station record
-			   stnSet.m_strFilter.Format("[StationID] = '%6.6s'", sStationID);
-			   stnSet.Requery();
-
-			   regHour = 13;
-
-			   if(! stnSet.IsEOF())
-			   {
-				   regHour = stnSet.m_RegSchdObs;
-			   }
-			   stnSet.Close();
-
-			   // format date & time properly
-			   int y=0,
-				   m=0,
-				   d=0,
-				   hr=13,
-				   min=0;
-			   COleDateTime today;
-			   today = COleDateTime::GetCurrentTime();
-
-			   char tdate[5];
-			   tdate[0] = sObsDate[0];
-			   tdate[1] = sObsDate[1];
-			   tdate[2] = '\0';
-			   y = atoi(tdate);
-			   if (y > 50)
-				   y = 1900 + y;
-			   else
-				   y = 2000 + y;
-
-			   tdate[0] = sObsDate[2];
-			   tdate[1] = sObsDate[3];
-			   tdate[2] = '\0';
-			   m = atoi(tdate);
-
-			   tdate[0] = sObsDate[4];
-			   tdate[1] = sObsDate[5];
-			   tdate[2] = '\0';
-			   d = atoi(tdate);
-
-			   tdate[0] = sObsDate[6];
-			   tdate[1] = sObsDate[7];
-			   tdate[2] = '\0';
-			   hr = atoi(tdate);
-
-			   if (y < 1900 || y > 2100){
-				   fprintf(errLog, "\tRecord Number %d, %s - ObsDate is not valid (bad year).\n",count , sObsDate);
-				   rejects ++;
-				   continue;
-			   }
-			   if (m < 1 || m > 12){
-				   fprintf(errLog, "\tRecord Number %d, %s - ObsDate is not valid (bad month).\n",count , sObsDate);
-				   rejects ++;
-				   continue;
-			   }
-			   if (d < 1 || d > 31){
-				   fprintf(errLog, "\tRecord Number %d, %s - ObsDate is not valid (bad day).\n",count , sObsDate);
-				   rejects ++;
-				   continue;
-			   }
-
-			   if (hr < 0 || hr > 23){
-				   fprintf(errLog, "\tRecord Number %d, %s - ObsTime is not valid (bad hour).\n",count, sObsDate );
-				   rejects ++;
-				   continue;
-			   }
-			   if (min < 0 || min > 59){
-				   fprintf(errLog, "\tRecord Number %d, %s - ObsTime is not valid (bad minute).\n" ,count, sObsDate);
-				   rejects ++;
-				   continue;
-			   }
-
-			   obsDate.SetDateTime(y, m, d, hr, 0 /*min*/, 0);  // set minute to 0
-
-			   if(obsDate.GetStatus() != 0 || y < 1900)
-			   {
-				   fprintf(errLog, "\tRecord Number %ld, %s - Date/Time is not valid: %d/%d/%04d\n", count , sObsDate, m, d, y);
-				   rejects ++;
-
-				   continue;
-			   }
-
-			   if(!theApp.m_enableFuture)
-				
-					if(obsDate > today)
-					{
-						fprintf(errLog, "\tRecord Number %ld, %s - Date is not valid (future): %d/%d/%04d\n", count,  sObsDate,m, d, y);
-						rejects ++;
-
-					continue;
-					}
-
-			   // check field values for rejects
-			   if (strlen(sTemp) > 0 && !IsNullValue(sTemp))
-				   if (atoi(sTemp) > 120 || atoi(sTemp) < -40){
-					   fprintf(errLog, "\tERROR: Record Number %d, %s - Temp (%s) is invalid\n", count,sObsDate,sTemp );
-					   rejects ++;
-					   continue;
-				   }
-				   if (strlen(sRH) > 0 && !IsNullValue(sRH))
-					   if (atoi(sRH) < 0 || atoi(sRH) > 100){
-						   fprintf(errLog, "\tERROR: Record Number %d, %s - RH (%s) is invalid\n", count,sObsDate,sRH );
-						   rejects ++;
-						   continue;
-					   }
-
-					   if (strlen(sWS) > 0 && !IsNullValue(sWS))
-						   if (atoi(sWS) > 100 || atoi(sWS) < 0){
-							   fprintf(errLog, "\tERROR: Record Number %d, %s -  WindSpeed (%s) is invalid\n", count,sObsDate,sWS );
-							   rejects ++;
-							   continue;
-						   }
-
-						   double newPrecipCounter = precipCounter;
-						   if (sPrecipCounter && !IsNullValue(sPrecipCounter) && atof(sPrecipCounter) >= 0){
-							   newPrecipCounter = (double) (atof(sPrecipCounter));
-						   }
-
-						   if (newPrecipCounter > precipCounter){
-							   currPrecip = newPrecipCounter - precipCounter;
-							   if (currPrecip > 2 || currPrecip < 0){
-								   fprintf(errLog, "\tWARNING: Record Number %d, %s - Current Precip (%8.4f) is invalid. Recip counter reset.\n", count,sObsDate,currPrecip );
-								   precipCounter = newPrecipCounter;
-								   currPrecip = 0;
-								   warnings ++;
-							   }
-							   precipCounter = newPrecipCounter;
-						   } else { // counter reset
-							   precipCounter = newPrecipCounter;
-							   currPrecip = 0;
-						   }
-
-						   if (strlen(sFuelMoisture) > 0 && !IsNullValue(sFuelMoisture))
-							   if (atoi(sFuelMoisture) > 100 || atoi(sFuelMoisture) < 0){
-								   fprintf(errLog, "\tERROR: Record Number %d, %s -  Fuel Moisture (%s) is invalid\n", count,sObsDate,sFuelMoisture );
-								   rejects ++;
-								   continue;
-							   }
-
-							   /* add new record */
-
-							   twxObs.AddNew();
-							   twxObs.m_StationID = sStationID;
-							   twxObs.m_ObsDate = obsDate;
-							   twxObs.m_Hour = obsDate.GetHour();
-							   //if (hr != 13)
-							   twxObs.m_ObsType = "R";
-							   //else
-							   //twxObs.m_ObsType = "O";
-
-							   twxObs.SetFieldNull(&twxObs.m_SOW);
-
-							   if (strlen(sTemp) > 0 && !IsNullValue(sTemp)){
-								   twxObs.m_Temp = atoi(sTemp);
-							   } else
-								   twxObs.SetFieldNull(&twxObs.m_Temp);
-
-							   if (strlen(sRH) > 0 && !IsNullValue(sRH)){
-								   twxObs.m_RH = max(atoi(sRH), 1);
-							   } else
-								   twxObs.SetFieldNull(&twxObs.m_RH);
-
-							   if (strlen(sWDir) > 0 && !IsNullValue(sWDir))
-							   {
-								   //{//convert dir to 1 - 8 scale
-								   int gDir = atoi(sWDir);
-								   if(gDir >= 0 && gDir <= 360)
-								   {
-									   if(gDir > 337 || gDir < 23)
-										   d = 8;
-									   else if(gDir > 22 && gDir < 68)
-										   d = 1;
-									   else if(gDir > 67 && gDir < 113)
-										   d = 2;
-									   else if(gDir > 112 && gDir < 158)
-										   d = 3;
-									   else if(gDir > 157 && gDir < 203)
-										   d = 4;
-									   else if(gDir > 202 && gDir < 248)
-										   d = 5;
-									   else if(gDir > 247 && gDir < 293)
-										   d = 6;
-									   else if(gDir > 292 && gDir < 338)
-										   d = 7;
-									   twxObs.m_WDir = d;
-									   twxObs.m_WAzimuth = gDir;
-								   }
-								   else
-								   {
-									   twxObs.SetFieldNull(&twxObs.m_WDir);
-									   twxObs.SetFieldNull(&twxObs.m_WAzimuth);
-								   }
-							   }
-							   else
-							   {
-								   twxObs.SetFieldNull(&twxObs.m_WDir);
-								   twxObs.SetFieldNull(&twxObs.m_WAzimuth);
-							   }
-
-							   if (strlen(sWS) > 0 && !IsNullValue(sWS)){
-								   twxObs.m_WS = atoi(sWS);
-							   } else
-								   twxObs.SetFieldNull(&twxObs.m_WS);
-
-							   twxObs.SetFieldNull(&twxObs.m_OMC10);
-							   twxObs.SetFieldNull(&twxObs.m_OMCWood);
-							   twxObs.SetFieldNull(&twxObs.m_OMCWoodDate);
-							   twxObs.SetFieldNull(&twxObs.m_TmpMax);
-
-							   twxObs.SetFieldNull(&twxObs.m_TmpMin);
-							   twxObs.SetFieldNull(&twxObs.m_RHMax);
-							   twxObs.SetFieldNull(&twxObs.m_RHMin);
-							   twxObs.SetFieldNull(&twxObs.m_PPTDUR);
-
-							   twxObs.SetFieldNull(&twxObs.m_PPTAMT);
-							   twxObs.SetFieldNull(&twxObs.m_HourlyPrecip);
-
-							   twxObs.m_HourlyPrecip = (float) (currPrecip);
-
-							   twxObs.SetFieldNull(&twxObs.m_Season);
-
-							   twxObs.SetFieldNull(&twxObs.m_GreenHerb);
-
-							   twxObs.SetFieldNull(&twxObs.m_GreenShrub);
-
-							   twxObs.SetFieldNull(&twxObs.m_MC1);
-
-							   twxObs.SetFieldNull(&twxObs.m_MC10);
-							   if (strlen(sFuelMoisture) > 0 && !IsNullValue(sFuelMoisture)) {
-								   twxObs.m_MC10 = (float) (atof(sFuelMoisture) / 100);
-							   }
-							   twxObs.SetFieldNull(&twxObs.m_MC100);
-
-							   twxObs.SetFieldNull(&twxObs.m_MC1000);
-
-							   if (strlen(sSolarRadiation) > 0 && !IsNullValue(sSolarRadiation)){
-								   if (solar_units == SOLAR_LY)
-									   twxObs.m_SolarRadiation = (int) (atof(sSolarRadiation) * 11.6);   // convert from Langley to W/m2
-								   else
-									   twxObs.m_SolarRadiation = atoi(sSolarRadiation);
-
-								   if (twxObs.m_SolarRadiation > 1500 ){
-									   fprintf(errLog, "\tWARNING: Record Number %d, %s - SolarRadiation (%d) appears to be invalid\n", count,sObsDate,twxObs.m_SolarRadiation );
-									   warnings ++;
-								   }
-							   } else
-								   twxObs.SetFieldNull(&twxObs.m_SolarRadiation);
-
-							   twxObs.SetFieldNull(&twxObs.m_WetFlag);
-
-							   if (strlen(sGustDir) > 0 && !IsNullValue(sGustDir))
-								   twxObs.m_GustDir = atoi(sGustDir);
-							   else
-								   twxObs.SetFieldNull(&twxObs.m_GustDir);
-
-							   if (strlen(sGustSpd) > 0 && !IsNullValue(sGustSpd)){
-								   twxObs.m_GustSpd = atoi(sGustSpd);
-								   if (atoi(sGustSpd) > 100 ){
-									   warnings ++;
-									   fprintf(errLog, "\tWARNING: Record Number %d, %s - Gust Speed (%s) appears to be invalid\n", count,sObsDate,sGustSpd );
-								   }
-							   } else
-								   twxObs.SetFieldNull(&twxObs.m_GustSpd);
-
-							   twxObs.Update();
-
-							   break;  // switch input_state
-		}
-	}
-
-	stream.close();
-
-	long appends = 0, edits = 0;
-
-	//if (!cd || ! cd->Abort()){
-		COleDateTime lastDay;
-		//CTime lastDay;  long edits = 0, appends = 0;
-		//twxObs.m_pDatabase->CommitTrans(); //so we can requery
-		/*if (cd)
-		{
-			cd->Reset();
-		    cd->SetStatusString("Updating Database");
-		}*/
-		CString strSQL;
-		strSQL.Format("[StationID] = '%6.6s'", sStationID);
-		wxObs.m_strFilter = strSQL;
-		twxObs.m_strFilter = strSQL;
-		wxObs.Requery();
-		twxObs.Requery();
-		lastDay.SetDateTime(1900,1, 1, 1, 1, 1);//minimum start date
-		//lastDay.SetTime(1900,1, 1, 1, 1, 1);//minimum start date
-		//twxObs.m_pDatabase->BeginTrans();
-		while(!twxObs.IsEOF())// && (!cd || !cd->Abort()))
-		{
-			//if (cd)
-			//   cd->Increment();
-			COleDateTime tTime(twxObs.m_ObsDate.GetYear(), twxObs.m_ObsDate.GetMonth(),
-				twxObs.m_ObsDate.GetDay(), twxObs.m_ObsDate.GetHour(), twxObs.m_ObsDate.GetMinute(),
-				twxObs.m_ObsDate.GetSecond());
-			while(!twxObs.IsEOF() && tTime <= lastDay)//may be dups in twxObs
-			{
-				twxObs.MoveNext();
-				tTime.SetDateTime(twxObs.m_ObsDate.GetYear(), twxObs.m_ObsDate.GetMonth(),
-					twxObs.m_ObsDate.GetDay(), twxObs.m_ObsDate.GetHour(), twxObs.m_ObsDate.GetMinute(),
-					twxObs.m_ObsDate.GetSecond());
-			}
-			if(twxObs.IsEOF())
-				break;
-			lastDay.SetDateTime(twxObs.m_ObsDate.GetYear(), twxObs.m_ObsDate.GetMonth(),
-				twxObs.m_ObsDate.GetDay(), twxObs.m_ObsDate.GetHour(), twxObs.m_ObsDate.GetMinute(),
-				twxObs.m_ObsDate.GetSecond());
-			//= twxObs.m_ObsDate;
-			while(!wxObs.IsEOF() && (wxObs.m_ObsDate < twxObs.m_ObsDate))
-				wxObs.MoveNext();
-			int newRec = false;
-
-			if(!wxObs.IsEOF() && (wxObs.m_ObsDate == twxObs.m_ObsDate))
-			{
-				wxObs.Edit();
-				edits++;
-			} else {
-				wxObs.AddNew();
-				appends++;
-				newRec = true;
-			}
-
-			/*for(int i = 0; i < wxObs.GetODBCFieldCount(); i++)
-			{
-			CDBVariant var;
-			twxObs.GetFieldValue(i, var);
-			wxObs.SetSetFieldValue(i, var);
-			}*/
-
-			if (! twxObs.IsFieldNull(&twxObs.m_StationID) && wxObs.IsFieldNull(&wxObs.m_StationID))
-				wxObs.m_StationID = twxObs.m_StationID;
-			if (! twxObs.IsFieldNull(&twxObs.m_ObsDate) && wxObs.IsFieldNull(&wxObs.m_ObsDate))
-			{
-				wxObs.m_ObsDate = twxObs.m_ObsDate;
-				wxObs.m_Hour = twxObs.m_ObsDate.GetHour();
-			}
-			if (! twxObs.IsFieldNull(&twxObs.m_ObsType) && wxObs.IsFieldNull(&wxObs.m_ObsType))
-				wxObs.m_ObsType = twxObs.m_ObsType;
-			//if (! twxObs.IsFieldNull(&twxObs.m_UserWX))
-			//   wxObs.m_UserWX = twxObs.m_UserWX;
-			//if(newRec && twxObs.IsFieldNull(&twxObs.m_UserWX))
-			//	wxObs.SetFieldNull(&wxObs.m_UserWX);
-			//if (! twxObs.IsFieldNull(&twxObs.m_SOW))
-			//	 wxObs.m_SOW = twxObs.m_SOW;
-
-			//if(newRec && twxObs.IsFieldNull(&twxObs.m_SOW))
-			//	wxObs.SetFieldNull(&wxObs.m_SOW);
-
-			if (! twxObs.IsFieldNull(&twxObs.m_Temp) && wxObs.IsFieldNull(&wxObs.m_Temp))
-				wxObs.m_Temp = twxObs.m_Temp;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_Temp))
-				wxObs.SetFieldNull(&wxObs.m_Temp);
-			if (! twxObs.IsFieldNull(&twxObs.m_RH) && wxObs.IsFieldNull(&wxObs.m_RH))
-				wxObs.m_RH = max(twxObs.m_RH, 1);
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_RH))
-				wxObs.SetFieldNull(&wxObs.m_RH);
-			if (! twxObs.IsFieldNull(&twxObs.m_WDir) && wxObs.IsFieldNull(&wxObs.m_WDir))
-				wxObs.m_WDir = twxObs.m_WDir;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_WDir))
-				wxObs.SetFieldNull(&wxObs.m_WDir);
-			if (! twxObs.IsFieldNull(&twxObs.m_WS) && wxObs.IsFieldNull(&wxObs.m_WS))
-				wxObs.m_WS = twxObs.m_WS;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_WS))
-				wxObs.SetFieldNull(&wxObs.m_WS);
-			//if (! twxObs.IsFieldNull(&twxObs.m_OMC10))
-			//	wxObs.m_OMC10 = twxObs.m_OMC10;
-
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_OMC10))
-				wxObs.SetFieldNull(&wxObs.m_OMC10);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_OMCWood))
-			//	wxObs.m_OMCWood = twxObs.m_OMCWood;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_OMCWood))
-				wxObs.SetFieldNull(&wxObs.m_OMCWood);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_OMCWoodDate))
-			//   wxObs.m_OMCWoodDate = twxObs.m_OMCWoodDate;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_OMCWoodDate))
-				wxObs.SetFieldNull(&wxObs.m_OMCWoodDate);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_TmpMax))
-			//	wxObs.m_TmpMax = twxObs.m_TmpMax;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_TmpMax))
-				wxObs.SetFieldNull(&wxObs.m_TmpMax);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_TmpMin))
-			//    wxObs.m_TmpMin = twxObs.m_TmpMin;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_TmpMin))
-				wxObs.SetFieldNull(&wxObs.m_TmpMin);
-			//if (! twxObs.IsFieldNull(&twxObs.m_RHMax))
-			//   wxObs.m_RHMax = twxObs.m_RHMax;
-
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_RHMax))
-				wxObs.SetFieldNull(&wxObs.m_RHMax);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_RHMin))
-			//wxObs.m_RHMin = twxObs.m_RHMin;
-
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_RHMin))
-				wxObs.SetFieldNull(&wxObs.m_RHMin);
-			if (! twxObs.IsFieldNull(&twxObs.m_PPTDUR) && wxObs.IsFieldNull(&wxObs.m_PPTDUR))
-				wxObs.m_PPTDUR = twxObs.m_PPTDUR;
-
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_PPTDUR))
-				wxObs.SetFieldNull(&wxObs.m_PPTDUR);
-
-			if (! twxObs.IsFieldNull(&twxObs.m_PPTAMT) && wxObs.IsFieldNull(&wxObs.m_PPTAMT))
-				wxObs.m_PPTAMT = twxObs.m_PPTAMT;
-
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_PPTAMT))
-				wxObs.SetFieldNull(&wxObs.m_PPTAMT);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_Season))
-			//	 wxObs.m_Season = twxObs.m_Season;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_Season))
-				wxObs.SetFieldNull(&wxObs.m_Season);
-			//if (! twxObs.IsFieldNull(&twxObs.m_GreenHerb))
-			//    wxObs.m_GreenHerb = twxObs.m_GreenHerb;
-
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_GreenHerb))
-				wxObs.SetFieldNull(&wxObs.m_GreenHerb);
-			//if (! twxObs.IsFieldNull(&twxObs.m_GreenShrub))
-			//    wxObs.m_GreenShrub = twxObs.m_GreenShrub;
-
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_GreenShrub))
-				wxObs.SetFieldNull(&wxObs.m_GreenShrub);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_MC1))
-			//	 wxObs.m_MC1 = twxObs.m_MC1;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_MC1))
-				wxObs.SetFieldNull(&wxObs.m_MC1);
-			//if (! twxObs.IsFieldNull(&twxObs.m_MC10))
-			//   wxObs.m_MC10 = twxObs.m_MC10;
-
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_MC10))
-				wxObs.SetFieldNull(&wxObs.m_MC10);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_MC100))
-			// wxObs.m_MC100 = twxObs.m_MC100;
-
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_MC100))
-				wxObs.SetFieldNull(&wxObs.m_MC100);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_MC1000))
-			//wxObs.m_MC1000 = twxObs.m_MC1000;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_MC1000))
-				wxObs.SetFieldNull(&wxObs.m_MC1000);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_X1000))
-			//wxObs.m_X1000 = twxObs.m_X1000;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_X1000))
-				wxObs.SetFieldNull(&wxObs.m_X1000);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_MCHerb))
-			//wxObs.m_MCHerb = twxObs.m_MCHerb;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_MCHerb))
-				wxObs.SetFieldNull(&wxObs.m_MCHerb);
-			//if (! twxObs.IsFieldNull(&twxObs.m_MCWood))
-			//wxObs.m_MCWood = twxObs.m_MCWood;
-
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_MCWood))
-				wxObs.SetFieldNull(&wxObs.m_MCWood);
-
-			if (! twxObs.IsFieldNull(&twxObs.m_GREN))
-				wxObs.m_GREN = twxObs.m_GREN;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_GREN))
-				wxObs.SetFieldNull(&wxObs.m_GREN);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_HStage))
-			//wxObs.m_HStage = twxObs.m_HStage;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_HStage))
-				wxObs.SetFieldNull(&wxObs.m_HStage);
-			//if (! twxObs.IsFieldNull(&twxObs.m_ROS))
-			// wxObs.m_ROS = twxObs.m_ROS;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_ROS))
-				wxObs.SetFieldNull(&wxObs.m_ROS);
-			//if (! twxObs.IsFieldNull(&twxObs.m_ERC))
-			//wxObs.m_ERC = twxObs.m_ERC;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_ERC))
-				wxObs.SetFieldNull(&wxObs.m_ERC);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_BI))
-			//wxObs.m_BI = twxObs.m_BI;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_BI))
-				wxObs.SetFieldNull(&wxObs.m_BI);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_FIL))
-			//wxObs.m_FIL = twxObs.m_FIL;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_FIL))
-				wxObs.SetFieldNull(&wxObs.m_FIL);
-
-			if (! twxObs.IsFieldNull(&twxObs.m_WAzimuth) && wxObs.IsFieldNull(&wxObs.m_WAzimuth))
-				wxObs.m_WAzimuth = twxObs.m_WAzimuth;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_WAzimuth))
-				wxObs.SetFieldNull(&wxObs.m_WAzimuth);
-
-			// new FFP4 fields here     5/2006
-			if (! twxObs.IsFieldNull(&twxObs.m_SolarRadiation) && wxObs.IsFieldNull(&wxObs.m_SolarRadiation))
-				wxObs.m_SolarRadiation = twxObs.m_SolarRadiation;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_SolarRadiation))
-				wxObs.SetFieldNull(&wxObs.m_SolarRadiation);
-
-			//if (! twxObs.IsFieldNull(&twxObs.m_WetFlag))
-			//wxObs.m_WetFlag = twxObs.m_WetFlag;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_WetFlag))
-				wxObs.SetFieldNull(&wxObs.m_WetFlag);
-
-			if (! twxObs.IsFieldNull(&twxObs.m_GustDir) && wxObs.IsFieldNull(&wxObs.m_GustDir))
-				wxObs.m_GustDir = twxObs.m_GustDir;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_GustDir))
-				wxObs.SetFieldNull(&wxObs.m_GustDir);
-
-			if (! twxObs.IsFieldNull(&twxObs.m_GustSpd) && wxObs.IsFieldNull(&wxObs.m_GustSpd))
-				wxObs.m_GustSpd = twxObs.m_GustSpd;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_GustSpd))
-				wxObs.SetFieldNull(&wxObs.m_GustSpd);
-
-			if (! twxObs.IsFieldNull(&twxObs.m_HourlyPrecip) && wxObs.IsFieldNull(&wxObs.m_HourlyPrecip))
-				wxObs.m_HourlyPrecip = twxObs.m_HourlyPrecip;
-			if(newRec && twxObs.IsFieldNull(&twxObs.m_HourlyPrecip))
-				wxObs.SetFieldNull(&wxObs.m_HourlyPrecip);
-
-			/* 09/2012   set DailyObs field appropriately */
-			wxObs.m_DailyObs = 0;
-			if (twxObs.m_ObsType.CompareNoCase("O") == 0)
-				wxObs.m_DailyObs = 1;
-			else
-				if ((twxObs.m_ObsType.CompareNoCase("R") == 0)
-					&& (twxObs.m_Hour == regHour)
-					&& (!twxObs.IsFieldNull(&twxObs.m_SOW)))
-					wxObs.m_DailyObs = 1;
-
-			wxObs.Update();
-			LogWxDataWarnings(errLog, &twxObs);
-			twxObs.MoveNext();
-		}
-		//if(!cd || !cd->Abort()){
-			//twxObs.m_pDatabase->CommitTrans(); //so we can requery
-			wxObs.m_strSort = "[ObsDate]";
-			wxObs.Requery();
-			// recalc running 24 hour totals for min/max temp, min/max RH, PPTAMT & PPTDUR, etc. - see class CWxSet
-			/*if (cd)
-			{
-				cd->Reset();
-			    cd->SetStatusString("Recalculating min/max values...");
-			}*/
-			wxObs.RecalcRunning24();
-		//} else
-		//	twxObs.m_pDatabase->Rollback();
-	//}
-
-	//if(!cd || !cd->Abort())
-	//{
-		fprintf(errLog, "Processed %ld weather records for stations %s:\n"
-
-			"\tAppended %ld records.\n"
-			"\tUpdated %ld existing records.\n"
-			"\tRejected %ld records for bad data.\n"
-			"\tField value warnings: %d\n"
-			,
-			count, sStationID, appends, edits,  rejects,warnings);
-
-		errors = rejects;
-	/*}
-	else
-	{
-		errors = -1;
-	}
-
-	if (cd)
-		cd->DestroyWindow();*/
-
-	twxObs.Close();
-	wxObs.Close();
-
-	try
-	{
-		pDoc->m_pDB->ExecuteSQL("DROP TABLE [ffpTempWx]");
-	}
-	catch(CDBException* e)
-	{
-		e->Delete();
-	}
-
-	return errors;
-}
 
 int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDialog *ffd){
 	int errors = 0;
@@ -3754,7 +2706,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 	}*/
 	
 	
-	if(pDoc->HasTempFires())
+	if(pDoc->HasTempFire())
 	{
 		try
 		{
@@ -3765,8 +2717,8 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 			e->Delete();
 		}
 	}
-	pDoc->CreateTempFires();
-	CFireSet tFires(fireSet.m_pDatabase);
+	pDoc->CreateTempFire();
+	CFiresSet tFires(firesSet.m_pDatabase);
 	tFires.Open(CRecordset::dynaset, "ffpTempFire");
 
 	char delim = '|';
@@ -3798,7 +2750,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 	CString strLine;
 	ifstream stream;
 
-	utils *util = new utils(fireSet.m_pDatabase);
+	utils util(firesSet.m_pDatabase);
 
 	stream.open(fileName);
 	//check for proper header info
@@ -3840,7 +2792,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 	CString temp2, temp3;
 	//stringstream stream2;
 
-	CFireSet cFires(fireSet.m_pDatabase);
+	CFiresSet cFires(firesSet.m_pDatabase);
 	cFires.Open();
 
 	while (stream.good())// && (!cd || ! cd->Abort()))
@@ -4040,13 +2992,13 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 
 		   }
 
-		CDOIUnitSet doiSet(fireSet.m_pDatabase);
+		CDOIUnitSet doiSet(firesSet.m_pDatabase);
 		if (sUnitID && strlen(sUnitID) > 0){
 			doiSet.m_strFilter.Format("[WFMICode] = '%s'",sUnitID);
 			doiSet.Open();
 			if (doiSet.IsEOF()){
 				// look up agency first
-				CFireAgencySet agencySet(fireSet.m_pDatabase);
+				CFireAgencySet agencySet(firesSet.m_pDatabase);
 				agencySet.m_strFilter.Format("[Name]='%s'",sAgency);
 				agencySet.Open();
 				if (agencySet.IsEOF()){
@@ -4059,7 +3011,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 					fprintf(errLog, "\tRecord Number %ld, UnitCode: %s has no match in refDOIUnits, ADDED:  %d/%d/%04d\n", count, sUnitID, m, d, y);
 					// add as a new unit, with name = WFMIcode
 
-					CFireUnitSet unitSet(fireSet.m_pDatabase);
+					CFireUnitSet unitSet(firesSet.m_pDatabase);
 					unitSet.m_strSort.Format("[UnitID]");
 					unitSet.Open();
 					unitSet.MoveLast();
@@ -4079,7 +3031,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 					doiSet.m_UnitID = nextID;
 					doiSet.m_SubunitID = -999;   // temporary flag, will be changed to 0 at end of import process below
 					doiSet.Update();
-
+					doiSet.Requery();
 					unitSet.Close();
 				}
 			}
@@ -4088,26 +3040,30 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 			rejects++;
 			continue;
 		}
-		// check for dupes
+		//2022/09
+		// New fire number for Fires table
+		CString newFireNumber;
+		newFireNumber.Format("%d%02d%02d-%d-%d-%d-0-%s", dt.GetYear(), dt.GetMonth(), dt.GetDay(), doiSet.m_AgencyID, doiSet.m_RegionID, doiSet.m_UnitID, sFireNumber);
 
-		cFires.m_strFilter.Format("[Year]='%d' AND [FireNumber]='%s' AND [AgencyID]=%d AND [RegionID]=%d AND [UnitID]=%d",
-			y,sFireNumber,doiSet.m_AgencyID,doiSet.m_RegionID,doiSet.m_UnitID);
+		// check for dupes
+		cFires.m_strFilter.Format("[FireNumber]='%s' AND [AgencyID]=%d AND [RegionID]=%d AND [UnitID]=%d",
+			newFireNumber.GetBuffer(), doiSet.m_AgencyID, doiSet.m_RegionID, doiSet.m_UnitID);
 		cFires.Requery();
 		if (! cFires.IsEOF()){ // dupe
 			doiSet.Close();
 			rejects ++;
-			fprintf(errLog, "\tRecord Number %ld, FireNumber %s  Duplicate record:  %d/%d/%04d\n", count, sFireNumber, m, d, y);
+			fprintf(errLog, "\tRecord Number %ld, FireNumber %s  Duplicate record:  %d/%d/%04d\n", count, newFireNumber.GetBuffer(), m, d, y);
 			continue;
 		}
 		//make sure not a duplicate in the current import file!!!!!!!!
-		tFires.m_strFilter.Format("[Year]='%d' AND [FireNumber]='%s' AND [AgencyID]=%d AND [RegionID]=%d AND [UnitID]=%d",
-			y,sFireNumber,doiSet.m_AgencyID,doiSet.m_RegionID,doiSet.m_UnitID);
+		tFires.m_strFilter.Format("[FireNumber]='%s' AND [AgencyID]=%d AND [RegionID]=%d AND [UnitID]=%d",
+			newFireNumber.GetBuffer(), doiSet.m_AgencyID, doiSet.m_RegionID, doiSet.m_UnitID);
 		tFires.Requery();
 		if(!tFires.IsEOF())
 		{
 			doiSet.Close();
 			rejects ++;
-			fprintf(errLog, "\tRecord Number %ld, FireNumber %s  Duplicate record:  %d/%d/%04d\n", count, sFireNumber, m, d, y);
+			fprintf(errLog, "\tRecord Number %ld, FireNumber %s  Duplicate record:  %d/%d/%04d\n", count, newFireNumber.GetBuffer(), m, d, y);
 			continue;
 		}
 		tFires.m_strFilter = "";
@@ -4128,17 +3084,17 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 			doiSet.Close();
 		}
 		tFires.m_Discovery = dt;
-		tFires.m_FireID = atoi(sFireID);
-		tFires.m_Year.Format("%d",y);
+		//tFires.m_FireID = atoi(sFireID);
+		//tFires.m_Year.Format("%d",y);
 		//	tFires.m_AgencyID = FIXME;
 		//	tFires.m_RegionID = FIXME;
 		//	tFires.m_UnitID = FIXME;
 		//	tFires.m_SubunitID = FIXME;
 
-		CString tempNumber;
-		tempNumber.Format("%s",sFireNumber);
+		//CString tempNumber;
+		//tempNumber.Format("%s",sFireNumber);
 
-		tFires.m_FireNumber = tempNumber.Left(12);
+		tFires.m_FireNumber = newFireNumber.GetBuffer();
 		//	tFires.m_State = FIXME;
 		//	tFires.m_County = FIXME:
 		tFires.m_TotalAcres = atof(sControlAcres);
@@ -4147,9 +3103,9 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 		tFires.m_FireName = sFireName;
 		tFires.m_FireName.Trim();
 		int causeVal = atoi(sGeneralCause);
-		bool validCause = util->validateStatCause(causeVal);
+		bool validCause = util.validateStatCause(causeVal);
 		if (validCause)
-			  tFires.m_StatisticalCause = tFires.m_GeneralCause = atoi(sGeneralCause);
+			  tFires.m_StatisticalCause = atoi(sGeneralCause);
 		else
 			{
 				fprintf(errLog, "\tRecord Number %ld, invalid statistical cause: %s\n", count, sGeneralCause);
@@ -4160,31 +3116,33 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 
 		if(strlen(sLatitude) > 0)
 		{
-			int dd, mm, ss;
+			tFires.m_latitude = atof(sLatitude);
+			/*int dd, mm, ss;
 			DecimalDegree2DDMMSS(atof(sLatitude), &dd, &mm, &ss);
 			tFires.m_LatDD = dd;
 			tFires.m_LatMM = mm;
-			tFires.m_LatSS = ss;
+			tFires.m_LatSS = ss;*/
 		}
 		else
 		{
-			tFires.SetFieldNull(&tFires.m_LatDD);
-			tFires.SetFieldNull(&tFires.m_LatMM);
-			tFires.SetFieldNull(&tFires.m_LatSS);
+			tFires.SetFieldNull(&tFires.m_latitude);
+			//tFires.SetFieldNull(&tFires.m_LatMM);
+			//tFires.SetFieldNull(&tFires.m_LatSS);
 		}
 		if(strlen(sLongitude) > 0)
 		{
-			int dd, mm, ss;
+			tFires.m_longitude = atof(sLongitude);
+			/*int dd, mm, ss;
 			DecimalDegree2DDMMSS(atof(sLongitude), &dd, &mm, &ss);
 			tFires.m_LonDD = dd;
 			tFires.m_LonMM = mm;
-			tFires.m_LonSS = ss;
+			tFires.m_LonSS = ss;*/
 		}
 		else
 		{
-			tFires.SetFieldNull(&tFires.m_LonDD);
-			tFires.SetFieldNull(&tFires.m_LonMM);
-			tFires.SetFieldNull(&tFires.m_LonSS);
+			tFires.SetFieldNull(&tFires.m_longitude);
+			//tFires.SetFieldNull(&tFires.m_LonMM);
+			//tFires.SetFieldNull(&tFires.m_LonSS);
 		}
 		/*     tFires.m_LatDD = atoi(sLatitude);
 		tFires.m_LatMM = (int) ((atof(sLatitude) + .000001 - (float) (tFires.m_LatDD)) * 60.0);
@@ -4205,7 +3163,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 		tFires.m_LonSS = 0 - tFires.m_LonSS;
 		*/
 
-		if (strlen(sInitAttTime) < 2){
+		/*if (strlen(sInitAttTime) < 2) {
 			// fprintf(errLog, "\tWARNING: Record Number %d, Init Attack Time is NULL\n", count );
 			// rejects ++;
 			// continue;
@@ -4232,7 +3190,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 
 			dt.SetDateTime(y, m, d, hr, min, 0);
 			tFires.m_FirstAttack = dt;
-		}
+		}*/
 
 		if (strlen(sControlTime) < 2){
 			//  fprintf(errLog, "\tWARNING: Record Number %d, Control Time is NULL\n", count );
@@ -4262,7 +3220,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 			dt.SetDateTime(y, m, d, hr, min, 0);
 			tFires.m_StrategyMet = dt;
 		}
-		if (strlen(sSlope) ==1)
+		/*if (strlen(sSlope) == 1)
 		      tFires.m_Slope = sSlope;
 		if (strlen(sElevation)==1)
 		   tFires.m_Elevation = sElevation;
@@ -4270,7 +3228,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 		   tFires.m_Aspect = sAspect;
 		if(strlen(sFuelModel) == 1)
 			tFires.m_FuelModel = sFuelModel;
-		tFires.m_FireType = sFireType;
+		tFires.m_FireType = sFireType;*/
 
 		tFires.Update();
 
@@ -4293,7 +3251,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 			count, skipped,count - skipped - rejects, rejects);
 		errors = rejects ;
 		// see if we added any units
-		CDOIUnitSet doiSet(fireSet.m_pDatabase);
+		CDOIUnitSet doiSet(firesSet.m_pDatabase);
 		doiSet.m_strFilter.Format("[SubunitID] = -999");
 		doiSet.Open();
 		if (! doiSet.IsEOF()){
@@ -4305,7 +3263,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 					unitStr2,
 					unitStr3;
 
-				CFireAgencySet agencySet(fireSet.m_pDatabase);
+				CFireAgencySet agencySet(firesSet.m_pDatabase);
 
 				agencySet.m_strFilter.Format("[AgencyID] = %d", doiSet.m_AgencyID);
 				agencySet.Open();
@@ -4315,7 +3273,7 @@ int CImportDialog::ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDia
 					unitStr.Format("Agency: N/A");
 				agencySet.Close();
 
-				CFireRegionSet regSet(fireSet.m_pDatabase);
+				CFireRegionSet regSet(firesSet.m_pDatabase);
 
 				regSet.m_strFilter.Format("[RegionID] = %d", doiSet.m_RegionID);
 				regSet.Open();
@@ -4400,7 +3358,7 @@ int CImportDialog::ImportWFMICodes(CString fileName, FILE *errLog){
 	CString temp2, temp3;
 	stringstream stream2;
 
-	utils *util = new utils(fireSet.m_pDatabase);
+	utils util(firesSet.m_pDatabase);
 
 	char sWFMIcode[MAX_FIELD_LEN],
 		sAgency[MAX_FIELD_LEN],
@@ -4418,23 +3376,23 @@ int CImportDialog::ImportWFMICodes(CString fileName, FILE *errLog){
 
 	bool found = false;
 
-	CFireUnitSet unitSet(fireSet.m_pDatabase);
+	CFireUnitSet unitSet(firesSet.m_pDatabase);
 	unitSet.m_strSort="[Name]";
 	unitSet.Open();
 
-	CFireSubunitSet subunitSet(fireSet.m_pDatabase);
+	CFireSubunitSet subunitSet(firesSet.m_pDatabase);
 	subunitSet.m_strSort="[Name]";
 	subunitSet.Open();
 
-	CFireRegionSet regionSet(fireSet.m_pDatabase);
+	CFireRegionSet regionSet(firesSet.m_pDatabase);
 	regionSet.m_strSort="[Name]";
 	regionSet.Open();
 
-	CFireAgencySet agencySet(fireSet.m_pDatabase);
+	CFireAgencySet agencySet(firesSet.m_pDatabase);
 	agencySet.m_strSort="[Name]";
 	agencySet.Open();
 
-	CDOIUnitSet doiSet(fireSet.m_pDatabase);
+	CDOIUnitSet doiSet(firesSet.m_pDatabase);
 	doiSet.Open();
 	while (! doiSet.IsEOF()){
 		doiSet.Delete();
@@ -4817,7 +3775,7 @@ int CImportDialog::ImportNewDOICodes(CString fileName, FILE *errLog){
 
 		// region?
 		if (strlen(sFFPRegion) > 0){
-			CFireRegionSet regionSet(fireSet.m_pDatabase);
+			CFireRegionSet regionSet(firesSet.m_pDatabase);
 			CString tempstr;
 			tempstr.Format("%s",sFFPRegion);
 			// sql escape for MS Access
@@ -4845,7 +3803,7 @@ int CImportDialog::ImportNewDOICodes(CString fileName, FILE *errLog){
 
 					continue;
 				} else {
-					CFireUnitSet unitSet(fireSet.m_pDatabase);
+					CFireUnitSet unitSet(firesSet.m_pDatabase);
 					CString tempstr;
 					tempstr.Format("%s",sFFPUnit);
 					// sql escape for MS Access
@@ -4873,7 +3831,7 @@ int CImportDialog::ImportNewDOICodes(CString fileName, FILE *errLog){
 	}
 
 	// now remove "A00"-type prefixes from units
-	CFireUnitSet unitSet(fireSet.m_pDatabase);
+	CFireUnitSet unitSet(firesSet.m_pDatabase);
 	unitSet.Open();
 	while (! unitSet.IsEOF()){
 		CString tempstr;
@@ -6372,6 +5330,8 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				loc = agencies.AddString(agencySet.m_Name);
 				if(loc >= 0)
 					agencies.SetItemData(loc, agencySet.m_AgencyID);
+				if (agencySet.m_Name.Compare("GACC") == 0)
+					m_GACC_Agency_ID = agencySet.m_AgencyID;
 			}
 			agencySet.MoveNext();
 		}
@@ -6552,8 +5512,8 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		return 1;
 	}
 
-	int CImportDialog::WriteFireRecFPL(char *buf, long *fireID, long agencyID,
-		FILE *errLog, CFireSet *tFires)
+	int CImportDialog::WriteFireRecFPL(char *buf, long agencyID,
+		FILE *errLog, CFiresSet *tFires)
 	{
 		bool append = true;
 		char temp[16];
@@ -6562,7 +5522,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		CString str;
 		char newUnitStr[64];
 		COleDateTime dt;
-		utils *util = new utils(fireSet.m_pDatabase);
+		utils util(firesSet.m_pDatabase);
 
 		switch(agencyID)
 		{
@@ -6638,7 +5598,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				//if(tFires->IsEOF() && tFires->IsBOF())
 				//{
 				tFires->AddNew();
-				tFires->m_FireID = ++(*fireID);
+				//tFires->m_FireID = ++(*fireID);
 				//}
 				//else
 				//{
@@ -6654,53 +5614,61 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				COleDateTime tTime(y, m, d, hr, 0, 0);
 				tFires->m_Discovery = tTime;
 				str.Format("%d", dt.GetYear());
-				tFires->m_Year = str;
+				//tFires->m_Year = str;
 				if(buf[16] == 'L')//Lat/Long dd MM
 				{
+					double dd = 0, mm = 0, ss = 0;
 					strncpy(temp, &buf[17], 2);
 					temp[2] = 0;
-					if(strlen(trim(temp)) > 0)
-						tFires->m_LatDD = atol(temp);
+					if (strlen(trim(temp)) > 0)
+					{
+						dd = atof(temp);
+						strncpy(temp, &buf[19], 2);
+						temp[2] = 0;
+						if (strlen(trim(temp)) > 0)
+							mm = atof(temp);
+						tFires->m_latitude = dd + mm / 60.0;
+					}
 					else
-						tFires->SetFieldNull(&tFires->m_LatDD);
-					strncpy(temp, &buf[19], 2);
-					temp[2] = 0;
-					if(strlen(trim(temp)) > 0)
-						tFires->m_LatMM = atol(temp);
-					else
-						tFires->SetFieldNull(&tFires->m_LatMM);
-					tFires->SetFieldNull(&tFires->m_LatSS);
+						tFires->SetFieldNull(&tFires->m_latitude);
+					//else
+					//	tFires->SetFieldNull(&tFires->m_LatMM);
+					//tFires->SetFieldNull(&tFires->m_LatSS);
+					dd = 0; 
+					mm = 0; 
+					ss = 0;
 					strncpy(temp, &buf[21], 3);
 					temp[3] = 0;
-					if(strlen(trim(temp)) > 0)
-						tFires->m_LonDD = -atol(temp);
+					if (strlen(trim(temp)) > 0)
+					{
+						dd = -atof(temp);
+						strncpy(temp, &buf[24], 2);
+						temp[2] = 0;
+						if (strlen(trim(temp)) > 0)
+							mm = atof(temp);
+						tFires->m_longitude = dd - mm / 60.0;
+					}
 					else
-						tFires->SetFieldNull(&tFires->m_LonDD);
-					strncpy(temp, &buf[24], 2);
-					temp[2] = 0;
-					if(strlen(trim(temp)) > 0)
-						tFires->m_LonMM = atol(temp);
-					else
-						tFires->SetFieldNull(&tFires->m_LonMM);
-					tFires->SetFieldNull(&tFires->m_LonSS);
+						tFires->SetFieldNull(&tFires->m_longitude);
+					//tFires->SetFieldNull(&tFires->m_LonSS);
 				}
 				else
 				{
-					tFires->SetFieldNull(&tFires->m_LatDD);
-					tFires->SetFieldNull(&tFires->m_LatMM);
-					tFires->SetFieldNull(&tFires->m_LatSS);
-					tFires->SetFieldNull(&tFires->m_LonDD);
-					tFires->SetFieldNull(&tFires->m_LonMM);
-					tFires->SetFieldNull(&tFires->m_LonSS);
+					tFires->SetFieldNull(&tFires->m_latitude);
+					tFires->SetFieldNull(&tFires->m_longitude);
+					//tFires->SetFieldNull(&tFires->m_LatSS);
+					//tFires->SetFieldNull(&tFires->m_LonDD);
+					//tFires->SetFieldNull(&tFires->m_LonMM);
+					//tFires->SetFieldNull(&tFires->m_LonSS);
 				}
 				strncpy(temp, &buf[26], 1);
 				temp[1] = 0;
 				if(strlen(trim(temp)) > 0)
 				{
 					int causeVal = atoi(temp);
-					bool validCause = util->validateStatCause(causeVal);
+					bool validCause = util.validateStatCause(causeVal);
 					if (validCause)
-						 tFires->m_StatisticalCause = tFires->m_GeneralCause = atoi(temp);
+						 tFires->m_StatisticalCause = atoi(temp);
 					else
 					{
 						fprintf(errLog, "\tRecord Number %ld, invalid statistical cause: %s\n", fplLineNo, temp);
@@ -6709,7 +5677,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		
 				} else
 					tFires->SetFieldNull(&tFires->m_StatisticalCause);
-				strncpy(temp, &buf[28], 1);
+				/*strncpy(temp, &buf[28], 1);
 				temp[1] = 0;
 				if(strlen(trim(temp)) > 0)
 					tFires->m_GeneralCause = atol(temp);
@@ -6732,7 +5700,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				if(str.GetLength() > 0)
 					tFires->m_SizeClass = str;
 				else
-					tFires->SetFieldNull(&tFires->m_SizeClass);
+					tFires->SetFieldNull(&tFires->m_SizeClass);*/
 				strncpy(temp, &buf[33], 7);
 				temp[7] = 0;
 				if(strlen(trim(temp)) > 0)
@@ -6742,7 +5710,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				//NULL OUT REMAINING FIELDS IF NOT APPENDING
 				if(!append)
 				{
-					tFires->SetFieldNull(&tFires->m_Township);
+					/*tFires->SetFieldNull(&tFires->m_Township);
 					tFires->SetFieldNull(&tFires->m_Range);
 					tFires->SetFieldNull(&tFires->m_Section);
 					tFires->SetFieldNull(&tFires->m_SubSection);
@@ -6751,12 +5719,12 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 					tFires->SetFieldNull(&tFires->m_Ignition);
 					tFires->SetFieldNull(&tFires->m_FirstAttack);
 					tFires->SetFieldNull(&tFires->m_Reinforcement);
-					tFires->SetFieldNull(&tFires->m_DeclareWildlandFire);
+					tFires->SetFieldNull(&tFires->m_DeclareWildlandFire);*/
 					tFires->SetFieldNull(&tFires->m_Contain);
 					tFires->SetFieldNull(&tFires->m_StrategyMet);
-					tFires->SetFieldNull(&tFires->m_FireOut);
+					//tFires->SetFieldNull(&tFires->m_FireOut);
 					tFires->SetFieldNull(&tFires->m_FireName);
-					tFires->SetFieldNull(&tFires->m_WildNum);
+					//tFires->SetFieldNull(&tFires->m_WildNum);
 				}
 				tFires->Update();
 			}
@@ -6922,7 +5890,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				//	if(tFires->IsEOF() && tFires->IsBOF())
 				//{
 				tFires->AddNew();
-				tFires->m_FireID = ++(*fireID);
+				//tFires->m_FireID = ++(*fireID);
 				//}
 				//	else
 				//	{
@@ -6939,15 +5907,27 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				//COleDateTime tTime(y, m, d, hr, mn, 0);
 				//tFires->m_Discovery = tTime;
 				tFires->m_Discovery = dt;
-				str.Format("%d", dt.GetYear());
-				tFires->m_Year = str;
+				//str.Format("%d", dt.GetYear());
+				//tFires->m_Year = str;
+				double dd = 0.0, mm = 0.0, ss = 0.0;
 				strncpy(temp, &buf[26], 2);
 				temp[2] = 0;
-				if(strlen(trim(temp)) > 0)
-					tFires->m_LatDD = atol(temp);
+				if (strlen(trim(temp)) > 0)
+				{
+					dd = atof(temp);
+					strncpy(temp, &buf[28], 2);
+					temp[2] = 0;
+					if (strlen(trim(temp)) > 0)
+						mm = atof(temp);
+					strncpy(temp, &buf[30], 2);
+					temp[2] = 0;
+					if (strlen(trim(temp)) > 0)
+						ss = atof(temp);
+					tFires->m_latitude = dd + mm / 60.0 + ss / 3600.0;
+				}
 				else
-					tFires->SetFieldNull(&tFires->m_LatDD);
-				strncpy(temp, &buf[28], 2);
+					tFires->SetFieldNull(&tFires->m_latitude);
+				/*strncpy(temp, &buf[28], 2);
 				temp[2] = 0;
 				if(strlen(trim(temp)) > 0)
 					tFires->m_LatMM = atol(temp);
@@ -6958,14 +5938,26 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				if(strlen(trim(temp)) > 0)
 					tFires->m_LatSS = atol(temp);
 				else
-					tFires->SetFieldNull(&tFires->m_LatSS);
+					tFires->SetFieldNull(&tFires->m_LatSS);*/
+				dd = mm = ss = 0.0;
 				strncpy(temp, &buf[32], 3);
 				temp[3] = 0;
-				if(strlen(trim(temp)) > 0)
-					tFires->m_LonDD = -atol(temp);
+				if (strlen(trim(temp)) > 0)
+				{
+					dd = -atof(temp);
+					strncpy(temp, &buf[35], 2);
+					temp[2] = 0;
+					if (strlen(trim(temp)) > 0)
+						mm = atol(temp);
+					strncpy(temp, &buf[37], 2);
+					temp[2] = 0;
+					if (strlen(trim(temp)) > 0)
+						ss = atol(temp);
+					tFires->m_longitude = dd - mm / 60.0 - ss / 3600.0;
+				}
 				else
-					tFires->SetFieldNull(&tFires->m_LonDD);
-				strncpy(temp, &buf[35], 2);
+					tFires->SetFieldNull(&tFires->m_longitude);
+				/*strncpy(temp, &buf[35], 2);
 				temp[2] = 0;
 				if(strlen(trim(temp)) > 0)
 					tFires->m_LonMM = atol(temp);
@@ -6976,16 +5968,16 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				if(strlen(trim(temp)) > 0)
 					tFires->m_LonSS = atol(temp);
 				else
-					tFires->SetFieldNull(&tFires->m_LonSS);
+					tFires->SetFieldNull(&tFires->m_LonSS);*/
 				/*   Causes - May want to confirm what's done here!!!! ******************************/
 				strncpy(temp, &buf[95], 1);
 				temp[1] = 0;
 				if(strlen(trim(temp)) > 0)
 				{
 					int causeVal = atoi(temp);
-					bool validCause = util->validateStatCause(causeVal);
+					bool validCause = util.validateStatCause(causeVal);
 					if (validCause)
-						 tFires->m_StatisticalCause = tFires->m_GeneralCause = atoi(temp);
+						 tFires->m_StatisticalCause = atoi(temp);
 					else
 					{
 						fprintf(errLog, "\tRecord Number %ld, invalid statistical cause: %s\n", fplLineNo, temp);
@@ -6993,12 +5985,12 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 					 }
 				} else
 					tFires->m_StatisticalCause = 1;//assume lightning
-				strncpy(temp, &buf[96], 2);
+				/*strncpy(temp, &buf[96], 2);
 				temp[2] = 0;
 				if(strlen(trim(temp)) > 0)
 					tFires->m_SpecificCause = atol(temp);
 				else
-					tFires->SetFieldNull(&tFires->m_SpecificCause);
+					tFires->SetFieldNull(&tFires->m_SpecificCause);*/
 
 				strncpy(temp, &buf[79], 8);
 				temp[8] = 0;
@@ -7015,7 +6007,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				}
 				else
 					tFires->SetFieldNull(&tFires->m_FireName);
-				strncpy(temp, &buf[39], 4);
+				/*strncpy(temp, &buf[39], 4);
 				temp[4] = 0;
 				if(strlen(trim(temp)) > 0)
 					tFires->m_Township = temp;
@@ -7038,7 +6030,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				if(strlen(trim(temp)) > 0)
 					tFires->m_State = temp;
 				else
-					tFires->SetFieldNull(&tFires->m_State);
+					tFires->SetFieldNull(&tFires->m_State);*/
 
 				//NULL OUT REMAINING FIELDS IF NOT APPENDING
 				/*if(!append)
@@ -7067,16 +6059,16 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		return 1;
 	}
 
-	int CImportDialog::WriteFireRecRAW(char *buf, long *fireID, long agencyID,
-		FILE *errLog, CFireSet *tFires)
+	int CImportDialog::WriteFireRecRAW(char *buf, long agencyID,
+		FILE *errLog, CFiresSet *tFires)
 	{
 		bool append = true;
 		char temp[16];
 		int m, d, y, hr, min;
 		long regID, unitID;
-		CString str;
+		CString str, sFireNum;
 		COleDateTime dt;
-		utils util(fireSet.m_pDatabase);
+		utils util(firesSet.m_pDatabase);
 
 		if(agencyID == 1)//USFS
 		{	//check if record already exists
@@ -7139,30 +6131,30 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			}
 			strncpy(temp, &buf[4], 3);
 			temp[3] = 0;
+			sFireNum.Format("%3.3s", temp);
 			//tFires->m_strFilter.Format("[Year] = '%d' and [AgencyID] = 1 and [RegionID] = %ld and [UnitID] = %ld and [FireNumber] = '%s'",
 			//	dt.GetYear(), regID, unitID, temp);
 			//tFires->Requery();
 			//if(tFires->IsEOF() && tFires->IsBOF())
 			//{
 			tFires->AddNew();
-			tFires->m_FireID = ++(*fireID);
+			//tFires->m_FireID = ++(*fireID);
 			/*}
 			else
 			{
 			append = false;
 			tFires->Edit();
 			}*/
-			str.Format("%3.3s", temp);
-			tFires->m_FireNumber = str;
 			tFires->m_AgencyID = agencyID;
 			tFires->m_RegionID = regID;
 			tFires->m_UnitID = unitID;
 			//CTime tTime(y, m, d, hr, min, 0);
 			tFires->m_Discovery = dt;
-			str.Format("%d", dt.GetYear());
-			tFires->m_Year = str;
+			//str.Format("%d", dt.GetYear());
+			//tFires->m_Year = str;
 			strncpy(temp, &buf[7], 2);
 			temp[2] = 0;
+			long suID = 0;
 			if(strlen(trim(temp)) > 0)
 			{
 				CString junk = temp;
@@ -7174,7 +6166,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 					temp[2] = 0;
 				}
 
-				long suID = GetFireSubunit(&subs, agencyID, unitID, temp);
+				suID = GetFireSubunit(&subs, agencyID, unitID, temp);
 				if(suID == 0)
 				{
 					suID = AddFireSubUnit(&subs, unitID, temp);
@@ -7186,6 +6178,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			}
 			else
 				tFires->SetFieldNull(&tFires->m_SubunitID);
+			tFires->m_FireNumber.Format("%d%02d%02d-%ld-%ld-%ld-%ld-%s", dt.GetYear(), dt.GetMonth(), dt.GetDay(),agencyID, regID, unitID, suID, sFireNum);// = str;
 			strncpy(temp, &buf[9], 1);
 			temp[1] = 0;
 			if(strlen(trim(temp)) > 0)
@@ -7193,7 +6186,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				int causeVal = atoi(temp);
 				bool validCause = util.validateStatCause(causeVal);
 				if (validCause)
-						 tFires->m_StatisticalCause = tFires->m_GeneralCause = atoi(temp);
+						 tFires->m_StatisticalCause = atoi(temp);
 					else
 					{
 						fprintf(errLog, "\tRecord Number %ld, invalid statistical cause: %s\n", fplLineNo, temp);
@@ -7201,7 +6194,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 					 }
 			} else
 				tFires->SetFieldNull(&tFires->m_StatisticalCause);
-			strncpy(temp, &buf[10], 1);
+			/*strncpy(temp, &buf[10], 1);
 			temp[1] = 0;
 			if(strlen(trim(temp)) > 0)
 				tFires->m_GeneralCause = atol(temp);
@@ -7224,23 +6217,38 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			if(str.GetLength() > 0)
 				tFires->m_SizeClass = str;
 			else
-				tFires->SetFieldNull(&tFires->m_SizeClass);
+				tFires->SetFieldNull(&tFires->m_SizeClass);*/
 			strncpy(temp, &buf[15], 9);
 			temp[9] = 0;
 			if(strlen(trim(temp)) > 0)
 				tFires->m_TotalAcres = atof(temp);
 			else
 				tFires->m_TotalAcres = 0;
+			double dd = 0.0, mm = 0.0, ss = 0.0;
 			strncpy(temp, &buf[70], 2);
 			temp[2] = 0;
-			if(strlen(trim(temp)) > 0)
-				tFires->m_LatDD = atol(temp);
+			if (strlen(trim(temp)) > 0)
+			{
+				dd = atof(temp);
+				strncpy(temp, &buf[72], 2);
+				temp[2] = 0;
+				if (strlen(trim(temp)) > 0)
+					mm = atof(temp);
+				strncpy(temp, &buf[74], 2);
+				temp[2] = 0;
+				if (strlen(trim(temp)) > 0)
+					ss = atof(temp);
+				tFires->m_latitude = dd + mm / 60.0 + ss / 3600.0;
+			}
 			else
-				tFires->SetFieldNull(&tFires->m_LatDD);
-			strncpy(temp, &buf[72], 2);
+				tFires->SetFieldNull(&tFires->m_latitude);
+			dd = mm = ss = 0.0;
+			/*strncpy(temp, &buf[72], 2);
 			temp[2] = 0;
-			if(strlen(trim(temp)) > 0)
+			if (strlen(trim(temp)) > 0)
+			{
 				tFires->m_LatMM = atol(temp);
+			}
 			else
 				tFires->SetFieldNull(&tFires->m_LatMM);
 			strncpy(temp, &buf[74], 2);
@@ -7248,14 +6256,25 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			if(strlen(trim(temp)) > 0)
 				tFires->m_LatSS = atol(temp);
 			else
-				tFires->SetFieldNull(&tFires->m_LatSS);
+				tFires->SetFieldNull(&tFires->m_LatSS);*/
 			strncpy(temp, &buf[76], 3);
 			temp[3] = 0;
-			if(strlen(trim(temp)) > 0)
-				tFires->m_LonDD = -atol(temp);
+			if (strlen(trim(temp)) > 0)
+			{
+				dd = -atof(temp);
+				strncpy(temp, &buf[79], 2);
+				temp[2] = 0;
+				if (strlen(trim(temp)) > 0)
+					mm = atof(temp);
+				strncpy(temp, &buf[81], 2);
+				temp[2] = 0;
+				if (strlen(trim(temp)) > 0)
+					ss = atof(temp);
+				tFires->m_longitude = dd - mm / 60.0 - ss / 3600.0;
+			}
 			else
-				tFires->SetFieldNull(&tFires->m_LonDD);
-			strncpy(temp, &buf[79], 2);
+				tFires->SetFieldNull(&tFires->m_longitude);
+			/*strncpy(temp, &buf[79], 2);
 			temp[2] = 0;
 			if(strlen(trim(temp)) > 0)
 				tFires->m_LonMM = atol(temp);
@@ -7302,9 +6321,9 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			if(strlen(trim(temp)) > 0)
 				tFires->m_County = atol(temp);
 			else
-				tFires->SetFieldNull(&tFires->m_County);
+				tFires->SetFieldNull(&tFires->m_County);*/
 			//dates....
-			strncpy(temp, &buf[131], 4);
+			/*strncpy(temp, &buf[131], 4);
 			temp[4] = 0;
 			y = atoi(temp);
 			strncpy(temp, &buf[135], 2);
@@ -7394,7 +6413,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				tFires->m_DeclareWildlandFire = dt;
 			}
 			else
-				tFires->SetFieldNull(&tFires->m_DeclareWildlandFire);
+				tFires->SetFieldNull(&tFires->m_DeclareWildlandFire);*/
 			strncpy(temp, &buf[191], 4);
 			temp[4] = 0;
 			y = atoi(temp);
@@ -7441,7 +6460,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			}
 			else
 				tFires->SetFieldNull(&tFires->m_StrategyMet);
-			strncpy(temp, &buf[215], 4);
+			/*strncpy(temp, &buf[215], 4);
 			temp[4] = 0;
 			y = atoi(temp);
 			strncpy(temp, &buf[219], 2);
@@ -7463,19 +6482,19 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				tFires->m_FireOut = dt;
 			}
 			else
-				tFires->SetFieldNull(&tFires->m_FireOut);
+				tFires->SetFieldNull(&tFires->m_FireOut);*/
 			str.Format("%20.20s", &buf[227]);
 			str.Trim();
 			if(str.GetLength() > 0)
 				tFires->m_FireName = str;
 			else
 				tFires->SetFieldNull(&tFires->m_FireName);
-			strncpy(temp, &buf[259], 3);
+			/*strncpy(temp, &buf[259], 3);
 			temp[3] = 0;
 			if(strlen(trim(temp)) > 0)
 				tFires->m_WildNum = atol(temp);
 			else
-				tFires->SetFieldNull(&tFires->m_WildNum);
+				tFires->SetFieldNull(&tFires->m_WildNum);*/
 
 			tFires->Update();
 		}
@@ -7493,34 +6512,48 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		if(loc != CB_ERR)
 		{
 			long agency = agencies.GetItemData(loc);
-			switch(agency)
+			if (agency == m_GACC_Agency_ID)
 			{
-			case 1://USFS
-				rawButton.EnableWindow(TRUE);
+				rawButton.EnableWindow(FALSE);
 				m_genericFireButton.EnableWindow(FALSE);
 				m_WFMIbutton.EnableWindow(FALSE);
 				m_nasfFireButton.EnableWindow(FALSE);
-				break;
-			case 2:
-			case 3:
-			case 4:
-			case 5://FWS
-				rawButton.EnableWindow(FALSE);
-				m_genericFireButton.EnableWindow(FALSE);
-				m_WFMIbutton.EnableWindow(TRUE);
-				m_nasfFireButton.EnableWindow(FALSE);
-				break;
-			case 6: // NASF national association of state foresters   - added for 2014 v4.2
-				rawButton.EnableWindow(FALSE);
-				m_WFMIbutton.EnableWindow(FALSE);
-				m_genericFireButton.EnableWindow(FALSE);
-				m_nasfFireButton.EnableWindow(TRUE);
-				break;
-			default:
-				rawButton.EnableWindow(FALSE);
-				m_WFMIbutton.EnableWindow(FALSE);
-				m_genericFireButton.EnableWindow(TRUE);
-				m_nasfFireButton.EnableWindow(FALSE);
+				m_btnINFORMS.EnableWindow(TRUE);
+			}
+			else
+			{
+				switch (agency)
+				{
+				case 1://USFS
+					rawButton.EnableWindow(TRUE);
+					m_genericFireButton.EnableWindow(FALSE);
+					m_WFMIbutton.EnableWindow(FALSE);
+					m_nasfFireButton.EnableWindow(FALSE);
+					m_btnINFORMS.EnableWindow(FALSE);
+					break;
+				case 2:
+				case 3:
+				case 4:
+				case 5://FWS
+					rawButton.EnableWindow(FALSE);
+					m_genericFireButton.EnableWindow(FALSE);
+					m_WFMIbutton.EnableWindow(TRUE);
+					m_nasfFireButton.EnableWindow(FALSE);
+					m_btnINFORMS.EnableWindow(FALSE);
+					break;
+				case 6: // NASF national association of state foresters   - added for 2014 v4.2
+					rawButton.EnableWindow(FALSE);
+					m_WFMIbutton.EnableWindow(FALSE);
+					m_genericFireButton.EnableWindow(FALSE);
+					m_nasfFireButton.EnableWindow(TRUE);
+					m_btnINFORMS.EnableWindow(FALSE);
+					break;
+				default:
+					rawButton.EnableWindow(FALSE);
+					m_WFMIbutton.EnableWindow(FALSE);
+					m_genericFireButton.EnableWindow(TRUE);
+					m_nasfFireButton.EnableWindow(FALSE);
+				}
 			}
 		}
 		else
@@ -9119,7 +8152,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 
 		
 		
-		if(pDoc->HasTempFires())
+		if(pDoc->HasTempFire())
 		{
 			try
 			{
@@ -9131,8 +8164,8 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			}
 			//pDoc->m_pDB->DeleteTableDef("ffpTempFire");
 		}
-		pDoc->CreateTempFires();
-		CFireSet tFireset(fireSet.m_pDatabase);
+		pDoc->CreateTempFire();
+		CFiresSet tFireset(firesSet.m_pDatabase);
 		tFireset.Open(CRecordset::dynaset, "ffpTempFire");
 		FILE *stream = fopen(fileName, "rb");
 		int result;
@@ -9140,17 +8173,17 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		long updates = 0, noDates = 0, others = 0;
 		if(stream)
 		{
-			long fireID;
-			fireSet.m_strSort.Format("[FireID]");
-			fireSet.m_strFilter.Format("");
-			fireSet.Requery();
-			if(fireSet.IsBOF() && fireSet.IsEOF())
-				fireID = 1;
-			else
-			{
-				fireSet.MoveLast();
-				fireID = fireSet.m_FireID;
-			}
+			//long fireID;
+			//firesSet.m_strSort.Format("[FireID]");
+			//fireSet.m_strFilter.Format("");
+			//fireSet.Requery();
+			//if(fireSet.IsBOF() && fireSet.IsEOF())
+			//	fireID = 1;
+			//else
+			//{
+			//	fireSet.MoveLast();
+			//	fireID = fireSet.m_FireID;
+			//}
 			while(!feof(stream))// && (!cd || !cd->Abort()))
 			{
 				if(GetFireRecFPL(buf, stream, agencyID, &ffd) == 0)//wrong type
@@ -9162,7 +8195,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				if(feof(stream))
 					break;
 				//set record members to values from file
-				result = WriteFireRecFPL(buf, &fireID, agencyID, errLog, &tFireset);
+				result = WriteFireRecFPL(buf, agencyID, errLog, &tFireset);
 				//if(result == 1)
 				//	updates++;
 				if(result == -1)
@@ -9255,7 +8288,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 	*/
 	
 		
-		if(pDoc->HasTempFires())
+		if(pDoc->HasTempFire())
 		{
 			try
 			{
@@ -9267,8 +8300,8 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			}
 			//pDoc->m_pDB->DeleteTableDef("ffpTempFire");
 		}
-		pDoc->CreateTempFires();
-		CFireSet tFireset(fireSet.m_pDatabase);
+		pDoc->CreateTempFire();
+		CFiresSet tFireset(firesSet.m_pDatabase);
 		tFireset.Open(CRecordset::dynaset, "ffpTempFire");
 		FILE *stream = fopen(fileName, "rb");
 		count = 0;
@@ -9311,16 +8344,16 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				threeLineFormat = true;
 			rewind(stream);
 			fseek(stream, firstRecSeek, SEEK_SET);
-			fireSet.m_strSort.Format("[FireID]");
-			fireSet.m_strFilter.Format("");
-			fireSet.Requery();
+			//firesSet.m_strSort.Format("[FireID]");
+			//fireSet.m_strFilter.Format("");
+			/*firesSet.Requery();
 			if(fireSet.IsBOF() && fireSet.IsEOF())
 				fireID = 1;
 			else
 			{
 				fireSet.MoveLast();
 				fireID = fireSet.m_FireID;
-			}
+			}*/
 			while(!feof(stream) )
 			{
 				//if (cd && cd->Abort())
@@ -9329,7 +8362,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				if(feof(stream))
 					break;
 				//set record members to values from file
-				int f = WriteFireRecRAW(buf, &fireID, agencyID, errLog, &tFireset);
+				int f = WriteFireRecRAW(buf, agencyID, errLog, &tFireset);
 				//if(f >= 0)
 				//	updates += f;
 				if(f < 0)
@@ -9376,12 +8409,12 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 	}
 
 	//long CImportDialog::WriteTempFires(CFireSet *tFires, CCancelDialog *cd, long agencyID)
-	long CImportDialog::WriteTempFires(CFireSet *tFires, long agencyID)
+	long CImportDialog::WriteTempFires(CFiresSet *tFires, long agencyID)
 	{
 		//	tFires->m_strSort = "[AgencyID],[RegionID],[UnitID],[Year],[FireNumber]";
 		//	fireSet.m_strSort = "[AgencyID],[RegionID],[UnitID],[Year],[FireNumber]";
 		//AfxMessageBox("Not yet implemented due to database engine upgrade.");
-		long updates = 0, lastID;
+		long updates = 0;// , lastID;
 		/*if (cd)
 		{
 		   cd->Reset();
@@ -9389,23 +8422,23 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		}*/
 		if(tFires->IsBOF())
 			return 0;
-		fireSet.m_strSort.Format("[FireID]");
-		fireSet.m_strFilter.Format("");
-		fireSet.Requery();
-		if(fireSet.IsBOF() && fireSet.IsEOF())
+		firesSet.m_strSort.Format("[FireNumber]");
+		firesSet.m_strFilter.Format("");
+		firesSet.Requery();
+		/*if (fireSet.IsBOF() && fireSet.IsEOF())
 			lastID = 1;
 		else
 		{
 			fireSet.MoveLast();
 			lastID = fireSet.m_FireID;
-		}
-		CString lYear, hYear;
-		tFires->m_strSort = "[Year]";
-		tFires->Requery();
-		lYear = hYear = tFires->m_Year;
+		}*/
+		//CString lYear, hYear;
+		//tFires->m_strSort = "[Year]";
+		//tFires->Requery();
+		//lYear = hYear = tFires->m_Year;
 		tFires->MoveLast();
 		//if(!tFires->IsEOF())
-		hYear = tFires->m_Year;
+		//hYear = tFires->m_Year;
 		long lUnit, hUnit,hAgency;
 		tFires->m_strSort = "[UnitID]";
 		tFires->Requery();
@@ -9415,41 +8448,39 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		hUnit = tFires->m_UnitID;
 		hAgency = tFires->m_AgencyID;
 
-		tFires->m_strSort = "[UnitID],[Year],[FireNumber]";
+		tFires->m_strSort = "[UnitID],[FireNumber]";
 
-		fireSet.m_strSort = "[UnitID],[Year],[FireNumber]";
-		fireSet.m_strFilter.Format("[AgencyID] = %ld and [Year] >= '%s' and  [Year] <= '%s' and [UnitID] >= %ld and [UnitID] <= %ld",
-			(agencyID?agencyID:hAgency), lYear, hYear, lUnit, hUnit);
+		firesSet.m_strSort = "[UnitID],[FireNumber]";
+		firesSet.m_strFilter.Format("[AgencyID] = %ld and [UnitID] >= %ld and [UnitID] <= %ld",
+			(agencyID?agencyID:hAgency), lUnit, hUnit);
 		tFires->Requery();
-		fireSet.Requery();
+		firesSet.Requery();
 		//fireSet.m_pDatabase->BeginTrans();
 
 		//while ((!cd || !cd->Abort()) && !tFires->IsEOF())
 		while (!tFires->IsEOF())
 		{
-			while(!fireSet.IsEOF() && tFires->m_UnitID > fireSet.m_UnitID)
-				fireSet.MoveNext();
-			while(!fireSet.IsEOF() && tFires->m_UnitID == fireSet.m_UnitID
-				&& tFires->m_Year > fireSet.m_Year)
-				fireSet.MoveNext();
-			while(!fireSet.IsEOF() && tFires->m_UnitID == fireSet.m_UnitID
-				&& tFires->m_Year == fireSet.m_Year && tFires->m_FireNumber > fireSet.m_FireNumber)
-				fireSet.MoveNext();
+			while(!firesSet.IsEOF() && tFires->m_UnitID > firesSet.m_UnitID)
+				firesSet.MoveNext();
+			//	fireSet.MoveNext();
+			while(!firesSet.IsEOF() && tFires->m_UnitID == firesSet.m_UnitID
+				&& tFires->m_FireNumber > firesSet.m_FireNumber)
+				firesSet.MoveNext();
 			//if(!cd || !cd->Abort())
 			//{
 				//if (cd)
 				//   cd->Increment();
-				if(!fireSet.IsEOF() && tFires->m_UnitID == fireSet.m_UnitID
-					&& tFires->m_Year == fireSet.m_Year
-					&& fireSet.m_FireNumber == tFires->m_FireNumber)
+				if(!firesSet.IsEOF() && tFires->m_UnitID == firesSet.m_UnitID
+					//&& tFires->m_Year == fireSet.m_Year
+					&& firesSet.m_FireNumber == tFires->m_FireNumber)
 				{
 					//fireSet.Edit();
 					updates++;
 				}
 				else
 				{
-					fireSet.AddNew();
-					fireSet.m_FireID = ++lastID;
+					firesSet.AddNew();
+					//fireSet.m_FireID = ++lastID;
 					/*for(int i = 1; i < fireSet.GetODBCFieldCount(); i++)
 					{
 					CDBVariant var;
@@ -9458,39 +8489,39 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 					fireSet.SetFieldValue(i, var);
 					}*/
 					//fireSet.m_FireID = tFires->m_FireID;	//Local unique key
-					fireSet.m_Year = tFires->m_Year;	//Discovery year
-					fireSet.m_AgencyID = tFires->m_AgencyID;	//Protection Agency - Link to FireAgency table
-					fireSet.m_RegionID = tFires->m_RegionID;	//Region, broad management unit- Link to FireRegions table
+					//firesSet.m_Year = tFires->m_Year;	//Discovery year
+					firesSet.m_AgencyID = tFires->m_AgencyID;	//Protection Agency - Link to FireAgency table
+					firesSet.m_RegionID = tFires->m_RegionID;	//Region, broad management unit- Link to FireRegions table
 					if(tFires->IsFieldNull(&tFires->m_RegionID))
-						fireSet.SetFieldNull(&fireSet.m_RegionID);
-					fireSet.m_UnitID = tFires->m_UnitID;	//Report Unit (Forest, BLM District, NPS unit, etc.)- Link to FireUnits table
+						firesSet.SetFieldNull(&firesSet.m_RegionID);
+					firesSet.m_UnitID = tFires->m_UnitID;	//Report Unit (Forest, BLM District, NPS unit, etc.)- Link to FireUnits table
 					if(tFires->IsFieldNull(&tFires->m_UnitID))
-						fireSet.SetFieldNull(&fireSet.m_UnitID);
-					fireSet.m_SubunitID = tFires->m_SubunitID;	//Subunit - Link to FireSubunits table
+						firesSet.SetFieldNull(&firesSet.m_UnitID);
+					firesSet.m_SubunitID = tFires->m_SubunitID;	//Subunit - Link to FireSubunits table
 					if(tFires->IsFieldNull(&tFires->m_SubunitID))
-						fireSet.SetFieldNull(&fireSet.m_SubunitID);
-					fireSet.m_FireNumber = tFires->m_FireNumber;	//Fire identifier from report system
+						firesSet.SetFieldNull(&firesSet.m_SubunitID);
+					firesSet.m_FireNumber = tFires->m_FireNumber;	//Fire identifier from report system
 					if(tFires->IsFieldNull(&tFires->m_FireNumber))
-						fireSet.SetFieldNull(&fireSet.m_FireNumber);
-					fireSet.m_State = tFires->m_State;	//State/Country Code
-					if(tFires->IsFieldNull(&tFires->m_State))
-						fireSet.SetFieldNull(&fireSet.m_State);
-					fireSet.m_County = tFires->m_County;	//FIPS county number
-					if(tFires->IsFieldNull(&tFires->m_County))
-						fireSet.SetFieldNull(&fireSet.m_County);
-					fireSet.m_TotalAcres = tFires->m_TotalAcres;	//Total Fire Acres
+						firesSet.SetFieldNull(&firesSet.m_FireNumber);
+					//firesSet.m_State = tFires->m_State;	//State/Country Code
+					//if(tFires->IsFieldNull(&tFires->m_State))
+					//	fireSet.SetFieldNull(&fireSet.m_State);
+					//fireSet.m_County = tFires->m_County;	//FIPS county number
+					//if(tFires->IsFieldNull(&tFires->m_County))
+					//	fireSet.SetFieldNull(&fireSet.m_County);
+					firesSet.m_TotalAcres = tFires->m_TotalAcres;	//Total Fire Acres
 					if(tFires->IsFieldNull(&tFires->m_TotalAcres))
-						fireSet.SetFieldNull(&fireSet.m_TotalAcres);
-					fireSet.m_SizeClass = tFires->m_SizeClass;	//Fire Size Class
-					if(tFires->IsFieldNull(&tFires->m_SizeClass))
-						fireSet.SetFieldNull(&fireSet.m_SizeClass);
-					fireSet.m_FireName = tFires->m_FireName;	//Name of the Fire
+						firesSet.SetFieldNull(&firesSet.m_TotalAcres);
+					//fireSet.m_SizeClass = tFires->m_SizeClass;	//Fire Size Class
+					//if(tFires->IsFieldNull(&tFires->m_SizeClass))
+					//	fireSet.SetFieldNull(&fireSet.m_SizeClass);
+					firesSet.m_FireName = tFires->m_FireName;	//Name of the Fire
 					if(tFires->IsFieldNull(&tFires->m_FireName))
-						fireSet.SetFieldNull(&fireSet.m_FireName);
-					fireSet.m_StatisticalCause = tFires->m_StatisticalCause;	//FS Statistical Cause code
+						firesSet.SetFieldNull(&firesSet.m_FireName);
+					firesSet.m_StatisticalCause = tFires->m_StatisticalCause;	//FS Statistical Cause code
 					if(tFires->IsFieldNull(&tFires->m_StatisticalCause))
-						fireSet.SetFieldNull(&fireSet.m_StatisticalCause);
-					fireSet.m_SpecificCause = tFires->m_SpecificCause;	//FS Specific cause code
+						firesSet.SetFieldNull(&firesSet.m_StatisticalCause);
+					/*fireSet.m_SpecificCause = tFires->m_SpecificCause;	//FS Specific cause code
 					if(tFires->IsFieldNull(&tFires->m_SpecificCause))
 						fireSet.SetFieldNull(&fireSet.m_SpecificCause);
 					fireSet.m_GeneralCause = tFires->m_GeneralCause;	//FS General Cause code
@@ -9513,8 +8544,14 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 						fireSet.SetFieldNull(&fireSet.m_Section);
 					fireSet.m_SubSection = tFires->m_SubSection;	//Subsection (smallest first)
 					if(tFires->IsFieldNull(&tFires->m_SubSection))
-						fireSet.SetFieldNull(&fireSet.m_SubSection);
-					fireSet.m_LatDD = tFires->m_LatDD;	//Latitude Deg (+ for East, - for West)
+						fireSet.SetFieldNull(&fireSet.m_SubSection);*/
+					firesSet.m_latitude = tFires->m_latitude;
+					if (tFires->IsFieldNull(&tFires->m_latitude))
+						firesSet.SetFieldNull(&firesSet.m_latitude);
+					firesSet.m_longitude = tFires->m_longitude;
+					if (tFires->IsFieldNull(&tFires->m_longitude))
+						firesSet.SetFieldNull(&firesSet.m_longitude);
+					/*fireSet.m_LatDD = tFires->m_LatDD;	//Latitude Deg (+ for East, - for West)
 					if(tFires->IsFieldNull(&tFires->m_LatDD))
 						fireSet.SetFieldNull(&fireSet.m_LatDD);
 					fireSet.m_LatMM = tFires->m_LatMM;	//Latitude minutes
@@ -9543,11 +8580,11 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 						fireSet.SetFieldNull(&fireSet.m_Notes);
 					fireSet.m_Ignition = tFires->m_Ignition;	//Date/time of ignition (ofetn estimated)
 					if(tFires->IsFieldNull(&tFires->m_Ignition))
-						fireSet.SetFieldNull(&fireSet.m_Ignition);
-					fireSet.m_Discovery = tFires->m_Discovery;	//Date/time of discovery
+						fireSet.SetFieldNull(&fireSet.m_Ignition);*/
+					firesSet.m_Discovery = tFires->m_Discovery;	//Date/time of discovery
 					if(tFires->IsFieldNull(&tFires->m_Discovery))
-						fireSet.SetFieldNull(&fireSet.m_Discovery);
-					fireSet.m_FirstAttack = tFires->m_FirstAttack;	//Date/time of first attack
+						firesSet.SetFieldNull(&firesSet.m_Discovery);
+					/*fireSet.m_FirstAttack = tFires->m_FirstAttack;	//Date/time of first attack
 					if(tFires->IsFieldNull(&tFires->m_FirstAttack))
 						fireSet.SetFieldNull(&fireSet.m_FirstAttack);
 					fireSet.m_Reinforcement = tFires->m_Reinforcement;	//Date/time ofreinforcment
@@ -9555,14 +8592,14 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 						fireSet.SetFieldNull(&fireSet.m_Reinforcement);
 					fireSet.m_DeclareWildlandFire = tFires->m_DeclareWildlandFire;	//Date/time of declared wildland
 					if(tFires->IsFieldNull(&tFires->m_DeclareWildlandFire))
-						fireSet.SetFieldNull(&fireSet.m_DeclareWildlandFire);
-					fireSet.m_Contain = tFires->m_Contain;	//Date/time of fire contained
+						fireSet.SetFieldNull(&fireSet.m_DeclareWildlandFire);*/
+					firesSet.m_Contain = tFires->m_Contain;	//Date/time of fire contained
 					if(tFires->IsFieldNull(&tFires->m_Contain))
-						fireSet.SetFieldNull(&fireSet.m_Contain);
-					fireSet.m_StrategyMet = tFires->m_StrategyMet;	//Date/time of strategy (usually control) met
+						firesSet.SetFieldNull(&firesSet.m_Contain);
+					firesSet.m_StrategyMet = tFires->m_StrategyMet;	//Date/time of strategy (usually control) met
 					if(tFires->IsFieldNull(&tFires->m_StrategyMet))
-						fireSet.SetFieldNull(&fireSet.m_StrategyMet);
-					fireSet.m_FireOut = tFires->m_FireOut;	//Date/time fire declared out
+						firesSet.SetFieldNull(&firesSet.m_StrategyMet);
+					/*fireSet.m_FireOut = tFires->m_FireOut;	//Date/time fire declared out
 					if(tFires->IsFieldNull(&tFires->m_FireOut))
 						fireSet.SetFieldNull(&fireSet.m_FireOut);
 					// new FFP4 fields   05/2006
@@ -9584,9 +8621,9 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 
 					fireSet.m_FireType = tFires->m_FireType;
 					if(tFires->IsFieldNull(&tFires->m_FireType))
-						fireSet.SetFieldNull(&fireSet.m_FireType);
+						fireSet.SetFieldNull(&fireSet.m_FireType);*/
 
-					fireSet.Update();
+					firesSet.Update();
 				}
 			//}
 			tFires->MoveNext();
@@ -9743,7 +8780,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 	}*/
 		
 		
-		if(pDoc->HasTempFires())
+		if(pDoc->HasTempFire())
 		{
 			try
 			{
@@ -9755,8 +8792,8 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			}
 			//pDoc->m_pDB->DeleteTableDef("ffpTempFire");
 		}
-		pDoc->CreateTempFires();
-		CFireSet tFireset(fireSet.m_pDatabase);
+		pDoc->CreateTempFire();
+		CFiresSet tFireset(firesSet.m_pDatabase);
 		tFireset.Open(CRecordset::dynaset, "ffpTempFire");
 		FILE *stream = fopen(fileName, "rb");
 		int result;
@@ -9778,16 +8815,16 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		if(stream)
 		{
 			long fireID;
-			fireSet.m_strSort.Format("[FireID]");
-			fireSet.m_strFilter.Format("");
-			fireSet.Requery();
-			if(fireSet.IsBOF() && fireSet.IsEOF())
+			/*firesSet.m_strSort.Format("[FireID]");
+			firesSet.m_strFilter.Format("");
+			firesSet.Requery();
+			if(firesSet.IsBOF() && firesSet.IsEOF())
 				fireID = 1;
 			else
 			{
-				fireSet.MoveLast();
-				fireID = fireSet.m_FireID;
-			}
+				firesSet.MoveLast();
+				fireID = firesSet.m_FireID;
+			}*/
 			while(!feof(stream))// && (!cd || !cd->Abort()))
 			{
 				if(GetFireRecFWSshort(buf, stream, &ffd) == 0)//wrong type
@@ -9798,7 +8835,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				if(feof(stream))
 					break;
 				//set record members to values from file
-				result = WriteFireRecFWSshort(buf, &fireID, errLog, &tFireset);
+				result = WriteFireRecFWSshort(buf, errLog, &tFireset);
 				//if(result == 1)
 				//	updates++;
 				if(result == -1)
@@ -9997,7 +9034,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		return 0;
 	}
 
-	int CImportDialog::WriteFireRecFWSshort(char *buf, long *fireID, FILE *errLog, CFireSet *tFires)
+	int CImportDialog::WriteFireRecFWSshort(char *buf, FILE *errLog, CFiresSet *tFires)
 	{
 		int ret = 0;
 		bool append = true;
@@ -10008,7 +9045,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		CString str, strFireName, strFireNum, strUnit, strUnitID, strSubtype, strCause, strDate;
 		//char newUnitStr[64];
 		COleDateTime dt;
-		utils *util = new utils(fireSet.m_pDatabase);
+		utils util(firesSet.m_pDatabase);
 
 		int fail = ParseFWSShortBuf(buf, strUnit, strFireName, strFireNum, strSubtype,
 			strCause, strDate, lat, lon, acres);
@@ -10089,7 +9126,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			nNewUnits++;
 		}
 		tFires->AddNew();
-		tFires->m_FireID = ++(*fireID);
+		//tFires->m_FireID = ++(*fireID);
 		tFires->m_FireNumber = strFireNum;
 		tFires->m_AgencyID = 5;
 		tFires->m_RegionID = regID;
@@ -10098,8 +9135,10 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		//CTime tTime(dt.GetYear(), dt.GetMonth(), dt.GetDay(), dt.GetHour(), dt.GetMinute(), 0);
 		tFires->m_Discovery = dt;
 		str.Format("%d", dt.GetYear());
-		tFires->m_Year = str;
-		int dd, mm, ss;
+		//tFires->m_Year = str;
+		tFires->m_latitude = lat;
+		tFires->m_longitude = lon;
+		/*int dd, mm, ss;
 		DecimalDegree2DDMMSS(lat, &dd, &mm, &ss);
 		tFires->m_LatDD = dd;
 		tFires->m_LatMM = mm;
@@ -10107,7 +9146,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		DecimalDegree2DDMMSS(lon, &dd, &mm, &ss);
 		tFires->m_LonDD = dd;
 		tFires->m_LonMM = mm;
-		tFires->m_LonMM = ss;
+		tFires->m_LonMM = ss;*/
 		/*	tFires->m_LatDD = (long)lat;
 		tFires->m_LatMM = (long) (lat - tFires->m_LatDD) * 60.0;
 		tFires->m_LatSS = (long) (((lat - tFires->m_LatDD) * 60.0) - tFires->m_LatMM) * 60.0;
@@ -10119,7 +9158,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		if(strCause.GetLength() > 0)
 		{
 			int causeVal = atoi(strCause);
-			bool validCause = util->validateStatCause(causeVal);
+			bool validCause = util.validateStatCause(causeVal);
 			if (validCause)
 			   tFires->m_StatisticalCause = atol(strCause);
 			else
@@ -10129,12 +9168,12 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			   }
 		} else
 			tFires->m_StatisticalCause = 1;//assume lightning
-		tFires->SetFieldNull(&tFires->m_SpecificCause);
+		//tFires->SetFieldNull(&tFires->m_SpecificCause);
 		if(strFireName.GetLength() > 0)
 			tFires->m_FireName = strFireName.Trim();
 		else
 			tFires->SetFieldNull(&tFires->m_FireName);
-		tFires->SetFieldNull(&tFires->m_Township);
+		/*tFires->SetFieldNull(&tFires->m_Township);
 		tFires->SetFieldNull(&tFires->m_Range);
 		tFires->SetFieldNull(&tFires->m_Section);
 		tFires->SetFieldNull(&tFires->m_State);
@@ -10143,10 +9182,10 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		tFires->SetFieldNull(&tFires->m_Ignition);
 		tFires->SetFieldNull(&tFires->m_FirstAttack);
 		tFires->SetFieldNull(&tFires->m_Reinforcement);
-		tFires->SetFieldNull(&tFires->m_DeclareWildlandFire);
+		tFires->SetFieldNull(&tFires->m_DeclareWildlandFire);*/
 		tFires->SetFieldNull(&tFires->m_Contain);
 		tFires->SetFieldNull(&tFires->m_StrategyMet);
-		tFires->SetFieldNull(&tFires->m_FireOut);
+		/*tFires->SetFieldNull(&tFires->m_FireOut);
 		tFires->SetFieldNull(&tFires->m_WildNum);
 		tFires->SetFieldNull(&tFires->m_GeneralCause);
 		tFires->SetFieldNull(&tFires->m_ClassPeople);
@@ -10158,7 +9197,7 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		tFires->SetFieldNull(&tFires->m_Elevation);
 		tFires->SetFieldNull(&tFires->m_Aspect);
 		tFires->SetFieldNull(&tFires->m_FuelModel);
-		tFires->SetFieldNull(&tFires->m_FireType);
+		tFires->SetFieldNull(&tFires->m_FireType);*/
 
 		tFires->Update();
 		return 0;//success
@@ -10197,4 +9236,541 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		CFW21ImportDlg dlg(this); 
 		dlg.pDoc = pDoc;
 		dlg.DoModal();
+	}
+
+
+	void CImportDialog::OnBnClickedInformsCsv()
+	{
+		CFileDialog	dlg(TRUE, _T("InFORMS Fires"), NULL, OFN_HIDEREADONLY | OFN_FILEMUSTEXIST |
+			OFN_PATHMUSTEXIST | OFN_ALLOWMULTISELECT,
+			_T("InFORMS Fire Files (*.csv)|*.csv|All Files (*.*)|*.*||"), this);
+		char* mfBuf = new char[MF_BUFSIZE];
+		mfBuf[0] = 0;
+		dlg.m_ofn.lpstrFile = mfBuf;
+		dlg.m_ofn.nMaxFile = MF_BUFSIZE;
+		int res = dlg.DoModal();
+
+		if (res == IDOK)
+		{
+			CWaitCursor wait;
+			long errors = 0;
+			// Get the position of the first filename
+			char* logFileName = GetTempFileName();
+			FILE* logFile = fopen(logFileName, "wt");
+			COleDateTime dateTime = COleDateTime::GetCurrentTime();
+			fprintf(logFile, "FireFamily Plus InFORMS Import Log\nStarted: %s\n\n", dateTime.Format("%m/%d/%Y at %H:%M:%S"));
+			POSITION filenamePosition = dlg.GetStartPosition();
+			CString fileName;
+
+			// Open each file selected
+			int tErrors;
+			bool didSomething = false;
+			while (filenamePosition != NULL)
+			{
+				fileName = dlg.GetNextPathName(filenamePosition);
+				//tErrors = ImportGenericWx(fileName, logFile);
+				tErrors = ImportInFORMS(fileName, logFile);
+
+
+				if (tErrors >= 0)
+				{
+					errors += tErrors;
+					didSomething = true;
+				}
+				else
+				{
+					//user cancelled
+					//errors = -1;
+					break;
+				}
+
+			}
+			//if(errors >= 0)
+			//{
+			if (!didSomething)//res == IDCANCEL)
+			{
+				fclose(logFile);
+				delete[] logFileName;
+			}
+			else {
+				dateTime = COleDateTime::GetCurrentTime();
+				CString strMsg;
+				if (errors >= 0)
+				{
+					fprintf(logFile, "\nImport Completed: %s\n%ld errors were encountered.", dateTime.Format("%m/%d/%Y at %H:%M:%S"), errors);
+					strMsg.Format("Import Complete.\n%ld errors were encountered.", errors);
+				}
+				else
+				{
+					fprintf(logFile, "\n****** Import Cancelled by user. **********\n");
+					strMsg.Format("Import cancelled. Some data may have been imported.\nPlease check the log file for complete information.");
+				}
+				fclose(logFile);
+				CImportDoneDialog idd(this);
+				idd.statusStr = strMsg;
+				idd.logFileName = logFileName;
+				delete[] logFileName;
+				idd.DoModal();
+				theApp.SetUserDir(dlg.GetPathName());
+			}
+		}
+		else if (res == IDCANCEL)
+		{
+			int err = CommDlgExtendedError();
+			if (err == FNERR_BUFFERTOOSMALL)
+			{
+				AfxMessageBox("File Name buffer overrun, select fewer files.");
+			}
+		}
+		delete[] mfBuf;
+		chdir(theApp.dbDir);
+	}
+
+	//bool regIsEqual(const std::pair<string, int>& element)
+	//{
+	//	return element.first == User.regionID;
+	//}
+
+	std::vector<string> informsFields =
+	{
+		"UniqueFireIdentifier", 
+		"FireDiscoveryDateTime", 
+		"ContainmentDateTime", 
+		"ControlDateTime",
+		"IncidentName",
+		"IncidentSize", //5
+		"Latitude",
+		"Longitude",
+		"FORID",
+		"RelatedIrwinIDs", 
+		"Fire Cause", //10
+		"GACC",
+		"POOProtectingUnit",
+		//"Fire Cause General", "Fire Cause Specific", 
+		"Status", 
+		"IncidentTypeCategory",
+		"Fire Cause General"
+	};
+
+	int TranslateInFORMSCause(CString fireCause, CString generalCause)
+	{
+		if (fireCause.CompareNoCase("Natural") == 0)
+			return 1;//lightning
+		if(fireCause.CompareNoCase("Undetermined") == 0)
+			return 9;//Misc, verified with Matt
+		if (fireCause.CompareNoCase("Human") == 0)
+		{
+			if (generalCause.CompareNoCase("Debris and open burning") == 0)
+				return 5;
+			if (generalCause.CompareNoCase("Equipment and vehicle use") == 0)
+				return 2;
+			if (generalCause.CompareNoCase("Misuse of fire by a minor") == 0)
+				return 8;
+			if (generalCause.CompareNoCase("Smoking") == 0)
+				return 3;
+			if (generalCause.CompareNoCase("Arson") == 0)
+				return 7;
+			if (generalCause.CompareNoCase("Railroad operations and maintenance") == 0)
+				return 6;
+			if (generalCause.CompareNoCase("Recreation and ceremony") == 0)
+				return 4;
+		}
+		return 9;
+	}
+
+	int CImportDialog::ImportInFORMS(CString fileName, FILE* errLog)
+	{
+		long defaultRegion = -1, defaultUnit = -1, defaultSubunit = -1;
+
+
+		//long errors = 0;
+		int nFires = 0;
+
+
+		fprintf(errLog, "**************************************************\nImport File Name: %s\n", fileName);
+		EnableWindow(FALSE);
+		if (pDoc->HasTempFire())
+		{
+			try
+			{
+				pDoc->m_pDB->ExecuteSQL("DROP TABLE [ffpTempFire]");
+			}
+			catch (CDBException* e)
+			{
+				e->Delete();
+			}
+		}
+		pDoc->CreateTempFire();
+
+		ifstream stream;
+		stream.open(fileName);
+		if (!stream.is_open())
+		{
+			fprintf(errLog, "Error opening %s as input\n", fileName);
+			return -1;
+		}
+		const int bufSize = 3000;
+		char buf[bufSize];
+		int fireNumberIdx, discoveryIdx, containIdx, strategyMetIdx, fireNameIdx, totalAcresIdx, latitudeIdx, longitudeIdx,
+			foridIdx, irwinidIdx, statisticalCauseIdx, gaccIdx, pooProtectingUnitIdx, statusIdx, typeIdx, generalCauseIdx;
+		stream.getline(buf, bufSize);
+		string line = buf;
+		vector<string> vFields = csv_read_row(line, ',');
+		fireNumberIdx = getColIndex(informsFields[0], vFields);
+		discoveryIdx = getColIndex(informsFields[1], vFields);
+		containIdx = getColIndex(informsFields[2], vFields);
+		strategyMetIdx = getColIndex(informsFields[3], vFields);
+		fireNameIdx = getColIndex(informsFields[4], vFields);
+		totalAcresIdx = getColIndex(informsFields[5], vFields);
+		latitudeIdx = getColIndex(informsFields[6], vFields);
+		longitudeIdx = getColIndex(informsFields[7], vFields);
+		foridIdx = getColIndex(informsFields[8], vFields);
+		irwinidIdx = getColIndex(informsFields[9], vFields);
+		statisticalCauseIdx = getColIndex(informsFields[10], vFields);
+		generalCauseIdx = getColIndex(informsFields[15], vFields);
+		gaccIdx = getColIndex(informsFields[11], vFields);
+		pooProtectingUnitIdx = getColIndex(informsFields[12], vFields);
+		statusIdx = getColIndex(informsFields[13], vFields);
+		typeIdx = getColIndex(informsFields[14], vFields);
+		int nErrors = 0;
+		if (fireNumberIdx < 0 || discoveryIdx < 0 || containIdx < 0 || strategyMetIdx < 0 || fireNameIdx < 0
+			|| totalAcresIdx < 0 || latitudeIdx < 0 || longitudeIdx < 0 || foridIdx < 0 || irwinidIdx < 0
+			|| statisticalCauseIdx < 0 || gaccIdx < 0 || pooProtectingUnitIdx < 0 || statusIdx < 0 || typeIdx < 0)
+		{
+			if (fireNumberIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[0]);
+				nErrors++;
+			}
+			if (discoveryIdx < 0)
+			{
+				nErrors++;
+			}
+			fprintf(errLog, "Error, field %s not found in header\n", vFields[1]);
+			if (containIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[2]);
+				nErrors++;
+			}
+			if (strategyMetIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[3]);
+				nErrors++;
+			}
+			if (fireNameIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[4]);
+				nErrors++;
+			}
+			if (totalAcresIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[5]);
+				nErrors++;
+			}
+			if (latitudeIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[6]);
+				nErrors++;
+			}
+			if (longitudeIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[7]);
+				nErrors++;
+			}
+			if (foridIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[8]);
+				nErrors++;
+			}
+			if (irwinidIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[9]);
+				nErrors++;
+			}
+			if (statisticalCauseIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[10]);
+				nErrors++;
+			}
+			if (generalCauseIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[15]);
+				nErrors++;
+			}
+			if (gaccIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[11]);
+				nErrors++;
+			}
+			if (pooProtectingUnitIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[12]);
+				nErrors++;
+			}
+			if (statusIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[13]);
+				nErrors++;
+			}
+			if (typeIdx < 0)
+			{
+				fprintf(errLog, "Error, field %s not found in header\n", vFields[14]);
+				nErrors++;
+			}
+			stream.close();
+			return -2;
+		}
+		int maxIdx = fireNumberIdx;
+		maxIdx = max(maxIdx, discoveryIdx);
+		maxIdx = max(maxIdx, containIdx);
+		maxIdx = max(maxIdx, strategyMetIdx);
+		maxIdx = max(maxIdx, fireNameIdx);
+		maxIdx = max(maxIdx, totalAcresIdx);
+		maxIdx = max(maxIdx, latitudeIdx);
+		maxIdx = max(maxIdx, longitudeIdx);
+		maxIdx = max(maxIdx, foridIdx);
+		maxIdx = max(maxIdx, irwinidIdx);
+		maxIdx = max(maxIdx, statisticalCauseIdx);
+		maxIdx = max(maxIdx, gaccIdx);
+		maxIdx = max(maxIdx, pooProtectingUnitIdx);
+		maxIdx = max(maxIdx, statusIdx);
+		maxIdx = max(maxIdx, typeIdx);
+		maxIdx = max(maxIdx, generalCauseIdx);
+
+		vector<std::pair<int, string>> vGaccRegionIds;
+		CFireRegionSet regionsSet(firesSet.m_pDatabase);
+		regionsSet.m_strFilter.Format("[AgencyID] = %d", m_GACC_Agency_ID);
+		regionsSet.Open();
+		while (!regionsSet.IsEOF())
+		{
+			vGaccRegionIds.push_back(std::pair<int, string>(regionsSet.m_RegionID, regionsSet.m_Name));
+			regionsSet.MoveNext();
+		}
+		regionsSet.Close();
+
+		//unordered_multimap <int, int> mapRegionUnits;
+		struct RegionUnit
+		{
+			int regionID;
+			string name;
+			int unitID;
+			bool operator<(const RegionUnit& rhs) const
+			{
+				return tie(regionID, name, unitID) < tie(rhs.regionID, rhs.name, rhs.unitID);
+			}
+			bool operator>(const RegionUnit& rhs) const
+			{
+				return tie(regionID, name, unitID) > tie(rhs.regionID, rhs.name, rhs.unitID);
+			}
+			bool operator==(const RegionUnit& rhs) const
+			{
+				return tie(regionID, name, unitID) == tie(rhs.regionID, rhs.name, rhs.unitID);
+			}
+		};
+		vector < RegionUnit> vNewUnitIds;
+		std::set<RegionUnit> regionUnitSet;
+		//unordered_multimap <int, std::pair<string, int>> mapRegionUnits;
+		CFireUnitSet unitSet(firesSet.m_pDatabase); 
+		//unitSet.m_strFilter.Format("[RegionID] = %d", m_GA);
+		unitSet.Open();
+		while (!unitSet.IsEOF())
+		{
+			int thisReg = unitSet.m_RegionID;
+			//vGaccRegionIds.
+			if (std::find_if(vGaccRegionIds.begin(), vGaccRegionIds.end(), [&](const auto& pair) { return pair.first == thisReg; }) != vGaccRegionIds.end())
+			{
+				RegionUnit thisUnit{ unitSet.m_RegionID, unitSet.m_Name, unitSet.m_UnitID };			
+				regionUnitSet.insert(thisUnit);
+			}
+			unitSet.MoveNext();
+				//mapRegionUnits.emplace(thisReg, std::pair<string, int>(unitSet.m_Name, unitSet.m_UnitID));
+		}
+		int nextUnitID = 1;
+		unitSet.m_strSort.Format("[UnitID]");
+		unitSet.Requery();
+		unitSet.MoveLast();
+		if (!unitSet.IsEOF())
+			nextUnitID = unitSet.m_UnitID + 1;
+		unitSet.Close();
+
+		CString fireNumber, status, statCause, discoveryStr, containStr, strategyMetStr,
+			fireName, acresStr, latStr, lonStr, foridStr, irwinIdStr, gaccStr, unitStr, typeStr, generalCauseStr;
+
+		//field headers ok, start processing records
+		int lineNo = 1;
+		int nDuplicates = 0;
+		CFiresSet tFires(firesSet.m_pDatabase);
+		tFires.Open(CRecordset::dynaset, "ffpTempFire");
+		while (stream.good())
+		{
+			stream.getline(buf, bufSize);
+			lineNo++;
+			line = buf;
+			vFields = csv_read_row(line, ',');
+			if (vFields.size() < maxIdx)//something wrong, probably a multiline record
+			{
+				//fprintf(errLog, "Error, too few fields in line %d\n", lineNo);
+				continue;
+			}
+			fireNumber = vFields[fireNumberIdx].c_str();
+			status = vFields[statusIdx].c_str();
+			statCause = vFields[statisticalCauseIdx].c_str();
+			discoveryStr = vFields[discoveryIdx].c_str();
+			containStr = vFields[containIdx].c_str();
+			strategyMetStr = vFields[strategyMetIdx].c_str();
+			fireName = vFields[fireNameIdx].c_str();
+			acresStr = vFields[totalAcresIdx].c_str();
+			latStr = vFields[latitudeIdx].c_str();
+			lonStr = vFields[longitudeIdx].c_str();
+			foridStr = vFields[foridIdx].c_str();
+			irwinIdStr = vFields[irwinidIdx].c_str();
+			if ( irwinIdStr.GetLength() > 38)
+			{
+				CString tStr = irwinIdStr;
+				irwinIdStr = tStr.Left(38);
+			}
+			gaccStr = vFields[gaccIdx].c_str();
+			unitStr = vFields[pooProtectingUnitIdx].c_str();
+			typeStr = vFields[typeIdx].c_str();
+			generalCauseStr = vFields[generalCauseIdx].c_str();
+			if ((typeStr.CompareNoCase("WF") != 0  && typeStr.CompareNoCase("CX") != 0) || (status.CompareNoCase("Complete") != 0 && status.CompareNoCase("Certified") != 0))
+				continue;
+			COleDateTime dtDisc, dtContain, dtStrategy;
+			dtDisc.SetStatus(COleDateTime::invalid);
+			dtContain.SetStatus(COleDateTime::invalid);
+			dtStrategy.SetStatus(COleDateTime::invalid);
+			if (discoveryStr.GetLength() > 0)
+			{
+				dtDisc.ParseDateTime(discoveryStr);
+				if (dtDisc.GetStatus() != COleDateTime::valid)
+				{
+					fprintf(errLog, "Error, FireDiscoveryDateTime (%s) is invalid, record %d\n", discoveryStr, lineNo);
+					nErrors++;
+					continue;
+				}
+			}
+			else
+			{
+				fprintf(errLog, "Error, FireDiscoveryDateTime is blank, record %d\n", lineNo);
+				nErrors++;
+				continue;
+			}
+			if (containStr.GetLength() > 0)
+			{
+				dtContain.ParseDateTime(containStr);
+				if (dtContain.GetStatus() != COleDateTime::valid)
+				{
+					fprintf(errLog, "Warning, ContainmentDateTime (%s) is invalid, record %d\n", containStr, lineNo);
+				}
+			}
+			if (strategyMetStr.GetLength() > 0)
+			{
+				dtStrategy.ParseDateTime(strategyMetStr);
+				if (dtStrategy.GetStatus() != COleDateTime::valid)
+				{
+					fprintf(errLog, "Warning, ControlDateTime (%s) is invalid, record %d\n", strategyMetStr, lineNo);
+				}
+			}
+			double acres = atof(acresStr.GetBuffer());
+			if (acres <= 0.0)
+				acres = 0.1;
+			double latitude = 0.0, longitude = 0.0;
+			if (latStr.GetLength() > 0)
+				latitude = atof(latStr.GetBuffer());
+			if (lonStr.GetLength() > 0.0)
+				longitude = atof(lonStr.GetBuffer());
+			if (gaccStr.GetLength() <= 0)
+			{
+				fprintf(errLog, "Error, GACC is blank, record %d\n", lineNo);
+				nErrors++;
+				continue;
+			}
+			if (unitStr.GetLength() <= 0)
+			{
+				fprintf(errLog, "Error, POOProtectingUnit is blank, record %d\n", lineNo);
+				nErrors++;
+				continue;
+			}
+			//now, see if Unit is in existing data
+			//find the regionID
+			int regID = -1;
+			auto index = std::distance(vGaccRegionIds.begin(), std::find_if(vGaccRegionIds.begin(), vGaccRegionIds.end(), [&](const auto& pair) { return pair.second == gaccStr.GetBuffer(); }));
+			if(index >= 0 && index < vGaccRegionIds.size())
+				regID = vGaccRegionIds[index].first;
+			else
+			{
+				fprintf(errLog, "Error, GACC %s is unrecognized, record %d\n", gaccStr.GetBuffer(), lineNo);
+				nErrors++;
+				continue;
+			}
+			//check to see if unit exists for this region
+			int unitID = -1;
+			auto it = regionUnitSet.begin();
+			for (; it != regionUnitSet.end(); ++it)
+			{
+				if ((*it).regionID == regID && (*it).name.compare(unitStr.GetBuffer()) == 0)
+					break;
+			}
+			if (it != regionUnitSet.end())
+			{
+				unitID = (*it).unitID;
+			}
+			else
+			{//need to add unit to new vNewUnitIds and regionUnitSet
+				//vNewUnitIds.push_back(std::pair<string, int>(unitStr.GetBuffer(), nextUnitID));
+				RegionUnit thisUnit{ regID, unitStr.GetBuffer(), nextUnitID };
+				vNewUnitIds.push_back(thisUnit);
+				regionUnitSet.emplace(thisUnit);
+				fprintf(errLog, "Added new FireUnit \"%s\" for FireRegion \"%s\", UnitID = %d\n", unitStr.GetBuffer(), gaccStr.GetBuffer(), nextUnitID);
+				unitID = nextUnitID;
+				nextUnitID++;
+			}
+			tFires.AddNew();
+			tFires.m_AgencyID = m_GACC_Agency_ID;
+			tFires.m_RegionID = regID;
+			tFires.m_UnitID = unitID;
+			tFires.SetFieldNull(&tFires.m_SubunitID);
+			tFires.m_Discovery = dtDisc;
+			if (dtContain.GetStatus() == COleDateTime::valid)
+				tFires.m_Contain = dtContain;
+			else
+				tFires.SetFieldNull(&tFires.m_Contain);
+			if(dtStrategy.GetStatus() == COleDateTime::valid)
+				tFires.m_StrategyMet = dtStrategy;
+			else
+				tFires.SetFieldNull(&tFires.m_StrategyMet);
+			tFires.m_FireName = fireName;
+			tFires.m_FireNumber.Format("%d%02d%02d-%ld-%ld-%ld-0-%s", dtDisc.GetYear(), dtDisc.GetMonth(), dtDisc.GetDay(), m_GACC_Agency_ID, regID, unitID, fireNumber.GetBuffer());
+			tFires.m_FORID = foridStr;
+			tFires.m_IRWINID = irwinIdStr;
+			tFires.m_latitude = latitude;
+			tFires.m_longitude = longitude;
+			tFires.m_TotalAcres = acres;
+			tFires.m_StatisticalCause = TranslateInFORMSCause(statCause, generalCauseStr);
+			tFires.Update();
+			nFires++;
+		}
+		stream.close();
+
+		//write the new units to the database
+
+		CFireUnitSet newUnits(firesSet.m_pDatabase);
+		newUnits.Open();
+		for (auto it = vNewUnitIds.begin(); it != vNewUnitIds.end(); ++it)
+		{
+			newUnits.AddNew();
+			newUnits.m_RegionID = (*it).regionID;
+			newUnits.m_UnitID = (*it).unitID;
+			newUnits.m_Name = (*it).name.c_str();
+			newUnits.Update();
+		}
+		newUnits.Close();
+		int updates = WriteTempFires(&tFires, m_GACC_Agency_ID);
+		tFires.Close();
+		fprintf(errLog, "\t%d errors encountered\n", nErrors);
+		fprintf(errLog, "\t%d fires imported\n", nFires);
+		fprintf(errLog, "\t%d fires updated\n", nFires);
+		fprintf(errLog, "\t%d new FireUnits created\n", (int)vNewUnitIds.size());
+
+		return nErrors;
 	}

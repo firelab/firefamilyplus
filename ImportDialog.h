@@ -12,6 +12,7 @@
 #include "updialog2.h"
 #include <vector>
 #include <string>
+#include "CFiresSet.h";
 
 class CFireplusDoc;
 
@@ -24,7 +25,8 @@ class CImportDialog : public CDialog
 {
 // Construction
 public:
-	long WriteTempFires(CFireSet *tFires, long agencyID);
+	long WriteTempFires(CFiresSet *tFires, long agencyID);
+	int ImportInFORMS(CString fileName, FILE* errLog);
 	//long WriteTempFires(CFireSet *tFires, CCancelDialog *cd, long agencyID);
 	int ImportFWSShort(CString fileName, FILE *errLog);
 	int ImportRAW(CString fileName, FILE *errLog, long agencyID);
@@ -41,11 +43,11 @@ public:
 	//long GetFireSubunit(long agencyID, long unit, char *temp);
 	//long GetFireUnit(long agencyID, long reg, char *temp);
 	//long GetFireRegion(long agencyID, char *find);
-	int WriteFireRecRAW(char *buf, long *fireID, long agencyID, FILE *errLog, CFireSet *tFires);
+	int WriteFireRecRAW(char *buf, long agencyID, FILE *errLog, CFiresSet *tFires);
 	void GetFireRecRAW(char *buf, FILE *stream, long agencyID, bool threeLineFormat);
-	int WriteFireRecFPL(char *buf, long *fireID, long agencyID, FILE *errLog, CFireSet *tFires);
+	int WriteFireRecFPL(char *buf, long agencyID, FILE *errLog, CFiresSet *tFires);
 	int GetFireRecFPL(char *buf, FILE *stream, long agencyID, CFireFilterDialog *ffd);
-	int WriteFireRecFWSshort(char *buf, long *fireID, FILE *errLog, CFireSet *tFires);
+	int WriteFireRecFWSshort(char *buf, FILE *errLog, CFiresSet *tFires);
 	int GetFireRecFWSshort(char *buf, FILE *stream, CFireFilterDialog *ffd);
 	int ImportCustom(long agencyID);
     // new ffp4:
@@ -53,7 +55,7 @@ public:
     int ImportWFMIFire(CString fileName, FILE *errLog, CFireFilterDialog *ffd);
 	int ImportWFMICodes(CString fileName, FILE *errLog);
 	int ImportNewDOICodes(CString fileName, FILE *errLog);
-	int ImportWRCCRAWS(CString fileName, FILE *errLog, CString sStationID);
+	//int ImportWRCCRAWS(CString fileName, FILE *errLog, CString sStationID);
 	int ImportNASFFire(CString fileName, FILE *errLog);
 	int IsNullValue(char *value);
 
@@ -79,7 +81,7 @@ protected:
 	CFireRegionSet regs;
 	CFireUnitSet units;
 	CFireSubunitSet subs;
-	CFireSet fireSet;
+	CFiresSet firesSet;
 	CFireplusDoc *pDoc;
 	// Generated message map functions
 	//{{AFX_MSG(CImportDialog)
@@ -96,10 +98,9 @@ protected:
 	afx_msg void OnWFMICodes();
 	afx_msg void OnGenericFires();
 	afx_msg void OnNASFFires();
-	afx_msg void OnWRCCRAWS();
 
 	long count;
-
+	int m_GACC_Agency_ID;
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 	INT_PTR RunFW13Import(std::vector<std::string> importFileNames, FILE *errLog, int *nErrors);
@@ -110,6 +111,8 @@ public:
 	CButton m_nasfFireButton;
 	CButton m_WFMIbutton;
 	afx_msg void OnBnClickedFw21();
+	CButton m_btnINFORMS;
+	afx_msg void OnBnClickedInformsCsv();
 };
 
 #define MAX_INPUT_LINE	4096

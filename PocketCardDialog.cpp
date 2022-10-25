@@ -13,7 +13,7 @@
 #include "ClimateSet.h"
 #include "FireDay.h"
 #include "perioddoc.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 #include "PocketCardDialog.h"
 #include "PcBgDiaolg.h"
@@ -147,7 +147,7 @@ int PocketCardCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param
 			else
 				query = baseQuery;
 			associations.Close();
-			CFireEditSet fireEditSet(fpSet->m_pDatabase);
+			CFiresSet fireEditSet(fpSet->m_pDatabase);
 			fireEditSet.m_strFilter = query;
 			fireEditSet.m_strSort = "[Discovery]";
 			fireEditSet.Open();

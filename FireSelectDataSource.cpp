@@ -70,7 +70,7 @@ int	CFireSelectDataSource::GetCell(int col,long row,CUGCell *cell)
 	return UG_SUCCESS;
 }
 
-void CFireSelectDataSource::SetRecords(CFireEditSet *_records)
+void CFireSelectDataSource::SetRecords(CFiresSet *_records)
 {
 	records = _records;
 	totalRecs = 0;

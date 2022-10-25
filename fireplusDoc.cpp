@@ -61,7 +61,8 @@
 #include "TermPercentilesSet.h"
 #include "SowThresholdsSet.h"
 #include "DOICauseSet.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
+#include "CFiresSet.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -306,6 +307,7 @@ BOOL CFireplusDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	bool hasffpTermPercentiles = false;
 	bool hasffpSowThresholds = false;
 	bool hasffpSowOptions = false;
+	bool hasFiresTable = false;
 	///bool hasWxSet2016 = false;
 	//bool hasffpNFDRS2016 = false;
 
@@ -930,7 +932,20 @@ BOOL CFireplusDoc::OnOpenDocument(LPCTSTR lpszPathName)
 			e->Delete();
 	}
 
-	
+	try
+	{
+		CRecordset trecs(m_pDB);
+		if (trecs.Open(CRecordset::dynaset, "SELECT * FROM Fires"))
+		{
+			hasFiresTable = true;
+			trecs.Close();
+		}
+	}
+	catch (CDBException* e)
+	{
+		e->Delete();
+	}
+
 /*	try
 	{
 		CRecordset trecs(m_pDB);
@@ -1870,7 +1885,14 @@ BOOL CFireplusDoc::OnOpenDocument(LPCTSTR lpszPathName)
 
 
 	}
-/*	try
+	if (!hasFiresTable)
+	{
+		if (!CreateFiresTable())
+		{
+			AfxMessageBox("Error creating Fires table");
+		}
+	}
+		/*	try
 	{
 		CString strSql;
 		strSql = "CREATE INDEX iStationID ON WXObs (StationID)";
@@ -4552,7 +4574,7 @@ bool CFireplusDoc::HasHLOutput()
 	return false;
 }
 
-bool CFireplusDoc::HasTempFires()
+bool CFireplusDoc::HasTempFire()
 {
 	try
 	{
@@ -4709,81 +4731,76 @@ void CFireplusDoc::CreateHLOutput()
 }
 
 
-void CFireplusDoc::CreateTempFires()
+void CFireplusDoc::CreateTempFire()
 {
-/*	try
-	{
-		CDaoFieldInfo fInfo;
-		CDaoTableDef fire(m_pDB);
-		fire.Open("Fire");
-		CDaoTableDef vt(m_pDB);
-		vt.Create("ffpTempFire");
-
-		for(int i = 0; i < fire.GetFieldCount(); i++)
-		{
-			fire.GetFieldInfo(i, fInfo, AFX_DAO_PRIMARY_INFO);
-			vt.CreateField(fInfo.m_strName, fInfo.m_nType, fInfo.m_lSize, fInfo.m_lAttributes);
-		}
-		fire.Close();
-		vt.Append();
-		vt.Close();
-	}
-	catch( CDaoException* e )
-	{
-		DisplayDaoException(e);
-		e->Delete();
-	}
-	*/
 	try
 	{
-		CString strSql =
+		CString sqlStr = "CREATE TABLE [ffpTempFire] ("
+			"[FireNumber] CHAR(50),"
+			"[Discovery] DATETIME,"
+			"[Contain] DATETIME,"
+			"[StrategyMet] DATETIME,"
+			"[FireName] CHAR(50),"
+			"[TotalAcres] DOUBLE,"
+			"[Latitude] DOUBLE,"
+			"[Longitude] DOUBLE,"
+			"[FORID] CHAR(40),"
+			"[IRWINID] CHAR(40),"
+			"[StatisticalCause] INTEGER,"
+			"[AgencyID] INTEGER,"
+			"[RegionID] INTEGER,"
+			"[UnitID] INTEGER,"
+			"[SubunitID] INTEGER)";
+		/*CString strSql =
 			"CREATE TABLE [ffpTempFire] ("
-				"[FireID] INTEGER ,"
-				"[Year] CHAR(4),"
+				//"[FireID] INTEGER ,"
+				//"[Year] CHAR(4),"
 				"[AgencyID] INTEGER ,"
 				"[RegionID] INTEGER ,"
 				"[UnitID] INTEGER ,"
 				"[SubunitID] INTEGER ,"
-				"[FireNumber] CHAR(12),"
-				"[State] CHAR(2),"
-				"[County] INTEGER ,"
+				"[FireNumber] CHAR(25),"
+				//"[State] CHAR(2),"
+				//"[County] INTEGER ,"
 				"[TotalAcres] DOUBLE ,"
-				"[SizeClass] CHAR(1),"
+				//"[SizeClass] CHAR(1),"
 				"[FireName] CHAR(25),"
 				"[StatisticalCause] INTEGER ,"
-				"[SpecificCause] INTEGER ,"
-				"[GeneralCause] INTEGER ,"
-				"[ClassPeople] INTEGER ,"
-				"[CauseNarr] CHAR(50),"
-				"[Township] CHAR(5),"
-				"[Range] CHAR(5),"
-				"[Section] INTEGER ,"
-				"[SubSection] CHAR(4),"
-				"[LatDD] INTEGER ,"
-				"[LatMM] INTEGER ,"
-				"[LatSS] INTEGER ,"
-				"[LonDD] INTEGER ,"
-				"[LonMM] INTEGER ,"
-				"[LonSS] INTEGER ,"
-				"[Other] CHAR(50),"
-				"[WildNum] INTEGER ,"
-				"[Notes] CHAR(50),"
-				"[Ignition] DATETIME,"
+				//"[SpecificCause] INTEGER ,"
+				//"[GeneralCause] INTEGER ,"
+				//"[ClassPeople] INTEGER ,"
+				//"[CauseNarr] CHAR(50),"
+				//"[Township] CHAR(5),"
+				//"[Range] CHAR(5),"
+				//"[Section] INTEGER ,"
+				//"[SubSection] CHAR(4),"
+			"[Latitude] DOUBLE ,"
+			"[Longitude] DOUBLE ,"
+			//"[LatDD] INTEGER ,"
+				//"[LatMM] INTEGER ,"
+				//"[LatSS] INTEGER ,"
+				//"[LonDD] INTEGER ,"
+				//"[LonMM] INTEGER ,"
+				//"[LonSS] INTEGER ,"
+				//"[Other] CHAR(50),"
+				//"[WildNum] INTEGER ,"
+				//"[Notes] CHAR(50),"
+				//"[Ignition] DATETIME,"
 				"[Discovery] DATETIME,"
-				"[FirstAttack] DATETIME,"
+				//"[FirstAttack] DATETIME,"
 				"[Reinforcement] DATETIME,"
 				"[DeclareWildlandFire] DATETIME,"
 				"[Contain] DATETIME,"
-				"[StrategyMet] DATETIME,"
-				"[FireOut] DATETIME,"
-				"[Slope] CHAR(1),"
-				"[Elevation] CHAR(1),"
-				"[Aspect] CHAR(1),"
-				"[FuelModel] CHAR(1),"
-				"[FireType] CHAR(1),"
-				"CONSTRAINT PrimaryKey PRIMARY KEY ([FireID]))";
+			"[StrategyMet] DATETIME)";
+				//"[FireOut] DATETIME,"
+				//"[Slope] CHAR(1),"
+				//"[Elevation] CHAR(1),"
+				//"[Aspect] CHAR(1),"
+				//"[FuelModel] CHAR(1),"
+				//"[FireType] CHAR(1),"
+				//"CONSTRAINT PrimaryKey PRIMARY KEY ([FireID]))";*/
 
-		m_pDB->ExecuteSQL(strSql);
+		m_pDB->ExecuteSQL(sqlStr);
 	}
 	catch(CDBException* e)
 	{
@@ -6605,7 +6622,7 @@ void CFireplusDoc::CheckFireTable()
 			// strSql = "ALTER TABLE [Fire] ALTER COLUMN [FireNumber] CHAR(12)";
 			// m_pDB->ExecuteSQL(strSql);
 			//
-			CFireSumSet fireSet(m_pDB);
+			CFireSet fireSet(m_pDB);
 			fireSet.m_strSort.Format("[FireID]");
 			fireSet.m_strFilter.Format("");
 
@@ -6672,10 +6689,248 @@ void CFireplusDoc::CheckFireTable()
 	}
 }
 
-void CFireplusDoc::ChecNFDRS2016Table()
+CString CreateNewFireNumber(CFireSet* pFires, int *nextNum)
 {
-
+	if (!pFires || !nextNum)
+		return "NewFire";
+	CString retNumber = "", oldNumber = "";
+	int year = 0, month = 0, day = 0, agency = 0, region = 0, unit = 0, subunit = 0;
+	if (!pFires->IsFieldNull(&pFires->m_Discovery))
+	{
+		year = pFires->m_Discovery.GetYear();
+		month = pFires->m_Discovery.GetMonth();
+		day = pFires->m_Discovery.GetDay();
+	}
+	if (!pFires->IsFieldNull(&pFires->m_AgencyID))
+		agency = pFires->m_AgencyID;
+	if (!pFires->IsFieldNull(&pFires->m_RegionID))
+		region = pFires->m_RegionID;
+	if (!pFires->IsFieldNull(&pFires->m_UnitID))
+		unit = pFires->m_UnitID;
+	if (!pFires->IsFieldNull(&pFires->m_SubunitID))
+		subunit = pFires->m_SubunitID;
+	if (!pFires->IsFieldNull(&pFires->m_FireNumber))
+		oldNumber = pFires->m_FireNumber;
+	else
+	{
+		if (nextNum)
+		{
+			oldNumber.Format("%d", *nextNum);
+			*nextNum++;
+		}
+	}
+	retNumber.Format("%d%02d%02d-%d-%d-%d-%d-%s", year, month, day, agency, region, unit, subunit, oldNumber.GetBuffer());
+	return retNumber;
 }
+
+int CFireplusDoc::CreateFiresTable()
+{
+	CWaitCursor wait;
+	try
+	{
+		CString sqlStr = "CREATE TABLE [Fires] ("
+			"[FireNumber] CHAR(50),"
+			"[Discovery] DATETIME,"
+			"[Contain] DATETIME,"
+			"[StrategyMet] DATETIME,"
+			"[FireName] CHAR(50),"
+			"[TotalAcres] DOUBLE,"
+			"[Latitude] DOUBLE,"
+			"[Longitude] DOUBLE,"
+			"[FORID] CHAR(40),"
+			"[IRWINID] CHAR(40),"
+			"[StatisticalCause] INTEGER,"
+			"[AgencyID] INTEGER,"
+			"[RegionID] INTEGER,"
+			"[UnitID] INTEGER,"
+			"[SubunitID] INTEGER)";
+		m_pDB->ExecuteSQL(sqlStr);
+	}
+	catch (CDBException* e)
+	{
+		DisplayDBException(e);
+		e->Delete();
+		return 0;
+	}
+	int tDummyFireNum = 0;
+	//now poulate Fires with any data from Fire table
+	CFireSet oldFires(m_pDB);
+	oldFires.Open();
+	CFiresSet newFires(m_pDB);
+	newFires.Open();
+	while (!oldFires.IsEOF())
+	{
+		newFires.AddNew();
+		if (!oldFires.IsFieldNull(&oldFires.m_Discovery))
+			newFires.m_Discovery = oldFires.m_Discovery;
+		else
+			newFires.SetFieldNull(&newFires.m_Discovery);
+		CString tFireNum = CreateNewFireNumber(&oldFires, &tDummyFireNum);
+		newFires.m_FireNumber = tFireNum;
+		//if (!oldFires.IsFieldNull(&oldFires.m_FireNumber))
+		//	newFires.m_FireNumber.Format("%d-%ld-%ld-%ld-%ld-%s", oldFires.m_Discovery.GetYear(), oldFires.m_UnitID, oldFires.m_FireNumber);
+		//else
+		//	newFires.SetFieldNull(&newFires.m_FireNumber);
+		if (!oldFires.IsFieldNull(&oldFires.m_Contain))
+			newFires.m_Contain = oldFires.m_Contain;
+		else
+			newFires.SetFieldNull(&newFires.m_Contain);
+		if (!oldFires.IsFieldNull(&oldFires.m_StrategyMet))
+			newFires.m_StrategyMet = oldFires.m_StrategyMet;
+		else
+			newFires.SetFieldNull(&newFires.m_StrategyMet);
+		if (!oldFires.IsFieldNull(&oldFires.m_FireName))
+			newFires.m_FireName = oldFires.m_FireName;
+		else
+			newFires.SetFieldNull(&newFires.m_FireName);
+		if (!oldFires.IsFieldNull(&oldFires.m_TotalAcres))
+			newFires.m_TotalAcres = oldFires.m_TotalAcres;
+		else
+			newFires.SetFieldNull(&newFires.m_TotalAcres);
+		if (!oldFires.IsFieldNull(&oldFires.m_LatDD) && !oldFires.IsFieldNull(&oldFires.m_LonDD))
+		{
+			double latDegrees, latMins = 0.0, latSecs = 0.0, lonDegrees, lonMins = 0.0, lonSecs = 0.0;
+			latDegrees = oldFires.m_LatDD;
+			lonDegrees = oldFires.m_LonDD;
+			if (!oldFires.IsFieldNull(&oldFires.m_LatMM))
+				latMins = oldFires.m_LatMM;
+			if (!oldFires.IsFieldNull(&oldFires.m_LatSS))
+				latSecs = oldFires.m_LatSS;
+			if (!oldFires.IsFieldNull(&oldFires.m_LonMM))
+				lonMins = oldFires.m_LonMM;
+			if (!oldFires.IsFieldNull(&oldFires.m_LonSS))
+				lonSecs = oldFires.m_LonSS;
+			newFires.m_latitude = latDegrees + latMins / 60.0 + latSecs / 3600.0;
+			newFires.m_longitude = lonDegrees + lonMins / 60.0 + lonSecs / 3600.0;
+		}
+		else
+		{
+			newFires.SetFieldNull(&newFires.m_latitude);
+			newFires.SetFieldNull(&newFires.m_longitude);
+		}
+		newFires.SetFieldNull(&newFires.m_FORID);
+		newFires.SetFieldNull(&newFires.m_IRWINID);
+		if (!oldFires.IsFieldNull(&oldFires.m_StatisticalCause))
+			newFires.m_StatisticalCause = oldFires.m_StatisticalCause;
+		else
+			newFires.SetFieldNull(&newFires.m_StatisticalCause);
+		if (!oldFires.IsFieldNull(&oldFires.m_AgencyID))
+			newFires.m_AgencyID = oldFires.m_AgencyID;
+		else
+			newFires.SetFieldNull(&newFires.m_AgencyID);
+		if (!oldFires.IsFieldNull(&oldFires.m_RegionID))
+			newFires.m_RegionID = oldFires.m_RegionID;
+		else
+			newFires.SetFieldNull(&newFires.m_RegionID);
+		if (!oldFires.IsFieldNull(&oldFires.m_UnitID))
+			newFires.m_UnitID = oldFires.m_UnitID;
+		else
+			newFires.SetFieldNull(&newFires.m_UnitID);
+		if (!oldFires.IsFieldNull(&oldFires.m_SubunitID))
+			newFires.m_SubunitID = oldFires.m_SubunitID;
+		else
+			newFires.SetFieldNull(&newFires.m_SubunitID);
+		newFires.Update();
+		oldFires.MoveNext();
+	}
+	oldFires.Close();
+	newFires.Close();
+
+	//now drop the old fire table
+	/*try
+	{
+		CString sqlStr = "DROP TABLE [Fire]";
+		m_pDB->ExecuteSQL(sqlStr);
+	}
+	catch (CDBException* e)
+	{
+		DisplayDBException(e);
+		e->Delete();
+		//return 0;
+	}*/
+	//add agency "GACC", and the GACCs as Regions of GACC
+	//this is to set up importing InFORMS fires
+	//POOProtectingUnit will be added as FireUnits of respective regions as they are imported
+	CFireAgencySet agencySet(m_pDB);
+	agencySet.m_strSort = "[AgencyID]";
+	agencySet.Open();
+	agencySet.MoveLast();
+	int nextAgency = agencySet.m_AgencyID + 1;
+	agencySet.AddNew();
+	agencySet.m_AgencyID = nextAgency;
+	agencySet.m_Name = "GACC";
+	agencySet.m_Permanent = TRUE;
+	agencySet.Update();
+	agencySet.Close();
+	CFireRegionSet regionSet(m_pDB);
+	regionSet.m_strSort = "[RegionID]";
+	regionSet.Open();
+	regionSet.MoveLast();
+	int nextRegion = regionSet.m_RegionID + 1;
+	regionSet.AddNew();
+	regionSet.m_RegionID = nextRegion;
+	regionSet.m_AgencyID = nextAgency;
+	regionSet.m_Name = "AICC";
+	regionSet.Update();
+	nextRegion++;
+	regionSet.AddNew();
+	regionSet.m_RegionID = nextRegion;
+	regionSet.m_AgencyID = nextAgency;
+	regionSet.m_Name = "EACC";
+	regionSet.Update();
+	nextRegion++;
+	regionSet.AddNew();
+	regionSet.m_RegionID = nextRegion;
+	regionSet.m_AgencyID = nextAgency;
+	regionSet.m_Name = "GBCC";
+	regionSet.Update();
+	nextRegion++;
+	regionSet.AddNew();
+	regionSet.m_RegionID = nextRegion;
+	regionSet.m_AgencyID = nextAgency;
+	regionSet.m_Name = "NRCC";
+	regionSet.Update();
+	nextRegion++;
+	regionSet.AddNew();
+	regionSet.m_RegionID = nextRegion;
+	regionSet.m_AgencyID = nextAgency;
+	regionSet.m_Name = "NWCC";
+	regionSet.Update();
+	nextRegion++;
+	regionSet.AddNew();
+	regionSet.m_RegionID = nextRegion;
+	regionSet.m_AgencyID = nextAgency;
+	regionSet.m_Name = "ONCC";
+	regionSet.Update();
+	nextRegion++;
+	regionSet.AddNew();
+	regionSet.m_RegionID = nextRegion;
+	regionSet.m_AgencyID = nextAgency;
+	regionSet.m_Name = "OSCC";
+	regionSet.Update();
+	nextRegion++;
+	regionSet.AddNew();
+	regionSet.m_RegionID = nextRegion;
+	regionSet.m_AgencyID = nextAgency;
+	regionSet.m_Name = "RMCC";
+	regionSet.Update();
+	nextRegion++;
+	regionSet.AddNew();
+	regionSet.m_RegionID = nextRegion;
+	regionSet.m_AgencyID = nextAgency;
+	regionSet.m_Name = "SACC";
+	regionSet.Update();
+	nextRegion++;
+	regionSet.AddNew();
+	regionSet.m_RegionID = nextRegion;
+	regionSet.m_AgencyID = nextAgency;
+	regionSet.m_Name = "SWCC";
+	regionSet.Update();
+	regionSet.Close();
+
+	return 1;
+}
+
 
 // 09/2012
 // loop through WxObs.

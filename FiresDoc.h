@@ -1,5 +1,5 @@
 #pragma once
-#include "FireEditSet.h"
+#include "CFiresSet.h"
 
 // CFiresDoc document
 
@@ -10,7 +10,7 @@ class CFiresDoc : public CDocument
 public:
 	CFiresDoc();
 	virtual ~CFiresDoc();
-	CFireEditSet *records;
+	CFiresSet *records;
 
 #ifndef _WIN32_WCE
 	virtual void Serialize(CArchive& ar);   // overridden for document i/o

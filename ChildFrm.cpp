@@ -23,7 +23,7 @@
 #include "ClimateView.h"
 #include "fireplusDoc.h"
 #include "SIGStationSet.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 #include "MergedFrame.h"
 #include "MergedView.h"

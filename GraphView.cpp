@@ -18,7 +18,7 @@
 #include "fireplusset.h"
 #include "climateSet.h"
 #include "SIGStationSet.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "ClimAnalysis.h"
 #include ".\graphview.h"
 #include "GraphSaveDialog.h"

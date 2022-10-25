@@ -35,8 +35,8 @@ public:
 
 // Implementation
 public:
-	bool HasTempFires();
-	void CreateTempFires();
+	bool HasTempFire();
+	void CreateTempFire();
 	void CheckPocketCardTable();
 	// added for batch2
 	void CheckGraphOptionsTable();
@@ -49,7 +49,6 @@ public:
 	void CreateTempWx();
 	void CheckFireTable();
 	void CheckFireOptionsTable();
-	void ChecNFDRS2016Table();
 	void CheckWxObsTable();
 	//void CheckWxStationTable(CCancelDialog *cd);
 	//void CheckffpRunWxStationTable(CCancelDialog *cd);
@@ -110,6 +109,7 @@ public:
  	int CreateffpSowThresholdsTable();
  	int CreateffpSowOptionsTable();
 	int CreateRefDOICauseTable();
+	int CreateFiresTable();
 //	int CreateTimeZoneTable();
    // end added for batch
 	//void PopulateFfpOptsTable();

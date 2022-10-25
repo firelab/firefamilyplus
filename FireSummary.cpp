@@ -8,7 +8,7 @@
 #include "fireplus.h"
 #include "FireSummary.h"
 #include "FireAssocSet.h"
-#include "FireSumSet.h"
+#include "CFiresSet.h"
 #include "FireRegionSet.h"
 #include "FireUnitSet.h"
 #include "FireSubunitSet.h"
@@ -181,7 +181,7 @@ int CFireSummary::ProcessFires(CDatabase *pDB, CString queryID, CString baseQuer
 	regSet.Close();
 	unitSet.Close();
 	subunitSet.Close();
-	CFireSumSet fireSet(pDB);
+	CFiresSet fireSet(pDB);
 	if(tQuery.GetLength() > 0)
 		fireSet.m_strFilter.Format("(%s) and (%s)", tQuery, baseQuery);
 	else
