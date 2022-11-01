@@ -6621,9 +6621,24 @@ int CClimAnalysis::AnalyzeBatchItem(CWnd *_caller, CClimateSet *_climSet, CFirep
 
 int CClimAnalysis::AnalyzeBatchItem(CWnd *_caller, int *_varIDs, int _nVarIDs, CFireplusSet *_fpSet, bool _inverted, bool isFPA)
 {
+	int ret = Analyze2(_varIDs, _nVarIDs, _fpSet, isFPA);
+	if (ret == 0)
+	{
+		int wsFireYears = 0;
+		Period*** wsPeriods = GetWorkingSetPeriods(periods);
+		m_opts.numtPeriods = numPeriods;
+		m_opts.tPeriods = periods;
+		CFireDay** wsFires = GetWorkingSetFires(fires, &wsFireYears);
+		m_opts.tFires = fires;
+		periods = wsPeriods;
+		fires = wsFires;
+		fireYears = wsFireYears;
+
+	}
+	return ret;
 	//caller = _caller;
 	fpSet = _fpSet;
-	int ret = 0;
+	//int ret = 0;
 	inverted = _inverted;
 	if(inverted)
 		pCUPDUPData->SetProgress("Processing Auxiliary Years Data");
@@ -6642,8 +6657,8 @@ int CClimAnalysis::AnalyzeBatchItem(CWnd *_caller, int *_varIDs, int _nVarIDs, C
 	int sYear = fpSet->m_StartYear, eYear = fpSet->m_EndYear;
 	//if(inverted)
 	//	return ret;
-	if(inverted)
-	{//need to know how many years
+	//if(inverted)
+	//{//need to know how many years
 		CString wxQuery = "";
 		CWxSet tSet(fpSet->m_pDatabase);
 		tSet.m_strSort = "[ObsDate]";
@@ -6751,7 +6766,7 @@ int CClimAnalysis::AnalyzeBatchItem(CWnd *_caller, int *_varIDs, int _nVarIDs, C
 			}
 		}
 		tSet.Close();
-	}
+	//}
 	int pLen = atoi(fpSet->m_PeriodLength);
 	COleDateTimeSpan span( pLen - 1, 0, 0, 0 );
 	COleDateTime d1, d2, d3;

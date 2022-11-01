@@ -1478,7 +1478,7 @@ int CRunOutput::CreateReports(CClimateSet *climSet)
 	int tnumPeriods = 0;
 	Period ***tperiods = NULL;
 	CFireDay **tFires = NULL;
-	bool useAux = false;
+	/*bool useAux = false;
 	climSet->MoveFirst();
 	while(!climSet->IsEOF())    
 	{
@@ -1504,7 +1504,7 @@ int CRunOutput::CreateReports(CClimateSet *climSet)
 			tperiods = tAnalysis.periods;
 			tFires = tAnalysis.fires;
 		}
-	}
+	}*/
 //	analysis->autosave = true;
 	//CClimateSet climSet(analysis->pDB);
 	//climSet.Open();
@@ -1527,7 +1527,7 @@ int CRunOutput::CreateReports(CClimateSet *climSet)
 		}
 		if(climSet->m_Stats_Graph)
 		{
-			pdDoc = analysis->AddGraphView(pdDoc, climSet->m_VarID - 1, climSet->m_OptionType, tnumPeriods, tperiods, tFires);
+			pdDoc = analysis->AddGraphView(pdDoc, climSet->m_VarID - 1, climSet->m_OptionType, analysis->m_opts.numtPeriods, analysis->m_opts.tPeriods, analysis->m_opts.tFires);
 			ret++;
 		}
 		if(climSet->m_Daily_Freqs)
