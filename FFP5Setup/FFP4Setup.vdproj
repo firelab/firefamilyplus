@@ -21,12 +21,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_103B818047F809AC6715B52ED82EBCB7"
-        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_19F4E3601B9F4064A9A2A3CACCD8CB7C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -89,6 +83,12 @@
         {
         "MsmKey" = "8:_83F1999217CD4E4A955EEE5A351420B3"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8F6F07E5559B02FC7DB5B896F0D3C2E9"
+        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -232,26 +232,6 @@
             {
             "SourcePath" = "8:gdiplus.dll"
             "TargetName" = "8:gdiplus.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_103B818047F809AC6715B52ED82EBCB7"
-            {
-            "SourcePath" = "8:CNFDRS.dll"
-            "TargetName" = "8:CNFDRS.dll"
             "Tag" = "8:"
             "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
             "Condition" = "8:"
@@ -426,6 +406,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8F6F07E5559B02FC7DB5B896F0D3C2E9"
+            {
+            "SourcePath" = "8:CNFDRS.dll"
+            "TargetName" = "8:CNFDRS.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_975A8B95576747C08B06BF57817882BF"
@@ -675,15 +675,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FireFamily Plus 5"
-        "ProductCode" = "8:{A92317C1-C8D1-4926-941E-C676FA0CA518}"
-        "PackageCode" = "8:{E9EA03B0-5CE4-4D47-83C4-34D4100F0823}"
+        "ProductCode" = "8:{1BF6705F-749C-46D6-9D53-D713EB0B2A0A}"
+        "PackageCode" = "8:{301CEB72-9E86-4233-8063-3904809EBFA9}"
         "UpgradeCode" = "8:{F8587583-3FC5-468D-ADCE-121EDD2AF2A6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:5.0.47"
+        "ProductVersion" = "8:5.0.48"
         "Manufacturer" = "8:USFS"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

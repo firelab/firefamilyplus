@@ -623,25 +623,8 @@ void CNFDRSCalculator2Dlg::OnBnClickedCalculate()
 		m_nfdrs2016.SetMxdHumid(m_btnHumid.GetCheck());
 		m_nfdrs2016.SetHerbGSIparams(gsiMax, gsiThreshold);
 		//need fuel temp in C
-		double fTempC, tfact = 0.0;
-		switch (atoi(sow))
-		{
-		case -1:
-			tfact = 0.0;
-			break;
-		case 0:
-			tfact = 25.0;
-			break;
-		case 1:
-			tfact = 19.0;
-			break;
-		case 2:
-			tfact = 12.0;
-			break;
-		default:
-			tfact = 5.0;
-		}
-		fTempC = (fuelTemperature + tfact - 32) / 1.8;
+		double fTempC;
+		fTempC = (fuelTemperature - 32) / 1.8;
 		m_nfdrs2016.iSetFuelMoistures(fm1, fm10, fm100, fm1000, fmWood, fmHerb, fTempC);
 		m_nfdrs2016.iCalcIndexes(windSpeed, atoi(slopeClass), &fSC, &fERC, &fBI, &fIC, gsi, kbdi2016);// , &iBI);
 		sc = fSC;
