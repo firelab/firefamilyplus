@@ -295,12 +295,12 @@ BOOL CNFDRSCalculator2Dlg::OnInitDialog()
 	m_spinGSIThreshold.SetRangeAndDelta(0.0, 1.0, 0.01);
 	m_spinGSIThreshold.SetPos(gsiThreshold);
 	m_spinGSIThreshold.SetBuddy(&m_editGSIThreshold);
-	m_spinSCM.SetRange(1, 300);
+	m_spinSCM.SetRange(1, 1000);
 	m_spinSCM.SetPos(30);
 	m_btnHumid.SetCheck(FALSE);
 	m_spinFuelTemp.SetDecimalPlaces(0);
 	m_spinFuelTemp.SetTrimTrailingZeros(TRUE);
-	m_spinFuelTemp.SetRangeAndDelta(-20.0, 120.0, 1.0);
+	m_spinFuelTemp.SetRangeAndDelta(-50.0, 150.0, 1.0);
 	m_spinFuelTemp.SetPos(temperature);
 	m_spinFuelTemp.SetBuddy(&m_editFuelTemp);
 	//set values from theApp->pOptions
