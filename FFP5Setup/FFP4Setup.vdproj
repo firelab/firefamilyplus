@@ -87,12 +87,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_8F6F07E5559B02FC7DB5B896F0D3C2E9"
-        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_975A8B95576747C08B06BF57817882BF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -105,7 +99,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_9BC7D31EBFF74F90BE7416400C4F1780"
+        "MsmKey" = "8:_A1B5EE7FD13145CC9AF51262031515E2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -142,6 +136,12 @@
         "Entry"
         {
         "MsmKey" = "8:_E550850143DC51FA9A0E6F5142B22E48"
+        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EE6853D9973CF10BA4B03C478BEE4291"
         "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -408,26 +408,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8F6F07E5559B02FC7DB5B896F0D3C2E9"
-            {
-            "SourcePath" = "8:CNFDRS.dll"
-            "TargetName" = "8:CNFDRS.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_975A8B95576747C08B06BF57817882BF"
             {
             "SourcePath" = "8:..\\yr.bmp"
@@ -588,6 +568,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EE6853D9973CF10BA4B03C478BEE4291"
+            {
+            "SourcePath" = "8:CNFDRS.dll"
+            "TargetName" = "8:CNFDRS.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FD4905F92D2C4E31863CC0E78629DF97"
             {
             "SourcePath" = "8:..\\ffplus5.ffp"
@@ -676,7 +676,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FireFamily Plus 5"
         "ProductCode" = "8:{1BF6705F-749C-46D6-9D53-D713EB0B2A0A}"
-        "PackageCode" = "8:{301CEB72-9E86-4233-8063-3904809EBFA9}"
+        "PackageCode" = "8:{47B93437-1282-4219-93C1-A9E6A24581F0}"
         "UpgradeCode" = "8:{F8587583-3FC5-468D-ADCE-121EDD2AF2A6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1192,11 +1192,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_9BC7D31EBFF74F90BE7416400C4F1780"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_A1B5EE7FD13145CC9AF51262031515E2"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:FALSE"
-            "SourcePath" = "8:C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Redist\\MSVC\\v142\\MergeModules\\Microsoft_VC142_OpenMP_x86.msm"
+            "SourcePath" = "8:C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Redist\\MSVC\\v143\\MergeModules\\Microsoft_VC143_OpenMP_x86.msm"
                 "Properties"
                 {
                 }
