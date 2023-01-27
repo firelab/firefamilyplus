@@ -137,4 +137,16 @@ public:
 	CSpinButtonCtrl m_spinSCM;
 	CButton m_btnHumid;
 	CEdit m_editSCM;
+	afx_msg void OnChangeGsi();
+	afx_msg void OnKillfocusGsi();
+	afx_msg void OnChangeGsiThreshold();
+	afx_msg void OnKillfocusGsiThreshold();
+	afx_msg void OnChangeFuelTemp();
+	afx_msg void OnKillfocusFuelTemp();
+	afx_msg void OnChangeGsimax();
+	afx_msg void OnKillfocusGsimax();
+	afx_msg void OnChangeKbdi2016();
+	afx_msg void OnKillfocusKbdi2016();
+	afx_msg void OnChangeEditScm();
+	afx_msg void OnKillfocusEditScm();
 };

@@ -177,6 +177,18 @@ BEGIN_MESSAGE_MAP(CNFDRSCalculator2Dlg, CDialog)
 	ON_EN_CHANGE(IDC_TEMP, &CNFDRSCalculator2Dlg::OnEnChangeTemp)
 	ON_EN_KILLFOCUS(IDC_WIND, &CNFDRSCalculator2Dlg::OnEnKillfocusWind)
 	ON_EN_CHANGE(IDC_WIND, &CNFDRSCalculator2Dlg::OnEnChangeWind)
+	ON_EN_CHANGE(IDC_GSI, &CNFDRSCalculator2Dlg::OnChangeGsi)
+	ON_EN_KILLFOCUS(IDC_GSI, &CNFDRSCalculator2Dlg::OnKillfocusGsi)
+	ON_EN_CHANGE(IDC_GSI_THRESHOLD, &CNFDRSCalculator2Dlg::OnChangeGsiThreshold)
+	ON_EN_KILLFOCUS(IDC_GSI_THRESHOLD, &CNFDRSCalculator2Dlg::OnKillfocusGsiThreshold)
+	ON_EN_CHANGE(IDC_FUEL_TEMP, &CNFDRSCalculator2Dlg::OnChangeFuelTemp)
+	ON_EN_KILLFOCUS(IDC_FUEL_TEMP, &CNFDRSCalculator2Dlg::OnKillfocusFuelTemp)
+	ON_EN_CHANGE(IDC_GSIMAX, &CNFDRSCalculator2Dlg::OnChangeGsimax)
+	ON_EN_KILLFOCUS(IDC_GSIMAX, &CNFDRSCalculator2Dlg::OnKillfocusGsimax)
+	ON_EN_CHANGE(IDC_KBDI2016, &CNFDRSCalculator2Dlg::OnChangeKbdi2016)
+	ON_EN_KILLFOCUS(IDC_KBDI2016, &CNFDRSCalculator2Dlg::OnKillfocusKbdi2016)
+	ON_EN_CHANGE(IDC_EDIT_SCM, &CNFDRSCalculator2Dlg::OnChangeEditScm)
+	ON_EN_KILLFOCUS(IDC_EDIT_SCM, &CNFDRSCalculator2Dlg::OnKillfocusEditScm)
 END_MESSAGE_MAP()
 
 
@@ -577,6 +589,12 @@ void CNFDRSCalculator2Dlg::OnBnClickedCalculate()
 		return;
 	}
 	kbdi = m_spinKBDI.GetPos();
+	if (kbdi < 0 || kbdi > 800)
+	{
+		AfxMessageBox("ERROR: KBDI must be betweeen 0 and 800");
+		m_editKBDI.SetFocus();
+		return;
+	}
 	woodyGreen = m_spinWoodyGreen.GetPos();
 	if(use88 && woodyGreen < 0.0 || woodyGreen > 20.0)
 	{
@@ -585,16 +603,48 @@ void CNFDRSCalculator2Dlg::OnBnClickedCalculate()
 		return;
 	}
 	fuelTemperature = m_spinFuelTemp.GetPos();
-	if (fuelTemperature < -20.0 || fuelTemperature > 120.0)
+	if (fuelTemperature < -50.0 || fuelTemperature > 150.0)
 	{
-		AfxMessageBox("ERROR: Fuel Temperature must be betweeen -20.0 and 120.0");
+		AfxMessageBox("ERROR: Fuel Temperature must be betweeen -50.0 and 150.0");
 		m_editFuelTemp.SetFocus();
 		return;
 	}
+
 	gsi = m_spinGSI.GetPos();
+	if (gsi < 0.0 || gsi > 1.0)
+	{
+		AfxMessageBox("ERROR: GSI must be betweeen 0.0 and 1.0");
+		m_editGSI.SetFocus();
+		return;
+	}
+
 	kbdi2016 = m_spinKBDI2016.GetPos();
+	if(kbdi2016 < 0 || kbdi2016 > 800 )
+	{
+		AfxMessageBox("ERROR: KBDI must be betweeen 0 and 800");
+		m_editKBDI2016.SetFocus();
+		return;
+	}
 	gsiMax = m_spinMaxGSI.GetPos();
+	if (gsiMax < 0.0 || gsiMax > 1.0)
+	{
+		AfxMessageBox("ERROR: Max GSI must be betweeen 0.0 and 1.0");
+		m_editMaxGSI.SetFocus();
+		return;
+	}
 	gsiThreshold = m_spinGSIThreshold.GetPos();
+	if (gsiThreshold < 0.0 || gsiThreshold > 1.0)
+	{
+		AfxMessageBox("ERROR: GSI Greenup Threshold must be betweeen 0.0 and 1.0");
+		m_editGSIThreshold.SetFocus();
+		return;
+	}
+	if (m_spinSCM.GetPos() < 1 || m_spinSCM.GetPos() > 1000)
+	{
+		AfxMessageBox("ERROR: SCM must be betweeen 1 and 1000");
+		m_editSCM.SetFocus();
+		return;
+	}
 	//calculate the values
 	bool bIsNFDR2016 = false;
 	if (fuelModel.GetLength() > 0)
@@ -873,7 +923,7 @@ void CNFDRSCalculator2Dlg::OnEnChangeTemp()
 	double val = atof(str);
 	if(strlen(str) > 1 && (val < -20.0 || val > 120.0))
 	{
-		AfxMessageBox("Error: Temperature must be between -20 and 120.0");
+		AfxMessageBox("Error: Temperature must be between -20 and 135.0");
 		m_editTemp.SetFocus();
 	}
 }
@@ -898,5 +948,155 @@ void CNFDRSCalculator2Dlg::OnEnChangeWind()
 	{
 		AfxMessageBox("Error: 20' Wind must be between 0 and 99.0");
 		m_editWind.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnChangeGsi()
+{
+	CString str;
+	m_editGSI.GetWindowText(str);
+	double val = atof(str);
+	if (strlen(str) >= 1 && (val < 0.0 || val > 1.0))
+	{
+		AfxMessageBox("Error: GSI must be between 0 and 1.0");
+		m_editGSI.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnKillfocusGsi()
+{
+	CString str;
+	m_editGSI.GetWindowText(str);
+	if (str.GetLength() <= 0)
+	{
+		AfxMessageBox("Error: GSI can not be blank");
+		m_editGSI.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnChangeGsiThreshold()
+{
+	CString str;
+	m_editGSIThreshold.GetWindowText(str);
+	double val = atof(str);
+	if (strlen(str) >= 1 && (val < 0.0 || val > 1.0))
+	{
+		AfxMessageBox("Error: GSI Greenup Threshold must be between 0 and 1.0");
+		m_editGSIThreshold.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnKillfocusGsiThreshold()
+{
+	CString str;
+	m_editGSIThreshold.GetWindowText(str);
+	if (str.GetLength() <= 0)
+	{
+		AfxMessageBox("Error: GSI Greenup Threshold can not be blank");
+		m_editGSIThreshold.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnChangeFuelTemp()
+{
+	CString str;
+	m_editFuelTemp.GetWindowText(str);
+	double val = atof(str);
+	if (strlen(str) >= 1 && (val < -50.0 || val > 150))
+	{
+		AfxMessageBox("Error: Fuel Temperature must be between -50 and 150");
+		m_editFuelTemp.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnKillfocusFuelTemp()
+{
+	CString str;
+	m_editFuelTemp.GetWindowText(str);
+	if (str.GetLength() <= 0)
+	{
+		AfxMessageBox("Error: Fuel Temperature can not be blank");
+		m_editFuelTemp.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnChangeGsimax()
+{
+	CString str;
+	m_editMaxGSI.GetWindowText(str);
+	double val = atof(str);
+	if (strlen(str) >= 1 && (val < 0.0 || val > 1.0))
+	{
+		AfxMessageBox("Error: Max GSI must be between 0 and 1.0");
+		m_editMaxGSI.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnKillfocusGsimax()
+{
+	CString str;
+	m_editMaxGSI.GetWindowText(str);
+	if (str.GetLength() <= 0)
+	{
+		AfxMessageBox("Error: Max GSI can not be blank");
+		m_editMaxGSI.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnChangeKbdi2016()
+{
+	CString str;
+	m_editKBDI2016.GetWindowText(str);
+	double val = atof(str);
+	if (strlen(str) > 1 && (val < 0.0 || val > 800))
+	{
+		AfxMessageBox("Error: KBDI must be between 0 and 800");
+		m_editKBDI2016.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnKillfocusKbdi2016()
+{
+	CString str;
+	m_editKBDI2016.GetWindowText(str);
+	if (str.GetLength() <= 0)
+	{
+		AfxMessageBox("Error: KBDI can not be blank");
+		m_editKBDI2016.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnChangeEditScm()
+{
+	CString str;
+	m_editSCM.GetWindowText(str);
+	double val = atof(str);
+	if (strlen(str) > 1 && (val < 1.0 || val > 1000.0))
+	{
+		AfxMessageBox("Error: SCM must be between 0 and 1000");
+		m_editSCM.SetFocus();
+	}
+}
+
+
+void CNFDRSCalculator2Dlg::OnKillfocusEditScm()
+{
+	CString str;
+	m_editSCM.GetWindowText(str);
+	if (str.GetLength() <= 0)
+	{
+		AfxMessageBox("Error: SCM can not be blank");
+		m_editSCM.SetFocus();
 	}
 }
