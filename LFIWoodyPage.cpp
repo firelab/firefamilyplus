@@ -171,29 +171,29 @@ BOOL CLFIWoodyPage::OnInitDialog()
 
 		m_spinVPDMin.SetDecimalPlaces (1);
 		m_spinVPDMin.SetTrimTrailingZeros (FALSE);
-		m_spinVPDMin.SetRangeAndDelta (0.0, 8000.0, 10.0);
+		m_spinVPDMin.SetRangeAndDelta (0.0, 10000.0, 10.0);
 		m_spinVPDMin.SetBuddy(&m_editVPDMin);
 		m_spinVPDMin.SetPos(vpdMin);
 
 		m_spinVPDMax.SetDecimalPlaces (1);
 		m_spinVPDMax.SetTrimTrailingZeros (FALSE);
-		m_spinVPDMax.SetRangeAndDelta (0.0, 8000.0, 10.0);
+		m_spinVPDMax.SetRangeAndDelta (0.0, 10000.0, 10.0);
 		m_spinVPDMax.SetBuddy(&m_editVPDMax);
 		m_spinVPDMax.SetPos(vpdMax);
 
 		m_spinDaylenMin.SetDecimalPlaces (1);
 		m_spinDaylenMin.SetTrimTrailingZeros (FALSE);
-		m_spinDaylenMin.SetRangeAndDelta (36000.0, 50400.0, 10.0);
+		m_spinDaylenMin.SetRangeAndDelta (28800.0, 57600.0, 10.0);
 		m_spinDaylenMin.SetBuddy(&m_editDaylenMin);
 		m_spinDaylenMin.SetPos(daylenMin);
 
 		m_spinDaylenMax.SetDecimalPlaces (1);
 		m_spinDaylenMax.SetTrimTrailingZeros (FALSE);
-		m_spinDaylenMax.SetRangeAndDelta (36000.0, 50400.0, 10.0);
+		m_spinDaylenMax.SetRangeAndDelta (28800.0, 57600.0, 10.0);
 		m_spinDaylenMax.SetBuddy(&m_editDaylenMax);
 		m_spinDaylenMax.SetPos(daylenMax);
 
-		m_spinDaysAvg.SetRange(10, 31);
+		m_spinDaysAvg.SetRange(2, 90);
 		m_spinDaysAvg.SetPos(daysAvg);
 
 		m_spinMaxGSI.SetDecimalPlaces (2);
@@ -220,7 +220,7 @@ BOOL CLFIWoodyPage::OnInitDialog()
 		m_spinMinWoody.SetBuddy(&m_editMinWoody);
 		m_spinMinWoody.SetPos(minWoody);
 
-		m_spinPcpDays.SetRange(2, 60);
+		m_spinPcpDays.SetRange(2, 90);
 		m_spinPcpDays.SetPos(daysPcp);
 
 		m_spinPcpMin.SetDecimalPlaces(1);
