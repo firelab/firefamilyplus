@@ -505,11 +505,17 @@ void CMainFrame::OnDataCompact()
 		CFireplusView *tview = (CFireplusView *)pChild->GetActiveView();
 		CString fileName = tview->GetDocument()->GetPathName();
 		OnWindowCloseallWindows();
-		CompactDatabase(fileName, "$temp$.mdb");
-		unlink(fileName);
-		rename("$temp$.mdb", fileName);
-		unlink("$temp$.mdb");
-		//now open the puppy
+		HRESULT hr = CompactDatabase(fileName, "$temp$.mdb");
+		if (hr == S_OK)
+		{
+			unlink(fileName);
+			rename("$temp$.mdb", fileName);
+			unlink("$temp$.mdb");
+		}
+		else
+		{
+			AfxMessageBox("An error occurred while attempting to compact the database.\nPlease use MS Access to attempt to compact this database");
+		}
 		theApp.OpenDocumentFile(fileName);
 	}
 }
