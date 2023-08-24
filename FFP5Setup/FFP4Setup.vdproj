@@ -16,7 +16,7 @@
         "Entry"
         {
         "MsmKey" = "8:_0D37586A31938075D6470607BBC6AFA5"
-        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
+        "OwnerKey" = "8:_3F3B73A4E657458D9F23F5A4E629A8EF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -39,20 +39,14 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3F3B73A4E657458D9F23F5A4E629A8EF"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_45847A09412F439BBF0AB823AC920EFE"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_615505A8480937DE6CCCABACA9E7CA0C"
-        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -70,7 +64,7 @@
         "Entry"
         {
         "MsmKey" = "8:_7DB0654BFC79A2B2B8B79CB73D580130"
-        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
+        "OwnerKey" = "8:_3F3B73A4E657458D9F23F5A4E629A8EF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -94,7 +88,7 @@
         "Entry"
         {
         "MsmKey" = "8:_97824683F38847F988321E6E31A6C273"
-        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
+        "OwnerKey" = "8:_3F3B73A4E657458D9F23F5A4E629A8EF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -112,7 +106,7 @@
         "Entry"
         {
         "MsmKey" = "8:_B9D2E567B59F16BB21274FB6C71884FB"
-        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
+        "OwnerKey" = "8:_3F3B73A4E657458D9F23F5A4E629A8EF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -136,13 +130,7 @@
         "Entry"
         {
         "MsmKey" = "8:_E550850143DC51FA9A0E6F5142B22E48"
-        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_EE6853D9973CF10BA4B03C478BEE4291"
-        "OwnerKey" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
+        "OwnerKey" = "8:_3F3B73A4E657458D9F23F5A4E629A8EF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -306,26 +294,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_615505A8480937DE6CCCABACA9E7CA0C"
-            {
-            "SourcePath" = "8:oledlg.dll"
-            "TargetName" = "8:oledlg.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_61DF3B0661404AD7A77CEDD1367FEDB3"
@@ -568,26 +536,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EE6853D9973CF10BA4B03C478BEE4291"
-            {
-            "SourcePath" = "8:CNFDRS.dll"
-            "TargetName" = "8:CNFDRS.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FD4905F92D2C4E31863CC0E78629DF97"
             {
             "SourcePath" = "8:..\\ffplus5.ffp"
@@ -675,15 +623,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FireFamily Plus 5"
-        "ProductCode" = "8:{D6D4DC88-2876-4362-8BD8-2D46FAF0B555}"
-        "PackageCode" = "8:{643DA5B5-894B-4B33-9367-7D8BA408BFE4}"
+        "ProductCode" = "8:{88C9BDFB-2E28-4CBF-AAD9-39A03E7A0346}"
+        "PackageCode" = "8:{2F05EA71-7B98-4A07-B18F-964A02F598D0}"
         "UpgradeCode" = "8:{F8587583-3FC5-468D-ADCE-121EDD2AF2A6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:5.0.52"
+        "ProductVersion" = "8:5.0.53"
         "Manufacturer" = "8:USFS"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -768,15 +716,15 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_9536A0C17F9F49A4942D6717A27C6B45"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_AAE29EF8F9074117B1E9E22DC639445F"
             {
-            "Name" = "8:NFDRS Calculator"
+            "Name" = "8:NFDRS4 Calculator"
             "Arguments" = "8:"
-            "Description" = "8:NFDRS Calculator"
+            "Description" = "8:"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_565E753F0B484F8B9DD362DE29E82C7A"
+            "Target" = "8:_3F3B73A4E657458D9F23F5A4E629A8EF"
             "Folder" = "8:_353532DB064745ADB0476857136F27F7"
             "WorkingFolder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
             "Icon" = "8:_2E05B50E2EDC434999E8D292AC91D364"
@@ -1237,6 +1185,34 @@
                 {
                 }
             }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_3F3B73A4E657458D9F23F5A4E629A8EF"
+            {
+            "SourcePath" = "8:..\\Release\\NFDRS4Calculator.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{8890DBDA-23E4-4B34-AAFE-EE9D6363D0C5}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_4C622A8A8B1C484FB8DBF533659F3333"
             {
             "SourcePath" = "8:..\\Release\\fireplus.exe"
@@ -1260,34 +1236,6 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{9DD39016-6ACE-4A97-BFE7-E419CAC17A06}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_565E753F0B484F8B9DD362DE29E82C7A"
-            {
-            "SourcePath" = "8:..\\Release\\NFDRSCalculator2.exe"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{CD10527D-0651-43C9-B752-B1846DFD4B17}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {

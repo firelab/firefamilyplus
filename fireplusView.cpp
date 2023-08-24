@@ -3165,12 +3165,12 @@ void CFireplusView::OnWeatherForecasting()
 void CFireplusView::OnWeatherNfdrscalculator()
 {
 	CString calcStr;
-	calcStr.Format("%s\\NFDRSCalculator2.exe", theApp.exeDir);
+	calcStr.Format("%s\\NFDRS4Calculator.exe", theApp.exeDir);
 	int ret = _spawnl(_P_NOWAIT, calcStr, calcStr, NULL);
 	if(ret < 0)
 	{
 		CString retMsg;
-		retMsg.Format("Error launching the NFDRS Calculator.");
+		retMsg.Format("Error launching the NFDRS4 Calculator.");
 		AfxMessageBox(retMsg);
 	}
 }
