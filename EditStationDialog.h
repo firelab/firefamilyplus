@@ -106,11 +106,11 @@ public:
 	CSpinButtonCtrl m_spinMaxSC_X;
 	CSpinButtonCtrl m_spinMaxSC_Y;
 	CSpinButtonCtrl m_spinMaxSC_Z;
-	CButton m_btnHumid_V;
+	/*CButton m_btnHumid_V;
 	CButton m_btnHumid_W;
 	CButton m_btnHumid_X;
 	CButton m_btnHumid_Y;
-	CButton m_btnHumid_Z;
+	CButton m_btnHumid_Z;*/
 	CComboBox m_comboTimeZone;
 	CEdit m_editKBDIThreshold;
 	CSpinButtonCtrl m_spinKBDIThreshold;

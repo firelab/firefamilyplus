@@ -161,36 +161,40 @@ void SaveNFDRS2016MetaData(CDatabase *pDB, FFPViewCUG *grid, int row)
 			ssSet.Edit();
 			grid->GetCell(21, row, &cell);
 			int iVal = cell.GetNumber();//pCellCheck->GetCheck();
-			grid->GetCell(22, row, &cell);
-			BOOL bVal = cell.GetNumber();
 			switch (fm[0])
 			{
 			case 'v':
 			case 'V':
 				ssSet.m_SCM_V = iVal;
-				ssSet.m_MX_Humid_V = bVal;
+				//ssSet.m_MX_Humid_V = bVal;
 				break;
 			case 'w':
 			case 'W':
 				ssSet.m_SCM_W = iVal;
-				ssSet.m_MX_Humid_W = bVal;
+				//ssSet.m_MX_Humid_W = bVal;
 				break;
 			case 'x':
 			case 'X':
 				ssSet.m_SCM_X = iVal;
-				ssSet.m_MX_Humid_X = bVal;
+				//ssSet.m_MX_Humid_X = bVal;
 				break;
 			case 'y':
 			case 'Y':
 				ssSet.m_SCM_Y = iVal;
-				ssSet.m_MX_Humid_Y = bVal;
+				//ssSet.m_MX_Humid_Y = bVal;
 				break;
 			case 'z':
 			case 'Z':
 				ssSet.m_SCM_Z = iVal;
-				ssSet.m_MX_Humid_Z = bVal;
+				//ssSet.m_MX_Humid_Z = bVal;
 				break;
 			}
+			grid->GetCell(22, row, &cell);
+			double mxdVal = cell.GetNumber();
+			if (mxdVal > 0.0)
+				ssSet.m_MXD_Override = mxdVal;
+			else
+				ssSet.SetFieldNull(&ssSet.m_MXD_Override);
 			ssSet.Update();
 		}
 		ssSet.Close();
@@ -215,37 +219,40 @@ void LoadNFDRS2016MetaData(CDatabase *pDB, FFPViewCUG *grid, int row)
 		if (!ssSet.IsBOF() && !ssSet.IsEOF())//has a record
 		{
 			int iVal;
-			BOOL bVal;
+			//BOOL bVal;
 			switch (fm[0])
 			{
 			case 'v':
 			case 'V':
 				iVal = ssSet.m_SCM_V;
-				bVal = ssSet.m_MX_Humid_V;
+				//bVal = ssSet.m_MX_Humid_V;
 				break;
 			case 'w':
 			case 'W':
 				iVal = ssSet.m_SCM_W;
-				bVal = ssSet.m_MX_Humid_W;
+				//bVal = ssSet.m_MX_Humid_W;
 				break;
 			case 'x':
 			case 'X':
 				iVal = ssSet.m_SCM_X;
-				bVal = ssSet.m_MX_Humid_X;
+				//bVal = ssSet.m_MX_Humid_X;
 				break;
 			case 'y':
 			case 'Y':
 				iVal = ssSet.m_SCM_Y;
-				bVal = ssSet.m_MX_Humid_Y;
+				//bVal = ssSet.m_MX_Humid_Y;
 				break;
 			case 'z':
 			case 'Z':
 				iVal = ssSet.m_SCM_Z;
-				bVal = ssSet.m_MX_Humid_Z;
+				//bVal = ssSet.m_MX_Humid_Z;
 				break;
 			}
 			grid->QuickSetNumber(21, row, iVal);
-			grid->QuickSetNumber(22, row, bVal);
+			if (!ssSet.IsFieldNull(&ssSet.m_MXD_Override))
+				grid->QuickSetNumber(22, row, ssSet.m_MXD_Override);
+			else
+				grid->QuickSetText(22, row, "");
 		}
 		ssSet.Close();
 	}
@@ -257,6 +264,7 @@ void LoadNFDRS2016MetaData(CDatabase *pDB, FFPViewCUG *grid, int row)
 FFPViewCUG::FFPViewCUG()
 {
 	m_pDB = NULL;
+	SetCancelMode(FALSE);
 }
 
 FFPViewCUG::~FFPViewCUG()
@@ -309,7 +317,7 @@ void FFPViewCUG::OnSetup()
 
 	//nfdrs2016 additions
 	QuickSetText(21, -1, "Max SC");
-	QuickSetText(22, -1, "Humid");
+	QuickSetText(22, -1, "MXD Override");
 
 	SetColWidth(0, wid * 3);
 	SetColWidth(1, wid * 5);
@@ -461,9 +469,9 @@ void FFPViewCUG::OnSetup()
 	SetColDefault(21, &cell);
 
 	GetColDefault(22, &cell);
-	cell.SetCellType(m_iCheckBoxIndex);
-	cell.SetCellTypeEx(UGCT_CHECKBOXUSEALIGN);
-	cell.SetAlignment(UG_ALIGNCENTER | UG_ALIGNVCENTER);
+	cell.SetReadOnly(FALSE);
+	cell.SetNumberDecimals(0);
+	cell.SetParam(USE_COXNUMBER);
 	SetColDefault(22, &cell);
 
 	((CUGEdit* )GetEditClass())->SetAutoSize( FALSE );
@@ -528,6 +536,7 @@ int FFPViewCUG::OnEditStart(int col, long row,CWnd **edit)
 		case 8:
 		case 17:
 		case 21:
+		case 22:
 			m_cutNumeric.SetFractionalDigitCount(0);
 			m_cutNumeric.SetDecimalDigitCount(3);
 			break;
@@ -1236,7 +1245,7 @@ void CFireplusView::OnSelchangeSigstation()
 					cell.SetNumber(ssSet.m_UseStick);
 					m_grid.SetCell(20, row, &cell);
 
-					//if it's an NFDR2016 Fuel set SCM and MX_Humid
+					//if it's an NFDR2016 Fuel set SCM and MXD
 					if (isNFDRS2016(ssSet.m_NFDRSFM[0]))
 					{
 						int scmVal, mxVal;
@@ -1245,32 +1254,35 @@ void CFireplusView::OnSelchangeSigstation()
 						case 'v':
 						case 'V':
 							scmVal = ssSet.m_SCM_V;
-							mxVal = ssSet.m_MX_Humid_V;
+							//mxVal = ssSet.m_MX_Humid_V;
 							break;
 						case 'w':
 						case 'W':
 							scmVal = ssSet.m_SCM_W;
-							mxVal = ssSet.m_MX_Humid_W;
+							//mxVal = ssSet.m_MX_Humid_W;
 							break;
 						case 'x':
 						case 'X':
 							scmVal = ssSet.m_SCM_X;
-							mxVal = ssSet.m_MX_Humid_X;
+							//mxVal = ssSet.m_MX_Humid_X;
 							break;
 						case 'y':
 						case 'Y':
 							scmVal = ssSet.m_SCM_Y;
-							mxVal = ssSet.m_MX_Humid_Y;
+							//mxVal = ssSet.m_MX_Humid_Y;
 							break;
 						case 'z':
 						case 'Z':
 							scmVal = ssSet.m_SCM_Z;
-							mxVal = ssSet.m_MX_Humid_Z;
+							//mxVal = ssSet.m_MX_Humid_Z;
 							break;
 						}
 						m_grid.QuickSetNumber(21, row, scmVal);
-						m_grid.QuickSetNumber(22, row, mxVal);
 					}
+					if (!ssSet.IsFieldNull(&ssSet.m_MXD_Override))
+						m_grid.QuickSetNumber(22, row, ssSet.m_MXD_Override);
+					else
+						m_grid.QuickSetText(22, row, "");
 				}
 				//check for hourly data
 				sSet.MoveNext();
@@ -1376,38 +1388,42 @@ void CFireplusView::OnSelchangeSigstation()
 				//if it's an NFDR2016 Fuel set SCM and MX_Humid
 				if (isNFDRS2016(ssSet.m_NFDRSFM[0]))
 				{
-					int scmVal, mxVal;
+					int scmVal;// , mxVal;
 					switch (ssSet.m_NFDRSFM[0])
 					{
 					case 'v':
 					case 'V':
 						scmVal = ssSet.m_SCM_V;
-						mxVal = ssSet.m_MX_Humid_V;
+						//mxVal = ssSet.m_MX_Humid_V;
 						break;
 					case 'w':
 					case 'W':
 						scmVal = ssSet.m_SCM_W;
-						mxVal = ssSet.m_MX_Humid_W;
+						//mxVal = ssSet.m_MX_Humid_W;
 						break;
 					case 'x':
 					case 'X':
 						scmVal = ssSet.m_SCM_X;
-						mxVal = ssSet.m_MX_Humid_X;
+						//mxVal = ssSet.m_MX_Humid_X;
 						break;
 					case 'y':
 					case 'Y':
 						scmVal = ssSet.m_SCM_Y;
-						mxVal = ssSet.m_MX_Humid_Y;
+						//mxVal = ssSet.m_MX_Humid_Y;
 						break;
 					case 'z':
 					case 'Z':
 						scmVal = ssSet.m_SCM_Z;
-						mxVal = ssSet.m_MX_Humid_Z;
+						//mxVal = ssSet.m_MX_Humid_Z;
 						break;
 					}
 					m_grid.QuickSetNumber(21, row, scmVal);
-					m_grid.QuickSetNumber(22, row, mxVal);
+					//m_grid.QuickSetNumber(22, row, mxVal);
 				}
+				if (!ssSet.IsFieldNull(&ssSet.m_MXD_Override))
+					m_grid.QuickSetNumber(22, row, ssSet.m_MXD_Override);
+				else
+					m_grid.QuickSetText(22, row, "");
 			}
 		}
 		ssSet.Close();
@@ -1543,41 +1559,45 @@ void CFireplusView::InitSigstation()
 					cell.SetNumber(ssSet.m_UseStick);
 					m_grid.SetCell(20, row, &cell);
 
-					//if it's an NFDR2016 Fuel set SCM and MX_Humid
+					//if it's an NFDR2016 Fuel set SCM
 					if (isNFDRS2016(ssSet.m_NFDRSFM[0]))
 					{
-						int scmVal, mxVal;
+						int scmVal;// , mxVal;
 						switch (ssSet.m_NFDRSFM[0])
 						{
 						case 'v':
 						case 'V':
 							scmVal = ssSet.m_SCM_V;
-							mxVal = ssSet.m_MX_Humid_V;
+							//mxVal = ssSet.m_MX_Humid_V;
 							break;
 						case 'w':
 						case 'W':
 							scmVal = ssSet.m_SCM_W;
-							mxVal = ssSet.m_MX_Humid_W;
+							//mxVal = ssSet.m_MX_Humid_W;
 							break;
 						case 'x':
 						case 'X':
 							scmVal = ssSet.m_SCM_X;
-							mxVal = ssSet.m_MX_Humid_X;
+							//mxVal = ssSet.m_MX_Humid_X;
 							break;
 						case 'y':
 						case 'Y':
 							scmVal = ssSet.m_SCM_Y;
-							mxVal = ssSet.m_MX_Humid_Y;
+							//mxVal = ssSet.m_MX_Humid_Y;
 							break;
 						case 'z':
 						case 'Z':
 							scmVal = ssSet.m_SCM_Z;
-							mxVal = ssSet.m_MX_Humid_Z;
+							//mxVal = ssSet.m_MX_Humid_Z;
 							break;
 						}
 						m_grid.QuickSetNumber(21, row, scmVal);
-						m_grid.QuickSetNumber(22, row, mxVal);
+						//m_grid.QuickSetNumber(22, row, mxVal);
 					}
+					if (!ssSet.IsFieldNull(&ssSet.m_MXD_Override))
+						m_grid.QuickSetNumber(22, row, ssSet.m_MXD_Override);
+					else
+						m_grid.QuickSetText(22, row, "");
 				}
 				//check for hourly data
 				sSet.MoveNext();
@@ -1686,32 +1706,36 @@ void CFireplusView::InitSigstation()
 					case 'v':
 					case 'V':
 						scmVal = ssSet.m_SCM_V;
-						mxVal = ssSet.m_MX_Humid_V;
+						//mxVal = ssSet.m_MX_Humid_V;
 						break;
 					case 'w':
 					case 'W':
 						scmVal = ssSet.m_SCM_W;
-						mxVal = ssSet.m_MX_Humid_W;
+						//mxVal = ssSet.m_MX_Humid_W;
 						break;
 					case 'x':
 					case 'X':
 						scmVal = ssSet.m_SCM_X;
-						mxVal = ssSet.m_MX_Humid_X;
+						//mxVal = ssSet.m_MX_Humid_X;
 						break;
 					case 'y':
 					case 'Y':
 						scmVal = ssSet.m_SCM_Y;
-						mxVal = ssSet.m_MX_Humid_Y;
+						//mxVal = ssSet.m_MX_Humid_Y;
 						break;
 					case 'z':
 					case 'Z':
 						scmVal = ssSet.m_SCM_Z;
-						mxVal = ssSet.m_MX_Humid_Z;
+						//mxVal = ssSet.m_MX_Humid_Z;
 						break;
 					}
 					m_grid.QuickSetNumber(21, row, scmVal);
-					m_grid.QuickSetNumber(22, row, mxVal);
+					//m_grid.QuickSetNumber(22, row, mxVal);
 				}
+				if (!ssSet.IsFieldNull(&ssSet.m_MXD_Override))
+					m_grid.QuickSetNumber(22, row, ssSet.m_MXD_Override);
+				else
+					m_grid.QuickSetText(22, row, "");
 			}
 		}
 		ssSet.Close();
@@ -1927,43 +1951,47 @@ void CFireplusView::SaveMetaTable()
 					ssSet.m_UseStick = iVal;
 
 					//if NFDRS2016 fuel model, need to save SCM_? and MX_Humid_? for station's selected fuel model
-					BOOL bVal;
+					//BOOL bVal;
 					if (isNFDRS2016(ssSet.m_NFDRSFM[0]))
 					{
 						m_grid.GetCell(21, rc, &cell);
 						iVal = cell.GetNumber();//pCellCheck->GetCheck();
-						m_grid.GetCell(22, rc, &cell);
-						bVal = cell.GetNumber();
 
 						switch (ssSet.m_NFDRSFM[0])
 						{
 						case 'v':
 						case 'V':
 							ssSet.m_SCM_V = iVal;
-							ssSet.m_MX_Humid_V = bVal;
+							//ssSet.m_MX_Humid_V = bVal;
 							break;
 						case 'w':
 						case 'W':
 							ssSet.m_SCM_W = iVal;
-							ssSet.m_MX_Humid_W = bVal;
+							//ssSet.m_MX_Humid_W = bVal;
 							break;
 						case 'x':
 						case 'X':
 							ssSet.m_SCM_X = iVal;
-							ssSet.m_MX_Humid_X = bVal;
+							//ssSet.m_MX_Humid_X = bVal;
 							break;
 						case 'y':
 						case 'Y':
-							ssSet.m_MX_Humid_Y = bVal;
+							//ssSet.m_MX_Humid_Y = bVal;
 							ssSet.m_SCM_Y = iVal;
 							break;
 						case 'z':
 						case 'Z':
 							ssSet.m_SCM_Z = iVal;
-							ssSet.m_MX_Humid_Z = bVal;
+							//ssSet.m_MX_Humid_Z = bVal;
 							break;
 						}
 					}
+					m_grid.GetCell(22, rc, &cell);
+					int mxdVal = cell.GetNumber();
+					if (mxdVal > 0)
+						ssSet.m_MXD_Override = mxdVal;
+					else
+						ssSet.SetFieldNull(&ssSet.m_MXD_Override);
 					ssSet.Update();
 				}
 			}

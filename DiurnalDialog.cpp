@@ -626,7 +626,8 @@ int CDiurnalAnalysis::HourlyListing(CWnd *_caller, CFireplusSet *fpSet, int nVar
 				lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip(), lfiWoody.GetWoodyMin(), lfiWoody.GetWoodyMax());
 			theApp.m_NFDRS2016.SetStartKBDI(staSet.m_StartKBDI);
 			theApp.m_NFDRS2016.SetSCMax(staSet.GetSCM(staSet.m_NFDRSFM[0]));
-			theApp.m_NFDRS2016.SetMxdHumid(staSet.GetMxHumid(staSet.m_NFDRSFM[0]));
+			if (!staSet.IsFieldNull(&staSet.m_MXD_Override))
+				theApp.m_NFDRS2016.SetMXD(staSet.m_MXD_Override);
 		}
 		if (!isNFDRS2016(staSet.m_NFDRSFM[0]))
 		{   // "old" NFDRS calc
@@ -806,6 +807,7 @@ int CDiurnalAnalysis::HourlyListing(CWnd *_caller, CFireplusSet *fpSet, int nVar
 
 			double hourlyPrecip = wxSet.IsFieldNull(&wxSet.m_HourlyPrecip) ? 0 : wxSet.m_HourlyPrecip;
 			double solarRad = wxSet.IsFieldNull(&wxSet.m_SolarRadiation) ? 0 : wxSet.m_SolarRadiation;
+			double wtmcd, wtmcde, wtmcl, wtmcle;
 
 			//calculate model outputs
 			//NFDR 78
@@ -864,7 +866,11 @@ int CDiurnalAnalysis::HourlyListing(CWnd *_caller, CFireplusSet *fpSet, int nVar
 					iBI = (int)fBI;
 					iIC = (int)fIC;
 
-				
+					wtmcd = theApp.m_NFDRS2016.WTMCD;
+					wtmcde = theApp.m_NFDRS2016.WTMCDE;
+					wtmcl = theApp.m_NFDRS2016.WTMCL;
+					wtmcle = theApp.m_NFDRS2016.WTMCLE;
+
 
 				}
 				if (!isNFDRS2016(staSet.m_NFDRSFM[0]))
@@ -1409,6 +1415,30 @@ int CDiurnalAnalysis::HourlyListing(CWnd *_caller, CFireplusSet *fpSet, int nVar
 					else
 						nullVal = true;
 					break;
+				case 46:
+					if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+						sprintf(varVal, frmt, wtmcd);
+					else
+						nullVal = true;
+					break;
+				case 47:
+					if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+						sprintf(varVal, frmt, wtmcde);
+					else
+						nullVal = true;
+					break;
+				case 48:
+					if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+						sprintf(varVal, frmt, wtmcl);
+					else
+						nullVal = true;
+					break;
+				case 49:
+					if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+						sprintf(varVal, frmt, wtmcle);
+					else
+						nullVal = true;
+					break;
 				}
 
 				if (! nullVal)
@@ -1731,7 +1761,8 @@ int CDiurnalAnalysis::AnalyzeStation(CString stationStr, CSIGStationSet& staSet,
 				lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip(), lfiWoody.GetWoodyMin(), lfiWoody.GetWoodyMax());
 			theApp.m_NFDRS2016.SetStartKBDI(staSet.m_StartKBDI);
 			theApp.m_NFDRS2016.SetSCMax(staSet.GetSCM(staSet.m_NFDRSFM[0]));
-			theApp.m_NFDRS2016.SetMxdHumid(staSet.GetMxHumid(staSet.m_NFDRSFM[0]));
+			if (!staSet.IsFieldNull(&staSet.m_MXD_Override))
+				theApp.m_NFDRS2016.SetMXD(staSet.m_MXD_Override);
 		}
 		if (!isNFDRS2016(staSet.m_NFDRSFM[0]))
 		{   // "old" NFDRS calc
@@ -1761,6 +1792,7 @@ int CDiurnalAnalysis::AnalyzeStation(CString stationStr, CSIGStationSet& staSet,
 		iIC, iStage, iKBDI, iRainEvent, init = 1, iDeclareGreenUp = 0, iDeclareFreeze = 0;//,
 	double f1, f10, f100, f1000, fHerb, fWood, fGren, fX1000, fROS, fERC, fFL,
 		ffmc, dmc, dc, bui, isi, fwi, dsr, lfiVal, lfiHerbVal, lfiWoodyVal;
+	double wtmcd, wtmcde, wtmcl, wtmcle;
 	COleDateTime wxDay;//used to skip duplicates
 	COleDateTime yesterday;//used to skip duplicates
 	wxSet.Requery();
@@ -1894,6 +1926,10 @@ int CDiurnalAnalysis::AnalyzeStation(CString stationStr, CSIGStationSet& staSet,
 					iFIL = 0; //fixme
 					iBI = theApp.m_NFDRS2016.BI;
 					iIC = theApp.m_NFDRS2016.IC;
+					wtmcd = theApp.m_NFDRS2016.WTMCD;
+					wtmcde = theApp.m_NFDRS2016.WTMCDE;
+					wtmcl = theApp.m_NFDRS2016.WTMCL;
+					wtmcle = theApp.m_NFDRS2016.WTMCLE;
 
 				}
 				if (!isNFDRS2016(staSet.m_NFDRSFM[0]))
@@ -2232,6 +2268,30 @@ int CDiurnalAnalysis::AnalyzeStation(CString stationStr, CSIGStationSet& staSet,
 							if(!wxSet.IsFieldNull(&wxSet.m_Temp) && !wxSet.IsFieldNull(&wxSet.m_RH)
 									&& !wxSet.IsFieldNull(&wxSet.m_WS))
 								val = theApp.m_NFDRS.iCalcFFWI(wxSet.m_Temp, max(wxSet.m_RH, 1), wxSet.m_WS);
+							else
+								goodRecord = false;
+							break;
+						case 46:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcd;
+							else
+								goodRecord = false;
+							break;
+						case 47:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcde;
+							else
+								goodRecord = false;
+							break;
+						case 48:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcl;
+							else
+								goodRecord = false;
+							break;
+						case 49:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcle;
 							else
 								goodRecord = false;
 							break;

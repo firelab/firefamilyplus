@@ -8258,15 +8258,15 @@ void CFireplusDoc::CheckWxStationTable()
 		{
 			staSet.Edit();
 			theApp.m_NFDRS2016.iSetFuelModel('V');
-			staSet.m_MX_Humid_V = theApp.m_NFDRS2016.GetMxdHumid();
+			staSet.m_MX_Humid_V = FALSE;// theApp.m_NFDRS2016.GetMxdHumid();
 			theApp.m_NFDRS2016.iSetFuelModel('W');
-			staSet.m_MX_Humid_W = theApp.m_NFDRS2016.GetMxdHumid();
+			staSet.m_MX_Humid_W = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 			theApp.m_NFDRS2016.iSetFuelModel('X');
-			staSet.m_MX_Humid_X = theApp.m_NFDRS2016.GetMxdHumid();
+			staSet.m_MX_Humid_X = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 			theApp.m_NFDRS2016.iSetFuelModel('Y');
-			staSet.m_MX_Humid_Y = theApp.m_NFDRS2016.GetMxdHumid();
+			staSet.m_MX_Humid_Y = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 			theApp.m_NFDRS2016.iSetFuelModel('Z');
-			staSet.m_MX_Humid_Z = theApp.m_NFDRS2016.GetMxdHumid();
+			staSet.m_MX_Humid_Z = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 			staSet.Update();
 		}
 		else
@@ -8275,35 +8275,65 @@ void CFireplusDoc::CheckWxStationTable()
 			{
 				staSet.Edit();
 				theApp.m_NFDRS2016.iSetFuelModel('V');
-				staSet.m_MX_Humid_V = theApp.m_NFDRS2016.GetMxdHumid();
+				staSet.m_MX_Humid_V = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
+				staSet.Update();
+			}
+			else if (staSet.m_NFDRSFM[0] == 'V' && staSet.m_MX_Humid_V == TRUE)
+			{
+				staSet.Edit();
+				staSet.m_MXD_Override = 40;
 				staSet.Update();
 			}
 			if (staSet.IsFieldNull(&staSet.m_MX_Humid_W))
 			{
 				staSet.Edit();
 				theApp.m_NFDRS2016.iSetFuelModel('W');
-				staSet.m_MX_Humid_W = theApp.m_NFDRS2016.GetMxdHumid();
+				staSet.m_MX_Humid_W = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
+				staSet.Update();
+			}
+			else if (staSet.m_NFDRSFM[0] == 'W' && staSet.m_MX_Humid_W == TRUE)
+			{
+				staSet.Edit();
+				staSet.m_MXD_Override = 40;
 				staSet.Update();
 			}
 			if (staSet.IsFieldNull(&staSet.m_MX_Humid_X))
 			{
 				staSet.Edit();
 				theApp.m_NFDRS2016.iSetFuelModel('X');
-				staSet.m_MX_Humid_X = theApp.m_NFDRS2016.GetMxdHumid();
+				staSet.m_MX_Humid_X = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
+				staSet.Update();
+			}
+			else if (staSet.m_NFDRSFM[0] == 'X' && staSet.m_MX_Humid_X == TRUE)
+			{
+				staSet.Edit();
+				staSet.m_MXD_Override = 40;
 				staSet.Update();
 			}
 			if (staSet.IsFieldNull(&staSet.m_MX_Humid_Y))
 			{
 				staSet.Edit();
 				theApp.m_NFDRS2016.iSetFuelModel('Y');
-				staSet.m_MX_Humid_Y = theApp.m_NFDRS2016.GetMxdHumid();
+				staSet.m_MX_Humid_Y = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
+				staSet.Update();
+			}
+			else if (staSet.m_NFDRSFM[0] == 'Y' && staSet.m_MX_Humid_Y == TRUE)
+			{
+				staSet.Edit();
+				staSet.m_MXD_Override = 40;
 				staSet.Update();
 			}
 			if (staSet.IsFieldNull(&staSet.m_MX_Humid_Z))
 			{
 				staSet.Edit();
 				theApp.m_NFDRS2016.iSetFuelModel('Z');
-				staSet.m_MX_Humid_Z = theApp.m_NFDRS2016.GetMxdHumid();
+				staSet.m_MX_Humid_Z = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
+				staSet.Update();
+			}
+			else if (staSet.m_NFDRSFM[0] == 'Z' && staSet.m_MX_Humid_Z == TRUE)
+			{
+				staSet.Edit();
+				staSet.m_MXD_Override = 40;
 				staSet.Update();
 			}
 		}

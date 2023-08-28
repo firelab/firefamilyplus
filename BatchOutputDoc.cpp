@@ -424,7 +424,9 @@ void CRawClim::AllocData()
 				lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip(), lfiWoody.GetWoodyMin(), lfiWoody.GetWoodyMax());
 			theApp.m_NFDRS2016.SetStartKBDI(staSet.m_StartKBDI);
 			theApp.m_NFDRS2016.SetSCMax(staSet.GetSCM(staSet.m_NFDRSFM[0]));
-			theApp.m_NFDRS2016.SetMxdHumid(staSet.GetMxHumid(staSet.m_NFDRSFM[0]));
+			if (!staSet.IsFieldNull(&staSet.m_MXD_Override))
+				theApp.m_NFDRS2016.SetMXD(staSet.m_MXD_Override);   
+			//SetMxdHumid(staSet.GetMxHumid(staSet.m_NFDRSFM[0]));
 		}
 		if (!isNFDRS2016(staSet.m_NFDRSFM[0]))
 		{   // "old" NFDRS calc
@@ -453,6 +455,7 @@ void CRawClim::AllocData()
 			iKBDI, init = 1, iDeclareGreenUp = 0, iDeclareFreeze = 0, wetFlag, snowFlag;//,
 		double f1, f10, f100, f1000, fHerb, fWood, fGren, fX1000, fROS, fERC, fFL,
 			ffmc, dmc, dc, bui, isi, fwi, dsr, lfiVal, lfiHerbVal, lfiWoodyVal, iSC, iIC, iBI, iFIL;
+		double wtmcd, wtmcde, wtmcl, wtmcle;
 		long count = 0;
 		COleDateTime yesterday, wxDay;//used to skip duplicates
 		COleDateTime extremeDay;//used keep track of current day for extremes
@@ -638,6 +641,10 @@ void CRawClim::AllocData()
 					iFIL = 0; //fixme
 					iBI = theApp.m_NFDRS2016.BI;
 					iIC = theApp.m_NFDRS2016.IC;
+					wtmcd = theApp.m_NFDRS2016.WTMCD;
+					wtmcde = theApp.m_NFDRS2016.WTMCDE;
+					wtmcl = theApp.m_NFDRS2016.WTMCL;
+					wtmcle = theApp.m_NFDRS2016.WTMCLE;
 					//store moistures to DB
 					if (reCalc)
 					{
@@ -976,6 +983,30 @@ void CRawClim::AllocData()
 								&& !wxSet.IsFieldNull(&wxSet.m_WS))
 								//m_wxData[j]->m_vals[wxYear][wxDOY] 
 								val = theApp.m_NFDRS.iCalcFFWI(wxSet.m_Temp, max(wxSet.m_RH, 1), wxSet.m_WS);
+							else
+								goodRecord = false;
+							break;
+						case 46:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]))
+								val = wtmcd;
+							else
+								goodRecord = false;
+							break;
+						case 47:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]))
+								val = wtmcde;
+							else
+								goodRecord = false;
+							break;
+						case 48:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]))
+								val = wtmcl;
+							else
+								goodRecord = false;
+							break;
+						case 49:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]))
+								val = wtmcle;
 							else
 								goodRecord = false;
 							break;

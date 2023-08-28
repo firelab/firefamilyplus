@@ -109,11 +109,11 @@ void CEditStationDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN_MAXSC_X, m_spinMaxSC_X);
 	DDX_Control(pDX, IDC_SPIN_MAXSC_Y, m_spinMaxSC_Y);
 	DDX_Control(pDX, IDC_SPIN_MAXSC_Z, m_spinMaxSC_Z);
-	DDX_Control(pDX, IDC_CHECK_HUMID_V, m_btnHumid_V);
+	/*DDX_Control(pDX, IDC_CHECK_HUMID_V, m_btnHumid_V);
 	DDX_Control(pDX, IDC_CHECK_HUMID_W, m_btnHumid_W);
 	DDX_Control(pDX, IDC_CHECK_HUMID_X, m_btnHumid_X);
 	DDX_Control(pDX, IDC_CHECK_HUMID_Y, m_btnHumid_Y);
-	DDX_Control(pDX, IDC_CHECK_HUMID_Z, m_btnHumid_Z);
+	DDX_Control(pDX, IDC_CHECK_HUMID_Z, m_btnHumid_Z);*/
 	DDX_Control(pDX, IDC_COMBO_TIMEZONE, m_comboTimeZone);
 	DDX_Control(pDX, IDC_EDIT_KBDI_THRESHOLD, m_editKBDIThreshold);
 	DDX_Control(pDX, IDC_SPIN_KBDI_THRESHOLD, m_spinKBDIThreshold);
@@ -293,7 +293,7 @@ BOOL CEditStationDialog::OnInitDialog()
 				m_spinMaxSC_Z.SetPos(theApp.m_NFDRS2016.GetSCMax());
 			}
 
-			if (!station->IsFieldNull(&station->m_MX_Humid_V))
+			/*if (!station->IsFieldNull(&station->m_MX_Humid_V))
 				m_btnHumid_V.SetCheck(station->m_MX_Humid_V);
 			else
 			{
@@ -327,7 +327,7 @@ BOOL CEditStationDialog::OnInitDialog()
 			{
 				theApp.m_NFDRS2016.iSetFuelModel('Z');
 				m_btnHumid_Z.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
-			}
+			}*/
 			if (!station->IsFieldNull(&station->m_KBDIThreshold))
 				m_spinKBDIThreshold.SetPos(station->m_KBDIThreshold);
 			if (!station->IsFieldNull(&station->m_timeZoneOffset))
@@ -356,19 +356,19 @@ BOOL CEditStationDialog::OnInitDialog()
 			//nfdr2016 specific defaults for SCM_? and MX_Humid_?
 			theApp.m_NFDRS2016.iSetFuelModel('V');
 			m_spinMaxSC_V.SetPos(theApp.m_NFDRS2016.GetSCMax());
-			m_btnHumid_V.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
+			//m_btnHumid_V.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
 			theApp.m_NFDRS2016.iSetFuelModel('W');
 			m_spinMaxSC_W.SetPos(theApp.m_NFDRS2016.GetSCMax());
-			m_btnHumid_W.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
+			//m_btnHumid_W.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
 			theApp.m_NFDRS2016.iSetFuelModel('X');
 			m_spinMaxSC_X.SetPos(theApp.m_NFDRS2016.GetSCMax());
-			m_btnHumid_X.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
+			//m_btnHumid_X.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
 			theApp.m_NFDRS2016.iSetFuelModel('Y');
 			m_spinMaxSC_Y.SetPos(theApp.m_NFDRS2016.GetSCMax());
-			m_btnHumid_Y.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
+			//m_btnHumid_Y.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
 			theApp.m_NFDRS2016.iSetFuelModel('Z');
 			m_spinMaxSC_Z.SetPos(theApp.m_NFDRS2016.GetSCMax());
-			m_btnHumid_Z.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
+			//m_btnHumid_Z.SetCheck(theApp.m_NFDRS2016.GetMxdHumid());
 		}
 		//set comboboxes with lookups
 		//observation agency
@@ -617,15 +617,15 @@ void CEditStationDialog::SaveStation()
 		station->m_NESDIS_ID = m_strNESDID_ID;
 		station->m_WRCC_ID = m_strWRCC_ID;
 		station->m_SCM_V = m_spinMaxSC_V.GetPos();
-		station->m_MX_Humid_V = m_btnHumid_V.GetCheck();
+		//station->m_MX_Humid_V = m_btnHumid_V.GetCheck();
 		station->m_SCM_W = m_spinMaxSC_W.GetPos();
-		station->m_MX_Humid_W = m_btnHumid_W.GetCheck();
+		//station->m_MX_Humid_W = m_btnHumid_W.GetCheck();
 		station->m_SCM_X = m_spinMaxSC_X.GetPos();
-		station->m_MX_Humid_X = m_btnHumid_X.GetCheck();
+		//station->m_MX_Humid_X = m_btnHumid_X.GetCheck();
 		station->m_SCM_Y = m_spinMaxSC_Y.GetPos();
-		station->m_MX_Humid_Y = m_btnHumid_Y.GetCheck();
+		//station->m_MX_Humid_Y = m_btnHumid_Y.GetCheck();
 		station->m_SCM_Z = m_spinMaxSC_Z.GetPos();
-		station->m_MX_Humid_Z = m_btnHumid_Z.GetCheck();
+		//station->m_MX_Humid_Z = m_btnHumid_Z.GetCheck();
 		m_editKBDIThreshold.GetWindowTextA(str1);
 		station->m_KBDIThreshold = atoi(str1);
 		int sel = m_comboTimeZone.GetCurSel();

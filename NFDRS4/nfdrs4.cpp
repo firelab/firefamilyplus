@@ -183,7 +183,17 @@ int NFDRS4::GetSCMax()
 	return SCM;
 }
 
-void NFDRS4::SetMxdHumid(bool isHumid)
+void NFDRS4::SetMXD(int mxd)
+{
+    MXD = mxd;
+}
+
+int NFDRS4::GetMXD()
+{
+    return MXD;
+}
+
+/*void NFDRS4::SetMxdHumid(bool isHumid)
 {
 	mxdHumid = isHumid;
 	if (isHumid)
@@ -216,7 +226,7 @@ bool NFDRS4::GetMxdHumid()
 {
 	return mxdHumid;
 }
-
+*/
 
 double NFDRS4::GetFuelTemperature()
 {
@@ -518,7 +528,8 @@ void NFDRS4::Update(int Year, int Month, int Day, int Hour, double Temp, double 
         qHourlyPrecip.pop_front();
     //deques OK, now figure Min/Max's and 24 hour pcp
     double MinRH = NORECORD, MinTemp = NORECORD, MaxTemp = NORECORD, pcp24 = 0.0;
-    for (auto it = qHourlyTemp.begin(); it != qHourlyTemp.end(); ++it)
+    
+    for (std::deque<double>::iterator it = qHourlyTemp.begin(); it != qHourlyTemp.end(); ++it)
     {
         if ((*it) != NORECORD)
         {
@@ -532,7 +543,7 @@ void NFDRS4::Update(int Year, int Month, int Day, int Hour, double Temp, double 
                 MinTemp = min(MinTemp, *it);
         }
     }
-    for (auto it = qHourlyRH.begin(); it != qHourlyRH.end(); ++it)
+    for (std::deque<double>::iterator it = qHourlyRH.begin(); it != qHourlyRH.end(); ++it)
     {
         if ((*it) != NORECORD)
         {
@@ -542,7 +553,7 @@ void NFDRS4::Update(int Year, int Month, int Day, int Hour, double Temp, double 
                 MinRH = min(MinRH, *it);
         }
     }
-    for (auto it = qHourlyPrecip.begin(); it != qHourlyPrecip.end(); ++it)
+    for (std::deque<double>::iterator it = qHourlyPrecip.begin(); it != qHourlyPrecip.end(); ++it)
     {
         if (*it != NORECORD)
             pcp24 += *it;
@@ -1548,7 +1559,7 @@ bool NFDRS4::LoadState(NFDRS4State state)
 double NFDRS4::GetMinTemp()
 {
     double minTemp = NORECORD;
-    for (auto it = qHourlyTemp.begin(); it != qHourlyTemp.end(); ++it)
+    for (std::deque<double>::iterator it = qHourlyTemp.begin(); it != qHourlyTemp.end(); ++it)
     {
         if ((*it) != NORECORD)
         {
@@ -1564,7 +1575,7 @@ double NFDRS4::GetMinTemp()
 double NFDRS4::GetMaxTemp()
 {
     double maxTemp = NORECORD;
-    for (auto it = qHourlyTemp.begin(); it != qHourlyTemp.end(); ++it)
+    for (std::deque<double>::iterator it = qHourlyTemp.begin(); it != qHourlyTemp.end(); ++it)
     {
         if ((*it) != NORECORD)
         {
@@ -1579,7 +1590,7 @@ double NFDRS4::GetMaxTemp()
 double NFDRS4::GetMinRH()
 {
     double minRH = NORECORD;
-    for (auto it = qHourlyRH.begin(); it != qHourlyRH.end(); ++it)
+    for (std::deque<double>::iterator it = qHourlyRH.begin(); it != qHourlyRH.end(); ++it)
     {
         if ((*it) != NORECORD)
         {
@@ -1594,7 +1605,7 @@ double NFDRS4::GetMinRH()
 double NFDRS4::GetPcp24()
 {
     double pcp24 = 0.0;
-    for (auto it = qHourlyPrecip.begin(); it != qHourlyPrecip.end(); ++it)
+    for (std::deque<double>::iterator it = qHourlyPrecip.begin(); it != qHourlyPrecip.end(); ++it)
     {
         if (*it != NORECORD)
             pcp24 += *it;

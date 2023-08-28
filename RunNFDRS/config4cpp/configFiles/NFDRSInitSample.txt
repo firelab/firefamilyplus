@@ -24,7 +24,11 @@ kbdiThreshold = "100";
 # initial KBDI value on Init
 startKBDI = "100";
 # flag to indicate Humid climate
-isHumid = "0";
+# flag removed  8/26/2023 SB
+#isHumid = "1";
+#MXD added 8/26/2023 SB
+#Moisture of Extinction (%), any positive value other than zero (0) will override fuel model default MXD for the fuel model
+MXD = "0";
 # hour when daily observations are reported and GSI/Live fuel moistures updated
 obsHour = "13";
 # timeZone offset from UTC, absolutely necessary if FW21 data is Zulu time

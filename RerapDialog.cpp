@@ -1043,7 +1043,8 @@ BOOL CRerapDialog::ReadData()
 			lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip(), lfiWoody.GetWoodyMin(), lfiWoody.GetWoodyMax());
 		theApp.m_NFDRS2016.SetStartKBDI(staSet.m_StartKBDI);
 		theApp.m_NFDRS2016.SetSCMax(staSet.GetSCM(staSet.m_NFDRSFM[0]));
-		theApp.m_NFDRS2016.SetMxdHumid(staSet.GetMxHumid(staSet.m_NFDRSFM[0]));
+		if (!staSet.IsFieldNull(&staSet.m_MXD_Override))
+			theApp.m_NFDRS2016.SetMXD(staSet.m_MXD_Override);
 	}
 	if (!isNFDRS2016(staSet.m_NFDRSFM[0]))
 	{   // "old" NFDRS calc

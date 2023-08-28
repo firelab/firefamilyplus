@@ -4611,19 +4611,19 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 			stnSet.m_RegSchdObs = 13;
 			theApp.m_NFDRS2016.iSetFuelModel('V');
 			stnSet.m_SCM_V = theApp.m_NFDRS2016.GetSCMax();
-			stnSet.m_MX_Humid_V = theApp.m_NFDRS2016.GetMxdHumid();
+			stnSet.m_MX_Humid_V = FALSE;// theApp.m_NFDRS2016.GetMxdHumid();
 			theApp.m_NFDRS2016.iSetFuelModel('W');
 			stnSet.m_SCM_W = theApp.m_NFDRS2016.GetSCMax();
-			stnSet.m_MX_Humid_W = theApp.m_NFDRS2016.GetMxdHumid();
+			stnSet.m_MX_Humid_W = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 			theApp.m_NFDRS2016.iSetFuelModel('X');
 			stnSet.m_SCM_X = theApp.m_NFDRS2016.GetSCMax();
-			stnSet.m_MX_Humid_X = theApp.m_NFDRS2016.GetMxdHumid();
+			stnSet.m_MX_Humid_X = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 			theApp.m_NFDRS2016.iSetFuelModel('Y');
 			stnSet.m_SCM_Y = theApp.m_NFDRS2016.GetSCMax();
-			stnSet.m_MX_Humid_Y = theApp.m_NFDRS2016.GetMxdHumid();
+			stnSet.m_MX_Humid_Y = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 			theApp.m_NFDRS2016.iSetFuelModel('Z');
 			stnSet.m_SCM_Z = theApp.m_NFDRS2016.GetSCMax();
-			stnSet.m_MX_Humid_Z = theApp.m_NFDRS2016.GetMxdHumid();
+			stnSet.m_MX_Humid_Z = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 
 			wrccStnSet.m_strFilter.Format("[WRCC_ID] = '%s'", wrccSta);
 			wrccStnSet.Requery();
@@ -7237,19 +7237,19 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 		//need to set defaults for NFDRS2016 fuel model SCM and Humid
 		theApp.m_NFDRS2016.iSetFuelModel('V');
 		staSet.m_SCM_V = theApp.m_NFDRS2016.GetSCMax();
-		staSet.m_MX_Humid_V = theApp.m_NFDRS2016.GetMxdHumid();
+		staSet.m_MX_Humid_V = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 		theApp.m_NFDRS2016.iSetFuelModel('W');
 		staSet.m_SCM_W = theApp.m_NFDRS2016.GetSCMax();
-		staSet.m_MX_Humid_W = theApp.m_NFDRS2016.GetMxdHumid();
+		staSet.m_MX_Humid_W = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 		theApp.m_NFDRS2016.iSetFuelModel('X');
 		staSet.m_SCM_X = theApp.m_NFDRS2016.GetSCMax();
-		staSet.m_MX_Humid_X = theApp.m_NFDRS2016.GetMxdHumid();
+		staSet.m_MX_Humid_X = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 		theApp.m_NFDRS2016.iSetFuelModel('Y');
 		staSet.m_SCM_Y = theApp.m_NFDRS2016.GetSCMax();
-		staSet.m_MX_Humid_Y = theApp.m_NFDRS2016.GetMxdHumid();
+		staSet.m_MX_Humid_Y = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 		theApp.m_NFDRS2016.iSetFuelModel('Z');
 		staSet.m_SCM_Z = theApp.m_NFDRS2016.GetSCMax();
-		staSet.m_MX_Humid_Z = theApp.m_NFDRS2016.GetMxdHumid();
+		staSet.m_MX_Humid_Z = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 
 
 		fprintf(logFile, "\t%s station %s\n\t%d errors encountered.\n",
@@ -7715,19 +7715,19 @@ int CImportDialog::NewImportFW9(CString fileName, FILE *errLog, bool bOverwrite)
 				stnSet.m_RegSchdObs = 13;
 				theApp.m_NFDRS2016.iSetFuelModel('V');
 				stnSet.m_SCM_V = theApp.m_NFDRS2016.GetSCMax();
-				stnSet.m_MX_Humid_V = theApp.m_NFDRS2016.GetMxdHumid();
+				stnSet.m_MX_Humid_V = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 				theApp.m_NFDRS2016.iSetFuelModel('W');
 				stnSet.m_SCM_W = theApp.m_NFDRS2016.GetSCMax();
-				stnSet.m_MX_Humid_W = theApp.m_NFDRS2016.GetMxdHumid();
+				stnSet.m_MX_Humid_W = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 				theApp.m_NFDRS2016.iSetFuelModel('X');
 				stnSet.m_SCM_X = theApp.m_NFDRS2016.GetSCMax();
-				stnSet.m_MX_Humid_X = theApp.m_NFDRS2016.GetMxdHumid();
+				stnSet.m_MX_Humid_X = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 				theApp.m_NFDRS2016.iSetFuelModel('Y');
 				stnSet.m_SCM_Y = theApp.m_NFDRS2016.GetSCMax();
-				stnSet.m_MX_Humid_Y = theApp.m_NFDRS2016.GetMxdHumid();
+				stnSet.m_MX_Humid_Y = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 				theApp.m_NFDRS2016.iSetFuelModel('Z');
 				stnSet.m_SCM_Z = theApp.m_NFDRS2016.GetSCMax();
-				stnSet.m_MX_Humid_Z = theApp.m_NFDRS2016.GetMxdHumid();
+				stnSet.m_MX_Humid_Z = FALSE;//theApp.m_NFDRS2016.GetMxdHumid();
 
 				wrccStnSet.m_strFilter.Format("[WRCC_ID] = '%s'", wrccSta);
 				wrccStnSet.Requery();

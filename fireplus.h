@@ -59,7 +59,7 @@ enum GFile {BMP, PNG, JPG, TIF, GIF};
 
 #define OVERLAYS 3	//max years overlaid on graph
 #define MAXMERGES 4 //max 4 vars on a merged graph
-#define STATICVARIDS 45
+#define STATICVARIDS 49
 #define MAXVARIDS 100
 
 

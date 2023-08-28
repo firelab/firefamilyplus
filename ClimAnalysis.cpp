@@ -105,13 +105,16 @@ char *abbrevs[MAXVARIDS] =
 {   " Temp", " AvgT", " MinT", " MaxT", "   RH", " AvRH", " MnRH", " MxRH", " Rain", " RnDr", " Wind",
 	"   SC", "  ERC", "   BI", " KBDI", "   IC", "  FM1", " FM10", " F100", " 1000", "  FMH", "  FMW",
 	"SFlag", " WDIR", "  SOW", " FFMC", "  DMC", "   DC", "  ISI", "  BUI", "  FWI", "  DSR", " GDir",
-	" GSpd", " SolR", "WFlag", "DPT", "VPDM", "VPDA", "GSI", "WAZI", "HrRa", "LHerb", "LWood", " FFWI"};
+	" GSpd", " SolR", "WFlag", "DPT", "VPDM", "VPDA", "GSI", "WAZI", "HrRa", "LHerb", "LWood", " FFWI",
+	"WTMCD", "WMCDE", "WTMCL", "WMCLE"
+};
 
 char *varFormats[MAXVARIDS] =
 {   "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.2f", "5.0f", "5.0f",
 	"5.1f", "5.1f", "5.1f", "5.1f", "5.1f", "5.1f", "5.1f", "5.1f", "5.1f", "5.1f", "5.1f",
 	"5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f",
-	"5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.4f", "5.0f", "5.2f", "5.4f", "5.4f", "5.0f"};
+	"5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.0f", "5.4f", "5.0f", "5.2f", "5.4f", "5.4f", "5.0f",
+	"5.1f", "5.1f", "5.1f", "5.1f" };
 
 extern CFireplusApp theApp;
 
@@ -1750,8 +1753,9 @@ int CClimAnalysis::AnalyzeStation(CString stationStr, bool isFPA /* = false*/, C
 					lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip(), lfiWoody.GetWoodyMin(), lfiWoody.GetWoodyMax());
 				theApp.m_NFDRS2016.SetStartKBDI(staSet.m_StartKBDI);
 				theApp.m_NFDRS2016.SetSCMax(staSet.GetSCM(staSet.m_NFDRSFM[0]));
-				theApp.m_NFDRS2016.SetMxdHumid(staSet.GetMxHumid(staSet.m_NFDRSFM[0]));
-			//}
+				if (!staSet.IsFieldNull(&staSet.m_MXD_Override))
+					theApp.m_NFDRS2016.SetMXD(staSet.m_MXD_Override);
+				//}
 		}
 		if (!isNFDRS2016(staSet.m_NFDRSFM[0])) 
 		{   // "old" NFDRS calc
@@ -1816,6 +1820,7 @@ int CClimAnalysis::AnalyzeStation(CString stationStr, bool isFPA /* = false*/, C
 		int tmp, tmpMax, tmpMin, rh, rhMax, rhMin, pptDur, sow, greenHerb, greenShrub,
 			season, windSpd, windDir, slopeClass, wetFlag, snowFlag;
 		double pptAmt, omc10,lfiVal, lfiHerbVal, lfiWoodyVal;
+		double wtmcd, wtmcde, wtmcl, wtmcle;
 		while(!wxSet->IsEOF() && !pCUPDUPData->ShouldTerminate())
 		{
 
@@ -2005,6 +2010,10 @@ int CClimAnalysis::AnalyzeStation(CString stationStr, bool isFPA /* = false*/, C
 					iBI = (int)fBI;
 					iIC = (int)fIC;
 
+					wtmcd = theApp.m_NFDRS2016.WTMCD;
+					wtmcde = theApp.m_NFDRS2016.WTMCDE;
+					wtmcl = theApp.m_NFDRS2016.WTMCL;
+					wtmcle = theApp.m_NFDRS2016.WTMCLE;
 					//store moistures?
 					if (reCalc2016)
 					{
@@ -2302,6 +2311,30 @@ int CClimAnalysis::AnalyzeStation(CString stationStr, bool isFPA /* = false*/, C
 							if(!wxSet->IsFieldNull(&wxSet->m_Temp) && !wxSet->IsFieldNull(&wxSet->m_RH)
 									&& !wxSet->IsFieldNull(&wxSet->m_WS))
 								val = theApp.m_NFDRS.iCalcFFWI(wxSet->m_Temp, max(wxSet->m_RH, 1), wxSet->m_WS);
+							else
+								goodRecord = false;
+							break;
+						case 46:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcd;
+							else
+								goodRecord = false;
+							break;
+						case 47:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcde;
+							else
+								goodRecord = false;
+							break;
+						case 48:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcl;
+							else
+								goodRecord = false;
+							break;
+						case 49:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcle;
 							else
 								goodRecord = false;
 							break;
@@ -3122,6 +3155,10 @@ short OptionFromVarID(int varID)
 	case 39:
 	case 42:
 	case 43:
+	case 45:
+	case 46:
+	case 47:
+	case 48:
 		return 1;//NFDRS
 		break;
 	case 25:
@@ -7581,7 +7618,8 @@ int CClimAnalysis::AnalyzeBatchStation(CString stationStr, bool isFPA, CString s
 				lfiWoody.GetNumPrecipDays(), lfiWoody.GetRTPcpMin(), lfiWoody.GetRTPcpMax(), lfiWoody.GetUseRTPrecip(), lfiWoody.GetWoodyMin(), lfiHerb.GetWoodyMax());
 			theApp.m_NFDRS2016.SetStartKBDI(staSet.m_StartKBDI);
 			theApp.m_NFDRS2016.SetSCMax(staSet.GetSCM(staSet.m_NFDRSFM[0]));
-			theApp.m_NFDRS2016.SetMxdHumid(staSet.GetMxHumid(staSet.m_NFDRSFM[0]));
+			if (!staSet.IsFieldNull(&staSet.m_MXD_Override))
+				theApp.m_NFDRS2016.SetMXD(staSet.m_MXD_Override);
 		}
 		if (!isNFDRS2016(staSet.m_NFDRSFM[0]))
 		{   // "old" NFDRS calc
@@ -7613,7 +7651,7 @@ int CClimAnalysis::AnalyzeBatchStation(CString stationStr, bool isFPA, CString s
 		ffmc, dmc, dc, bui, isi, fwi, dsr;
 	double fSC, fIC, fFIL, fBI;
 	double pptAcc = 0;
-
+	double wtmcd, wtmcde, wtmcl, wtmcle;
 	COleDateTime yesterday, wxDay;//used to skip duplicates
 	wxSet->Requery();
 	int recCount = 0;
@@ -7777,8 +7815,10 @@ int CClimAnalysis::AnalyzeBatchStation(CString stationStr, bool isFPA, CString s
 					iIC = (int)fIC;
 					iSC = (int)fSC;
 					
-
-
+					wtmcd = theApp.m_NFDRS2016.WTMCD;
+					wtmcde = theApp.m_NFDRS2016.WTMCDE;
+					wtmcl = theApp.m_NFDRS2016.WTMCL;
+					wtmcle = theApp.m_NFDRS2016.WTMCLE;
 				}
 				if (!isNFDRS2016(staSet.m_NFDRSFM[0]))
 				{ // "old" NFDRS calc
@@ -8044,6 +8084,30 @@ int CClimAnalysis::AnalyzeBatchStation(CString stationStr, bool isFPA, CString s
 							if(!wxSet->IsFieldNull(&wxSet->m_Temp) && !wxSet->IsFieldNull(&wxSet->m_RH)
 									&& !wxSet->IsFieldNull(&wxSet->m_WS))
 								val = theApp.m_NFDRS.iCalcFFWI(wxSet->m_Temp, max(wxSet->m_RH, 1), wxSet->m_WS);
+							else
+								goodRecord = false;
+							break;
+						case 46:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcd;
+							else
+								goodRecord = false;
+							break;
+						case 47:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcde;
+							else
+								goodRecord = false;
+							break;
+						case 48:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcl;
+							else
+								goodRecord = false;
+							break;
+						case 49:
+							if (isNFDRS2016(staSet.m_NFDRSFM[0]) && useNFDRS)
+								val = wtmcle;
 							else
 								goodRecord = false;
 							break;
