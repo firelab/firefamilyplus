@@ -11,7 +11,6 @@
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_KBDI                 130
 #define IDD_FMPARAMS_DIALOG             132
-#define IDC_USE88                       1001
 #define IDC_SLOPECLASS                  1002
 #define IDC_SC                          1006
 #define IDC_ERC                         1007
@@ -20,6 +19,9 @@
 #define IDC_SPIN_WIND                   1010
 #define IDC_1HRFM                       1011
 #define IDC_IC                          1012
+#define IDC_MXD_OVERRIDE                1013
+#define IDC_SPIN_WIND2                  1014
+#define IDC_SPIN_MXD_OVERRIDE           1014
 #define IDC_BUTTON_KBDICALC             1015
 #define IDC_SPIN_1HRFM                  1020
 #define IDC_10HRFM                      1021
@@ -61,9 +63,7 @@
 #define IDC_GRID                        1049
 #define IDC_BUTTON_REMOVE               1050
 #define IDC_BUTTON_CLEAR                1051
-#define IDC_VERSION_STRING_NFDRS2016    1052
 #define IDC_VERSION_STRING_NFDRS4       1052
-#define IDC_CHECK_HUMID_MXD             1053
 #define IDC_NFDRSFM                     1136
 #define IDC_FUELMODEL                   1136
 

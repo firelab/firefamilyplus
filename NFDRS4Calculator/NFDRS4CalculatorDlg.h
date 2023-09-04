@@ -118,4 +118,8 @@ public:
 	afx_msg void OnKillfocusKbdi2016();
 	afx_msg void OnChangeEditScm();
 	afx_msg void OnKillfocusEditScm();
+	CEdit m_editMXDOverride;
+	CSpinButtonCtrl m_spinMXDOverride;
+	afx_msg void OnChangeMxdOverride();
+	afx_msg void OnKillfocusMxdOverride();
 };

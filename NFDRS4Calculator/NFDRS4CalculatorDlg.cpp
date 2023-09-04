@@ -92,10 +92,12 @@ void CNFDRS4CalculatorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_NFDRSFM, m_comboFuelModel);
 	DDX_Control(pDX, IDC_SLOPECLASS, m_comboSlopeClass);
 	DDX_Control(pDX, IDC_SPIN_SCM, m_spinSCM);
-	DDX_Control(pDX, IDC_CHECK_HUMID_MXD, m_btnHumid);
+	//DDX_Control(pDX, IDC_CHECK_HUMID_MXD, m_btnHumid);
 	DDX_Control(pDX, IDC_EDIT_SCM, m_editSCM);
 	DDX_Control(pDX, IDC_SPIN_FUEL_TEMP, m_spinFuelTemp);
 	DDX_Control(pDX, IDC_FUEL_TEMP, m_editFuelTemp);
+	DDX_Control(pDX, IDC_MXD_OVERRIDE, m_editMXDOverride);
+	DDX_Control(pDX, IDC_SPIN_MXD_OVERRIDE, m_spinMXDOverride);
 }
 
 BEGIN_MESSAGE_MAP(CNFDRS4CalculatorDlg, CDialogEx)
@@ -105,6 +107,34 @@ BEGIN_MESSAGE_MAP(CNFDRS4CalculatorDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CALCULATE, &CNFDRS4CalculatorDlg::OnClickedCalculate)
 	ON_BN_CLICKED(IDC_BUTTON_KBDICALC, OnBnClickedButtonKbdicalc)
 	ON_BN_CLICKED(IDC_BUTTON_FMPARAMS, OnBnClickedButtonFmparams)
+	ON_EN_KILLFOCUS(IDC_1HRFM, &CNFDRS4CalculatorDlg::OnEnKillfocus1hrfm)
+	ON_EN_CHANGE(IDC_1HRFM, &CNFDRS4CalculatorDlg::OnEnChange1hrfm)
+	ON_EN_KILLFOCUS(IDC_10HRFM, &CNFDRS4CalculatorDlg::OnEnKillfocus10hrfm)
+	ON_EN_CHANGE(IDC_10HRFM, &CNFDRS4CalculatorDlg::OnEnChange10hrfm)
+	ON_EN_KILLFOCUS(IDC_100HRFM, &CNFDRS4CalculatorDlg::OnEnKillfocus100hrfm)
+	ON_EN_CHANGE(IDC_100HRFM, &CNFDRS4CalculatorDlg::OnEnChange100hrfm)
+	ON_EN_KILLFOCUS(IDC_1000HRFM, &CNFDRS4CalculatorDlg::OnEnKillfocus1000hrfm)
+	ON_EN_CHANGE(IDC_1000HRFM, &CNFDRS4CalculatorDlg::OnEnChange1000hrfm)
+	ON_EN_KILLFOCUS(IDC_HERB, &CNFDRS4CalculatorDlg::OnEnKillfocusHerbfm)
+	ON_EN_CHANGE(IDC_HERB, &CNFDRS4CalculatorDlg::OnEnChangeHerbfm)
+	ON_EN_KILLFOCUS(IDC_WOODY, &CNFDRS4CalculatorDlg::OnEnKillfocusWoodyfm)
+	ON_EN_CHANGE(IDC_WOODY, &CNFDRS4CalculatorDlg::OnEnChangeWoodyfm)
+	ON_EN_KILLFOCUS(IDC_WIND, &CNFDRS4CalculatorDlg::OnEnKillfocusWind)
+	ON_EN_CHANGE(IDC_WIND, &CNFDRS4CalculatorDlg::OnEnChangeWind)
+	ON_EN_CHANGE(IDC_GSI, &CNFDRS4CalculatorDlg::OnChangeGsi)
+	ON_EN_KILLFOCUS(IDC_GSI, &CNFDRS4CalculatorDlg::OnKillfocusGsi)
+	ON_EN_CHANGE(IDC_GSI_THRESHOLD, &CNFDRS4CalculatorDlg::OnChangeGsiThreshold)
+	ON_EN_KILLFOCUS(IDC_GSI_THRESHOLD, &CNFDRS4CalculatorDlg::OnKillfocusGsiThreshold)
+	ON_EN_CHANGE(IDC_FUEL_TEMP, &CNFDRS4CalculatorDlg::OnChangeFuelTemp)
+	ON_EN_KILLFOCUS(IDC_FUEL_TEMP, &CNFDRS4CalculatorDlg::OnKillfocusFuelTemp)
+	ON_EN_CHANGE(IDC_GSIMAX, &CNFDRS4CalculatorDlg::OnChangeGsimax)
+	ON_EN_KILLFOCUS(IDC_GSIMAX, &CNFDRS4CalculatorDlg::OnKillfocusGsimax)
+	ON_EN_CHANGE(IDC_KBDI2016, &CNFDRS4CalculatorDlg::OnChangeKbdi2016)
+	ON_EN_KILLFOCUS(IDC_KBDI2016, &CNFDRS4CalculatorDlg::OnKillfocusKbdi2016)
+	ON_EN_CHANGE(IDC_EDIT_SCM, &CNFDRS4CalculatorDlg::OnChangeEditScm)
+	ON_EN_KILLFOCUS(IDC_EDIT_SCM, &CNFDRS4CalculatorDlg::OnKillfocusEditScm)
+	ON_EN_CHANGE(IDC_MXD_OVERRIDE, &CNFDRS4CalculatorDlg::OnChangeMxdOverride)
+	ON_EN_KILLFOCUS(IDC_MXD_OVERRIDE, &CNFDRS4CalculatorDlg::OnKillfocusMxdOverride)
 END_MESSAGE_MAP()
 
 
@@ -216,6 +246,9 @@ BOOL CNFDRS4CalculatorDlg::OnInitDialog()
 	m_spinFuelTemp.SetRangeAndDelta(-50.0, 150.0, 1.0);
 	m_spinFuelTemp.SetPos(m_fuelTemperature);
 	m_spinFuelTemp.SetBuddy(&m_editFuelTemp);
+	m_spinMXDOverride.SetRange(0, 100);
+	m_spinMXDOverride.SetPos(0);
+	m_editMXDOverride.SetWindowTextW(_T(""));
 	if (theApp.pOptions)
 	{
 		CString tmpStr;
@@ -409,7 +442,9 @@ void CNFDRS4CalculatorDlg::OnClickedCalculate()
 	m_nfdrs2016.Init(45, fmStr[0], _wtoi(m_slopeClass), 30, true, true, false, 100);// , gsiMax, gsiThreshold);
 	m_nfdrs2016.iSetFuelModel(fmStr[0]);
 	m_nfdrs2016.SetSCMax(m_spinSCM.GetPos());
-	m_nfdrs2016.SetMxdHumid(m_btnHumid.GetCheck());
+	if (m_spinMXDOverride.GetPos() > 0)
+		m_nfdrs2016.SetMXD(m_spinMXDOverride.GetPos());
+	//m_nfdrs2016.SetMxdHumid(m_btnHumid.GetCheck());
 	m_nfdrs2016.SetHerbGSIparams(m_gsiMax, m_gsiThreshold);
 	//need fuel temp in C
 	double fTempC;
@@ -787,4 +822,26 @@ CalcOptions::CalcOptions()
 
 CalcOptions::~CalcOptions()
 {
+}
+
+
+void CNFDRS4CalculatorDlg::OnChangeMxdOverride()
+{
+	CString str;
+	m_editMXDOverride.GetWindowText(str);
+	if (str.GetLength() > 0)// && (val < 0.0 || val > 800))
+	{
+		int val = _wtoi(str);
+		if (val < 1 || val > 100)
+		{
+			AfxMessageBox(_T("Error: MXD Override must be between 1 and 100, or blank"));
+			m_editMXDOverride.SetFocus();
+		}
+	}
+}
+
+
+void CNFDRS4CalculatorDlg::OnKillfocusMxdOverride()
+{
+	// TODO: Add your control notification handler code here
 }
