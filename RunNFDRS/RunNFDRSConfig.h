@@ -7,7 +7,7 @@
 #ifndef RunNFDRSConfig_h
 #define RunNFDRSConfig_h
 
-#include <config4cpp/Configuration.h>
+#include "config4cpp/Configuration.h"
 
 
 class RunNFDRSConfig

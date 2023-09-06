@@ -5,9 +5,12 @@
 #include "RunNFDRSConfiguration.h"
 #include "NFDRSConfiguration.h"
 #include "CNFDRSParams.h"
-#include "NFDRS4CalcState.h"
 #include "fw21.h"
+#ifdef WIN32
 #include <io.h>
+#else
+#include <unistd.h>
+#endif
 #include <stdlib.h>
 using namespace std;
 
@@ -44,9 +47,9 @@ int main(int argc, char* argv[])
 	int	exitStatus = 0;
 	if (argc < 2)
 	{
-		printf("RunNFDRS takes 1 parameter: A path to a RunNFDRS configuration file.\n"
-			"RunNFDRS <configFileName>\n"
-		"\twhere configFileName is the complete path to a RunNFDRS configuration file\n\n");
+		printf("NFDRS4_cli takes 1 parameter: A path to a NFDRS4_cli configuration file.\n"
+			"NFDRS4_cli <configFileName>\n"
+		"\twhere configFileName is the complete path to a NFDRS4_cli configuration file\n\n");
 		exit(1);
 	}
 	if (!fileExists(argv[1]))
@@ -91,7 +94,7 @@ int main(int argc, char* argv[])
 
 	if (strlen(wxFileName) == 0)
 	{
-		printf("A wxFile must be specified in the RunNFDRS Configuration file\n");
+		printf("A wxFile must be specified in the NFDRS4_cli Configuration file\n");
 		delete cfg;
 		return -3;
 	}
@@ -103,10 +106,8 @@ int main(int argc, char* argv[])
 	{
 		try
 		{
-			//NFDRSConfiguration *nfdrsCfg = new NFDRSConfiguration();
 			nfdrsCfg->parse(nfdrsInitFileName);
 			params = nfdrsCfg->getNFDRSParams();
-			//delete nfdrsCfg;
 		}
 		catch (NFDRSConfigurationException & ex)
 		{
@@ -118,7 +119,7 @@ int main(int argc, char* argv[])
 	}
 	//at this point we should have everything we need
 	NFDRS4 fw21Calc;
-	//use NFDRSParams to initialize NFDR2016Calc object
+	//use NFDRSParams to initialize NFDRS4 object
 	//params.InitNFDRS(&thisCalc);
 	params.InitNFDRS(&fw21Calc);
 	//do we have a state file?
@@ -155,7 +156,7 @@ int main(int argc, char* argv[])
 		}
 		//if(!allExists)
 			//fprintf(allOut, "DateTime, Temp, RH, Precip, WindSpeed, SolarRadiation, SnowFlag, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
-		fprintf(allOut, "DateTime, Temperature(F), RelativeHumidity(%%), Precipitation(in), WindSpeed(mph), SolarRadiation(W/m2), SnowFlag, MinTemp, MaxTemp, MinRH, Pcp24, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM, BI, ERC, SC, IC, GSI, KBDI\n");
+		fprintf(allOut, "DateTime,Temperature(F),RelativeHumidity(%%),Precipitation(in),WindSpeed(mph),SolarRadiation(W/m2),SnowFlag,MinTemp,MaxTemp,MinRH,Pcp24,1HourDFM,10HourDFM,100HourDFM,1000HourDFM,HerbLFM,WoodyLFM,BI,ERC,SC,IC,GSI,KBDI\n");
 	}
 	if (indexOutputsFileName && strlen(indexOutputsFileName) > 0)
 	{
@@ -172,7 +173,7 @@ int main(int argc, char* argv[])
 			return -3;
 		}
 		//if (!exists)
-		fprintf(indexOut, "DateTime, BI, ERC, SC, IC, GSI, KBDI\n");
+		fprintf(indexOut, "DateTime,BI,ERC,SC,IC,GSI,KBDI\n");
 	}
 	if (fuelMoistureOutputsFileName && strlen(fuelMoistureOutputsFileName) > 0)
 	{
@@ -191,7 +192,7 @@ int main(int argc, char* argv[])
 			return -3;
 		}
 		//if(!fExists)
-		fprintf(moistOut, "DateTime, 1HourDFM, 10HourDFM, 100HourDFM, 1000HourDFM, HerbLFM, WoodyLFM\n");
+		fprintf(moistOut, "DateTime,1HourDFM,10HourDFM,100HourDFM,1000HourDFM,HerbLFM,WoodyLFM\n");
 	}
 
 	//now need to read the wxFile and process the records
@@ -217,13 +218,13 @@ int main(int argc, char* argv[])
 			}
 			if (indexOut)
 			{
-				fprintf(indexOut, "%s, %.2f, %.2f, %.2f, %.2f, %.2f, %d\n",
+				fprintf(indexOut, "%s,%.2f,%.2f,%.2f,%.2f,%.2f,%d\n",
 					FormatToISO8061Offset(fw21Rec.GetDateTime(), params.getTimeZoneOffsetHours()).c_str(),
 					fw21Calc.BI, fw21Calc.ERC, fw21Calc.SC, fw21Calc.IC, fw21Calc.m_GSI, fw21Calc.KBDI);
 			}
 			if (moistOut)
 			{
-				fprintf(moistOut, "%s, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n",
+				fprintf(moistOut, "%s,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",
 					FormatToISO8061Offset(fw21Rec.GetDateTime(), params.getTimeZoneOffsetHours()).c_str(),
 					fw21Calc.MC1, fw21Calc.MC10, fw21Calc.MC100, fw21Calc.MC1000, fw21Calc.MCHERB, fw21Calc.MCWOOD);
 			}

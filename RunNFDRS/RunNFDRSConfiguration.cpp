@@ -1,7 +1,8 @@
 #include "RunNFDRSConfiguration.h"
-#include <config4cpp/Configuration.h>
-#include <config4cpp/SchemaValidator.h>
+#include "config4cpp/Configuration.h"
+#include "config4cpp/SchemaValidator.h"
 #include <stdio.h>
+#include <string.h>
 
 using CONFIG4CPP_NAMESPACE::Configuration;
 using CONFIG4CPP_NAMESPACE::ConfigurationException;
@@ -11,14 +12,14 @@ using CONFIG4CPP_NAMESPACE::SchemaValidator;
 RunNFDRSConfigurationException::RunNFDRSConfigurationException(const char *str)
 {
 	m_str = new char[strlen(str) + 1];
-	strcpy_s(m_str, strlen(str), str);
+	strcpy(m_str, str);
 
 }
 
 RunNFDRSConfigurationException::RunNFDRSConfigurationException(const RunNFDRSConfigurationException& other)
 {
 	m_str = new char[strlen(other.m_str) + 1];
-	strcpy_s(m_str, strlen(other.m_str), other.m_str);
+	strcpy(m_str, other.m_str);
 }
 
 RunNFDRSConfigurationException::~RunNFDRSConfigurationException()
@@ -55,7 +56,7 @@ RunNFDRSConfiguration::~RunNFDRSConfiguration()
 
 void RunNFDRSConfiguration::parse(
 	const char *	cfgInput,
-	const char *	cfgScope/* = ""*/) throw (RunNFDRSConfigurationException)
+	const char *	cfgScope/* = ""*/)// throw (RunNFDRSConfigurationException)
 {
 	Configuration *		cfg = (Configuration*)m_cfg;
 	SchemaValidator		sv;
@@ -86,7 +87,7 @@ void RunNFDRSConfiguration::parse(
 	}
 	catch (const ConfigurationException & ex) {
 		//do nothing but print the message
-		//throw RunNFDRSConfigurationException(ex.c_str());
+		throw RunNFDRSConfigurationException(ex.c_str());
 		printf("%s\n", ex.c_str());
 	}
 

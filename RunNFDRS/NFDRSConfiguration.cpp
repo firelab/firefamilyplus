@@ -11,14 +11,14 @@ using CONFIG4CPP_NAMESPACE::SchemaValidator;
 NFDRSConfigurationException::NFDRSConfigurationException(const char *str)
 {
 	m_str = new char[strlen(str) + 2];
-	strcpy_s(m_str, strlen(str), str);
+	strcpy(m_str, str);
 
 }
 
 NFDRSConfigurationException::NFDRSConfigurationException(const NFDRSConfigurationException& other)
 {
 	m_str = new char[strlen(other.m_str) + 2];
-	strcpy_s(m_str, strlen(other.m_str), other.m_str);
+	strcpy(m_str, other.m_str);
 }
 
 NFDRSConfigurationException::~NFDRSConfigurationException()
@@ -44,8 +44,8 @@ NFDRSConfiguration::~NFDRSConfiguration()
 }
 
 void NFDRSConfiguration::parse(
-	const char *	cfgInput,
-	const char *	cfgScope/* = ""*/) throw (NFDRSConfigurationException)
+	const char* cfgInput,
+	const char* cfgScope/* = ""*/)// throw (NFDRSConfigurationException)
 {
 	Configuration *		cfg = (Configuration*)m_cfg;
 	SchemaValidator		sv;
@@ -73,7 +73,7 @@ void NFDRSConfiguration::parse(
 		if(strlen(fm) > 0)
 			m_nfdrsParams.setFuelModel(fm[0]);
 		m_nfdrsParams.setIsAnnual(cfg->lookupInt(cfgScope, "isAnnuals"));
-		m_nfdrsParams.setIsHumid(cfg->lookupInt(cfgScope, "isHumid"));
+		m_nfdrsParams.setMXD(cfg->lookupInt(cfgScope, "MXD"));
 		m_nfdrsParams.setKbdiThreshold(cfg->lookupInt(cfgScope, "kbdiThreshold"));
 		m_nfdrsParams.setLatitude(cfg->lookupFloat(cfgScope, "latitude"));
 		m_nfdrsParams.setMaxSC(cfg->lookupInt(cfgScope, "maxSC"));
@@ -171,7 +171,7 @@ void NFDRSConfiguration::parse(
 		//saveAs("Dummyfile.cfg");
 	}
 	catch (const ConfigurationException & ex) {
-		//throw NFDRSConfigurationException(ex.c_str());
+		throw NFDRSConfigurationException(ex.c_str());
 		//throw ConfigurationException(ex.c_str());
 		printf("%s\n", ex.c_str());
 	}
