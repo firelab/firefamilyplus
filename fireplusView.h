@@ -32,6 +32,8 @@ public:
 	virtual int OnCellTypeNotify(long ID,int col,long row,long msg,long param);
 	virtual COLORREF OnGetDefBackColor(int section);
 	virtual void OnDrawFocusRect(CDC *dc,RECT *rect);
+	virtual int OnEditFinish(int col, long row, CWnd* edit, LPCTSTR string, BOOL cancelFlag);
+	virtual int OnEditVerify(int col, long row, CWnd* edit, UINT* vcKey);
 	void SetVisibleColumns();
 
 	CUTNumericEdit	m_cutNumeric;
@@ -179,6 +181,7 @@ protected:
 	afx_msg void OnCustomYearlyInits();
 	afx_msg void OnHourlyEventLocator();
 	afx_msg void OnUpdateHourlyEventLocator(CCmdUI* pCmdUI);
+	afx_msg void OnApplyMetadataChanges();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
@@ -212,6 +215,7 @@ public:
 	//afx_msg void OnUpdateViewobservationsNfdrs2016Inputs(CCmdUI *pCmdUI);
 	CButton m_chkUSeDailyExtremes;
 	CButton m_chkForceRecompute;
+	CButton m_btnApplyGridChanges;
 };
 
 #ifndef _DEBUG  // debug version in fireplusView.cpp

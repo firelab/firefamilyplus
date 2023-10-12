@@ -1106,6 +1106,7 @@
 #define IDC_BUTTON_FW21_FILE            1649
 #define ID_IMPORT_FW21                  1650
 #define IDC_EDIT_MXD                    1651
+#define IDC_BUTTON_APPLY_GRID_CHANGES   1652
 #define ID_CLIMATOLOGY                  32771
 #define ID_SIGS                         32772
 #define ID_DATA_IMPORT                  32773
@@ -1292,7 +1293,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        433
 #define _APS_NEXT_COMMAND_VALUE         33004
-#define _APS_NEXT_CONTROL_VALUE         1652
+#define _APS_NEXT_CONTROL_VALUE         1653
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

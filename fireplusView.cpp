@@ -263,8 +263,8 @@ void LoadNFDRS2016MetaData(CDatabase *pDB, FFPViewCUG *grid, int row)
 
 FFPViewCUG::FFPViewCUG()
 {
-	m_pDB = NULL;
 	SetCancelMode(FALSE);
+	m_pDB = NULL;
 }
 
 FFPViewCUG::~FFPViewCUG()
@@ -273,6 +273,7 @@ FFPViewCUG::~FFPViewCUG()
 
 void FFPViewCUG::OnSetup()
 {
+	SetCancelMode(FALSE);
 	CUGCell cell;
 	m_iCheckBoxIndex = AddCellType( &m_checkBoxCT );
 	m_iDTPickerIndex = AddCellType( &m_dtPicker );
@@ -471,7 +472,8 @@ void FFPViewCUG::OnSetup()
 	GetColDefault(22, &cell);
 	cell.SetReadOnly(FALSE);
 	cell.SetNumberDecimals(0);
-	cell.SetParam(USE_COXNUMBER);
+	cell.SetDataType(UGCELLDATA_NUMBER);
+	//cell.SetParam(USE_COXNUMBER);
 	SetColDefault(22, &cell);
 
 	((CUGEdit* )GetEditClass())->SetAutoSize( FALSE );
@@ -555,6 +557,28 @@ int FFPViewCUG::OnEditStart(int col, long row,CWnd **edit)
 		}
 		*edit = &m_cutNumeric;
 	}
+	return TRUE;
+}
+
+int FFPViewCUG::OnEditFinish(int col, long row, CWnd* edit, LPCTSTR string, BOOL cancelFlag)
+{
+	//if(col == 22 && cancelFlag == FALSE)
+	//	SaveNFDRS2016MetaData(m_pDB, this, row);
+	
+	return TRUE;
+}
+
+int FFPViewCUG::OnEditVerify(int col, long row, CWnd* edit, UINT* vcKey)
+{
+	CWnd* pView = GetParent();
+	CRuntimeClass* pClass = pView->GetRuntimeClass();
+	if (strcmp(pClass->m_lpszClassName, "CFireplusView") == 0)
+	{
+		((CFireplusView*)pView)->m_btnApplyGridChanges.EnableWindow(TRUE);
+	}
+	//else if (strcmp(pClass->m_lpszClassName, "CWorkingSetDialog") == 0)
+	//{
+	//}
 	return TRUE;
 }
 
@@ -808,6 +832,7 @@ BEGIN_MESSAGE_MAP(CFireplusView, CRecordView)
 	ON_EN_CHANGE(IDC_EDAY, &CFireplusView::OnEnChangeEday)
 	ON_EN_CHANGE(IDC_EYEAR, &CFireplusView::OnEnChangeEyear)
 	ON_EN_CHANGE(IDC_SYEAR, &CFireplusView::OnEnChangeSyear)
+	ON_BN_CLICKED(IDC_BUTTON_APPLY_GRID_CHANGES, &CFireplusView::OnApplyMetadataChanges)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -876,6 +901,7 @@ void CFireplusView::DoDataExchange(CDataExchange* pDX)
 	//DDX_Control(pDX, IDC_GRID, m_Grid);             // associate the grid window with a C++ object
 	DDX_Control(pDX, IDC_CHECK_DAILY_EXTREMES, m_chkUSeDailyExtremes);
 	DDX_Control(pDX, IDC_CHECK_FORCE_RECOMPUTE, m_chkForceRecompute);
+	DDX_Control(pDX, IDC_BUTTON_APPLY_GRID_CHANGES, m_btnApplyGridChanges);
 }
 
 BOOL CFireplusView::PreCreateWindow(CREATESTRUCT& cs)
@@ -894,6 +920,7 @@ void CFireplusView::OnInitialUpdate()
 	CRecordView::OnInitialUpdate();
 	m_grid.AttachGrid(this, IDC_GRID);
 	m_grid.m_pDB = this->GetDocument()->m_pDB;
+	m_grid.SetCancelMode(FALSE);
 	m_StartYear.SetWindowText("");
 	m_EndYear.SetWindowText("");
 	m_spnSyear.SetRange(1900, 2099);
@@ -3077,6 +3104,12 @@ void CFireplusView::OnFiresbutton()
 {
 	// TODO: Add your control notification handler code here
 	OnFiresAssociations();
+}
+
+void CFireplusView::OnApplyMetadataChanges()
+{
+	SaveMetaTable();
+	m_btnApplyGridChanges.EnableWindow(FALSE);
 }
 
 void CFireplusView::OnFiresFireanalysis()

@@ -51,6 +51,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_615505A8480937DE6CCCABACA9E7CA0C"
+        "OwnerKey" = "8:_3F3B73A4E657458D9F23F5A4E629A8EF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_61DF3B0661404AD7A77CEDD1367FEDB3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -294,6 +300,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_615505A8480937DE6CCCABACA9E7CA0C"
+            {
+            "SourcePath" = "8:oledlg.dll"
+            "TargetName" = "8:oledlg.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_835B11B89E0D4100A3937514BD1FEA34"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_61DF3B0661404AD7A77CEDD1367FEDB3"
@@ -623,15 +649,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:FireFamily Plus 5"
-        "ProductCode" = "8:{88C9BDFB-2E28-4CBF-AAD9-39A03E7A0346}"
-        "PackageCode" = "8:{2F05EA71-7B98-4A07-B18F-964A02F598D0}"
+        "ProductCode" = "8:{B4B7244A-80F7-46B9-A8FB-8605CEB02A8E}"
+        "PackageCode" = "8:{67E57F03-FD34-4381-B3DD-104405092B3A}"
         "UpgradeCode" = "8:{F8587583-3FC5-468D-ADCE-121EDD2AF2A6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:5.0.53"
+        "ProductVersion" = "8:5.0.55"
         "Manufacturer" = "8:USFS"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

@@ -723,37 +723,54 @@ void CWorkingSetDialog::SaveMetaTable()
 						{
 						case 'v':
 						case 'V':
+							if(ssSet.m_SCM_V != iVal)
+								fxParamChange = true;
 							ssSet.m_SCM_V = iVal;
 							//ssSet.m_MX_Humid_V = bVal;
 							break;
 						case 'w':
 						case 'W':
+							if (ssSet.m_SCM_W != iVal)
+								fxParamChange = true;
 							ssSet.m_SCM_W = iVal;
 							//ssSet.m_MX_Humid_W = bVal;
 							break;
 						case 'x':
 						case 'X':
+							if (ssSet.m_SCM_X != iVal)
+								fxParamChange = true;
 							ssSet.m_SCM_X = iVal;
 							//ssSet.m_MX_Humid_X = bVal;
 							break;
 						case 'y':
 						case 'Y':
-							//ssSet.m_MX_Humid_Y = bVal;
+							if (ssSet.m_SCM_Y != iVal)
+								fxParamChange = true;
 							ssSet.m_SCM_Y = iVal;
 							break;
 						case 'z':
 						case 'Z':
+							if (ssSet.m_SCM_Z != iVal)
+								fxParamChange = true;
 							ssSet.m_SCM_Z = iVal;
 							//ssSet.m_MX_Humid_Z = bVal;
 							break;
 						}
+						m_grid.GetCell(22, rc, &cell);
+						int mxdVal = cell.GetNumber();
+						if (mxdVal > 0)
+						{
+							if (ssSet.IsFieldNull(&ssSet.m_MXD_Override) || ssSet.m_MXD_Override != mxdVal)
+								fxParamChange = true;
+							ssSet.m_MXD_Override = mxdVal;
+						}
+						else
+						{
+							if(!ssSet.IsFieldNull(&ssSet.m_MXD_Override))
+								fxParamChange = true;
+							ssSet.SetFieldNull(&ssSet.m_MXD_Override);
+						}
 					}
-					m_grid.GetCell(22, rc, &cell);
-					int mxdVal = cell.GetNumber();
-					if (mxdVal > 0)
-						ssSet.m_MXD_Override = mxdVal;
-					else
-						ssSet.SetFieldNull(&ssSet.m_MXD_Override);
 
 					ssSet.Update();
 				}
