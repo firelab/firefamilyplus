@@ -926,7 +926,6 @@ void CGenericWxImportDialog::OnGenericWx(){
 			rejects ++;
 			continue;
 		}
-
 		// format date & time properly
         int y=0,
 			m=0,
@@ -969,8 +968,18 @@ void CGenericWxImportDialog::OnGenericWx(){
 		  tdate[1] = sObsDate[7];
           tdate[2] = '\0';
 		  d = atoi(tdate);
-		} else {  // MM/DD/YYYY
-			int nPos = 0;
+		} else 
+		{  // MM/DD/YYYY
+			COleDateTime tempDate;
+			tempDate.ParseDateTime(sObsDate, VAR_DATEVALUEONLY);
+			//tempTime.ParseDateTime();
+			if (tempDate.GetStatus() != COleDateTime::invalid)
+			{
+				m = tempDate.GetMonth();
+				d = tempDate.GetDay();
+				y = tempDate.GetYear();
+			}
+			/*int nPos = 0;
 
 		  if (sObsDate[1]=='/') // we need to add a leading zero
 		  {
@@ -1012,7 +1021,7 @@ void CGenericWxImportDialog::OnGenericWx(){
 	      tdate[2] = sObsDate[nPos+2];
 		  tdate[3] = sObsDate[nPos+3];
           tdate[4] = '\0';
-		  y = atoi(tdate);
+		  y = atoi(tdate);*/
 
 		}
 
@@ -1040,8 +1049,16 @@ void CGenericWxImportDialog::OnGenericWx(){
 			   rejects ++;
 			   continue;
 		   } else {   // normal format
-			   if (tt == FullTime){  // HH:MM
-		          tdate[0] = sObsTime[0];
+			   if (tt == FullTime)
+			   {  // HH:MM
+				   COleDateTime tempTime;
+				   tempTime.ParseDateTime(sObsTime, VAR_TIMEVALUEONLY);
+				   if (tempTime.GetStatus() != COleDateTime::invalid)
+				   {
+					   hr = tempTime.GetHour();
+					   min = tempTime.GetMinute();
+				   }
+		          /*tdate[0] = sObsTime[0];
 		          tdate[1] = sObsTime[1];
                   tdate[2] = '\0';
 		          hr = atoi(tdate);
@@ -1049,7 +1066,7 @@ void CGenericWxImportDialog::OnGenericWx(){
 				  tdate[0] = sObsTime[3];
 		          tdate[1] = sObsTime[4];
                   tdate[2] = '\0';
-		          min = atoi(tdate);
+		          min = atoi(tdate);*/
 			   } else { // HHMM
                   tdate[0] = sObsTime[0];
 		          tdate[1] = sObsTime[1];
