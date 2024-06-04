@@ -545,6 +545,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="CPercentilesView.cpp" />
     <ClCompile Include="CTimeZones.cpp" />
     <ClCompile Include="CumulativeBars.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
@@ -2490,6 +2491,7 @@
     <ClInclude Include="columnst.h" />
     <ClInclude Include="CompactDialog.h" />
     <ClInclude Include="CountySet.h" />
+    <ClInclude Include="CPercentilesView.h" />
     <ClInclude Include="CTimeZones.h" />
     <ClInclude Include="CumulativeBars.h" />
     <ClInclude Include="CumulativeFrame.h" />
