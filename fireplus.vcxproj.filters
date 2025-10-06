@@ -908,7 +908,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CFiresSet.cpp" />
-    <ClCompile Include="CPercentilesView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UGInclude\ExtCheckBox.h">
@@ -1845,7 +1844,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CFiresSet.h" />
-    <ClInclude Include="CPercentilesView.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

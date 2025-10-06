@@ -13,6 +13,7 @@
 #include "SowOptionsSet.h"
 #include <list>
 #include <numeric>
+#include <algorithm>
 
 using namespace std;
 
