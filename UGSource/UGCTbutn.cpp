@@ -2,7 +2,12 @@
 				Class Implementation : CUGButtonType
 **************************************************************************
 	Source file : UGCTButn.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
 
 #include "stdafx.h"
@@ -210,28 +215,49 @@ Return
 	none
 ****************************************************/
 void CUGButtonType::OnDraw(CDC *dc,RECT *rect,int col,long row,
-						   CUGCell *cell,int selected,int current){
+						   CUGCell *cell,int selected,int current)
+{
+	if (!m_drawThemesSet)
+		m_useThemes = cell->UseThemes();
 	
+	UGXPThemeState state = UGXPThemes::GetState(selected>0, current>0);
+
+	if (m_btnDown && current)
+	{
+		state = ThemeStatePressed;
+	}
+
 	RECT rectout;
+
+	if (m_useThemes && UGXPThemes::DrawBackground(NULL, *dc, XPCellTypeButton, state, rect, NULL))
+	{
+		UGXPThemes::DrawEdge(NULL, *dc, XPCellTypeButton, state, rect, 0, 0, &rectout);
+		cell->SetXPStyle(XPCellTypeButton);
+		DrawText(dc,rect,rect->right - rectout.right ,col,row,cell,selected,current);
+	}
+	else
+	{
+		//draw the button
+		if(m_btnDown && current)
+                {
+			cell->SetBorder(UG_BDR_RECESSED);
+			DrawBorder(dc,rect,&rectout,cell);
+		}
+		else
+                {
+			cell->SetBorder(UG_BDR_RAISED);
+			DrawBorder(dc,rect,&rectout,cell);
+		}
 	
-	//draw the button
-	if(m_btnDown && current){
-		cell->SetBorder(UG_BDR_RECESSED);
-		DrawBorder(dc,rect,&rectout,cell);
-	}
-	else{
-		cell->SetBorder(UG_BDR_RAISED);
-		DrawBorder(dc,rect,&rectout,cell);
-	}
-
 	//draw the text in using the default drawing routine
-	DrawText(dc,&rectout,0,col,row,cell,selected,current);
+		DrawText(dc,&rectout,0,col,row,cell,selected,current);
+	}
 
-	if(cell->IsPropertySet(UGCELL_CELLTYPEEX_SET) && current){
-		if(cell->GetCellTypeEx()&UGCT_BUTTONNOFOCUS){
+	if(cell->IsPropertySet(UGCELL_CELLTYPEEX_SET) && current)
+	{
+		if(cell->GetCellTypeEx()&UGCT_BUTTONNOFOCUS)
+		{
 			m_ctrl->TempDisableFocusRect();
 		}
 	}
-
-	return;
 }

@@ -164,11 +164,11 @@ void CRegionsDialog::FillRegions()
 	}
 }
 
-int CRegionsDialog::DoModal() 
+INT_PTR CRegionsDialog::DoModal() 
 {
 	// TODO: Add your specialized code here and/or call the base class
 	
-	int ret =  CDialog::DoModal();
+	INT_PTR ret =  CDialog::DoModal();
 	regSet.Close();
 	return ret;
 }

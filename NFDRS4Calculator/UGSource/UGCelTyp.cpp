@@ -2,9 +2,14 @@
 				Class Implementation : CUGCellType
 **************************************************************************
 	Source file : UGCelTyp.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
-#include "..\pch.h"
+#include "pch.h"
 #include "UGCtrl.h"
 
 #ifdef _DEBUG
@@ -21,8 +26,10 @@ CUGCellType - Constructor
 	NOTE: New cell types must be registered with the
 	grid before use.
 ****************************************************/
-CUGCellType::CUGCellType(){
-
+CUGCellType::CUGCellType()
+{
+	m_useThemes = true;
+	m_drawThemesSet = false;
 	m_canTextEdit = TRUE;
 	m_drawLabelText = FALSE;
 	m_canOverLap = TRUE;
@@ -263,7 +270,7 @@ Params:
 Return:
 	Value is dependant on the notification being fired
 ****************************************************/
-int CUGCellType::OnCellTypeNotify(long ID,int col,long row,long msg,long param){
+int CUGCellType::OnCellTypeNotify(long ID,int col,long row,long msg,LONG_PTR param){
 	return m_ctrl->OnCellTypeNotify(ID,col,row,msg,param);
 }
 
@@ -593,6 +600,9 @@ Return
 void CUGCellType::OnDraw(CDC *dc,RECT *rect,int col,long row,CUGCell *cell,
 						int selected,int current)
 {
+	if (!m_drawThemesSet)
+		m_useThemes = cell->UseThemes();
+
 #ifdef UG_ENABLE_PRINTING
 	// If it is printing, call OnDrawPrint to draw the cell 
 	if(dc->IsPrinting()){
@@ -650,7 +660,7 @@ void CUGCellType::OnDrawPrint(CDC *dc,RECT *rect,int col,long row,CUGCell *cell,
 	CRect   rectTmp(rect);
 	int     nHeadColCount = 0;	
 	float   fScale = m_ctrl->GetUGPrint()->GetPrintVScale(dc);
-	int     nColCount = m_ctrl->GetUGPrint()->m_ColRects.GetSize();
+	int     nColCount = (int)m_ctrl->GetUGPrint()->m_ColRects.GetSize();
 	CUGCell cellRight, cellLeft;
 
 	if( m_ctrl->GetUGPrint()->PrintSideHeading() )
@@ -750,8 +760,17 @@ void CUGCellType::DrawText(CDC *dc,RECT *rect,int offset,int col,long row,CUGCel
 	short		alignment;
 	int			oldleft	= rect->left;
 	long		properties = cell->GetPropertyFlags();
-	int			overLapCol = col;
+//	int			overLapCol = col;
 	CFont		*pOldFont = NULL;
+
+	// This is used by the theme drawing code.
+	RECT offsetRect = *rect;
+	offsetRect.left += offset;
+	offsetRect.right -= offset;
+	offsetRect.top += offset;
+	offsetRect.bottom -= offset;
+
+	UGXPThemeState state = UGXPThemes::GetState(selected>0, current>0);
 
 	//get the extended style
 	if(properties&UGCELL_CELLTYPEEX_SET){
@@ -780,16 +799,15 @@ void CUGCellType::DrawText(CDC *dc,RECT *rect,int offset,int col,long row,CUGCel
 			string = _T("");
 			stringLen = 0;
 		}
-	}
+	}	
 
 	//check for overlapping
-	if(overLapCol != col){
-		CUGCell olCell;
-		m_ctrl->GetCellIndirect(overLapCol,row,&olCell);
+/*	if(overLapCol != col)
+	{
 		cell->SetAlignment(olCell.GetAlignment());
 		string  = olCell.GetText();
 		stringLen = olCell.GetTextLength();
-	}
+	}*/
 
 	if(properties&UGCELL_ALIGNMENT_SET)
 		alignment = cell->GetAlignment();
@@ -801,6 +819,21 @@ void CUGCellType::DrawText(CDC *dc,RECT *rect,int offset,int col,long row,CUGCel
 	if(properties&UGCELL_FONT_SET )
 		pOldFont = dc->SelectObject(cell->GetFont());
 	
+	
+	int style = 0;
+	bool isDisabled = false;
+	if( cell->IsPropertySet( UGCELL_CELLTYPEEX_SET ))
+	{
+		style = cell->GetCellTypeEx();
+		isDisabled = (style & UGCT_CHECKBOXDISABLED) > 0;
+	}
+
+	if (isDisabled)
+	{
+		dc->SetTextColor(RGB(140, 140, 140));
+		backcolor = cell->GetBackColor();
+	}
+	else
 	//check the selected and current states
 	if(selected || (current && m_ctrl->m_GI->m_currentCellMode&2))
 	{
@@ -812,7 +845,10 @@ void CUGCellType::DrawText(CDC *dc,RECT *rect,int offset,int col,long row,CUGCel
 		dc->SetTextColor(cell->GetTextColor());
 		backcolor = cell->GetBackColor();
 	}
-	DrawBackground( dc, rect, backcolor );
+
+	// The button draws it's own background, so it can draw a pressed state
+	if (cell->GetXPStyle() != XPCellTypeButton || !UGXPThemes::IsThemed())
+		DrawBackground( dc, rect, backcolor, row, col, cell, (current != 0), (selected != 0) );
 	
 	//check for bitmaps
 	if(properties&UGCELL_BITMAP_SET){
@@ -823,9 +859,13 @@ void CUGCellType::DrawText(CDC *dc,RECT *rect,int offset,int col,long row,CUGCel
 			x= DrawBitmap(dc,cell->GetBitmap(),rect,backcolor);
 			rect->left -= offset;
 			offset += x;
+			offsetRect.left += x;
 		}
-		else{
-			rect->left += DrawBitmap(dc,cell->GetBitmap(),rect,backcolor);
+		else
+		{
+			int n = DrawBitmap(dc,cell->GetBitmap(),rect,backcolor);
+			rect->left += n;
+			offsetRect.left += n;
 		}
 	}
 
@@ -864,43 +904,99 @@ void CUGCellType::DrawText(CDC *dc,RECT *rect,int offset,int col,long row,CUGCel
 		rect->left -= 1;
 
 	// draw the text
-	if(cellTypeEx&(UGCT_NORMALMULTILINE|UGCT_NORMALELLIPSIS)){
+	if(cellTypeEx&(UGCT_NORMALMULTILINE|UGCT_NORMALELLIPSIS))
+	{
+		if(cellTypeEx&UGCT_NORMALMULTILINE)
+		{ // multiline
 
-		if(cellTypeEx&UGCT_NORMALMULTILINE){ // multiline
-
-			CRect	tempRect(rect);
+			CRect tempRect(rect);
 
 			// set up a default format
 			UINT format = DT_WORDBREAK | DT_NOPREFIX;
 
-			// check alignment - multiline
-			if(alignment) {
-				if(alignment & UG_ALIGNCENTER) {
-					format |= DT_CENTER;
-				}
-				else if(alignment & UG_ALIGNRIGHT) {
-					format |= DT_RIGHT;
-					tempRect.right -= m_ctrl->m_GI->m_margin + offset;
-				}
-				else if(alignment & UG_ALIGNLEFT) {
-					format |= DT_LEFT;
-					tempRect.left += m_ctrl->m_GI->m_margin + offset;
-				}
+			// v7.2 - update 03 - changes here to respect bottom and center
+			//        alignment settings for multi-line cells - 
+			//        fix courtesy Allen Shiels
+			// ..start
+			// set the alignment format
+			if (alignment & UG_ALIGNCENTER)	{
+				format |= DT_CENTER;
 			}
-			// if no alignment has been specified, then default to left justified
-			else
-			{
+			else if	(alignment & UG_ALIGNRIGHT) {
+				format |= DT_RIGHT;
+			}
+			else {
+				// if no alignment has been specified, then default to left justified
+				alignment |= UG_ALIGNLEFT;
 				format |= DT_LEFT;
-				tempRect.left += m_ctrl->m_GI->m_margin + offset;
+			}
+
+			// adjust the left and right for alignment
+			// if (format & (DT_CENTER|DT_RIGHT)) {
+			if (alignment & (UG_ALIGNCENTER|UG_ALIGNRIGHT)) {
+				tempRect.right -= m_ctrl->m_GI->m_margin + offset;
+				offsetRect.right -= m_ctrl->m_GI->m_margin + offset;
 			}
 			
-			dc->DrawText(string,-1,tempRect,format );			//draw the text
-		}
-		else{ // ellipsis
+//			if (format & (DT_CENTER|DT_LEFT)) {
+			if (alignment & (UG_ALIGNCENTER|UG_ALIGNLEFT)) {
+				tempRect.left += m_ctrl->m_GI->m_margin + offset;
+				offsetRect.left += m_ctrl->m_GI->m_margin + offset;
+			}
 
-			rect->left += 3; //set margines
+			// adjust the top and bottom for alignment
+			if (alignment & (UG_ALIGNBOTTOM|UG_ALIGNVCENTER)) {
+				CRect calcRect(tempRect);
+				int textHeight = dc->DrawText(string, -1, calcRect, format|DT_CALCRECT);
+              
+				if (alignment & UG_ALIGNVCENTER) {
+					tempRect.top += (tempRect.bottom - tempRect.top - textHeight) / 2;
+				}
+				else {
+					tempRect.top = (tempRect.bottom - textHeight);
+				}
+			}
+			// .. end
+
+//			// check alignment - multiline
+//			if(alignment) {
+//				if(alignment & UG_ALIGNCENTER) {
+//					format |= DT_CENTER;
+//				}
+//				else if(alignment & UG_ALIGNRIGHT) {
+//					format |= DT_RIGHT;
+//					tempRect.right -= m_ctrl->m_GI->m_margin + offset;
+//					offsetRect.right -= m_ctrl->m_GI->m_margin + offset;
+//				}
+//				else if(alignment & UG_ALIGNLEFT) {
+//					format |= DT_LEFT;
+//					tempRect.left += m_ctrl->m_GI->m_margin + offset;
+//					offsetRect.left += m_ctrl->m_GI->m_margin + offset;
+//				}
+//			}
+//			// if no alignment has been specified, then default to left justified
+//			else
+//			{
+//				format |= DT_LEFT;
+//				tempRect.left += m_ctrl->m_GI->m_margin + offset;
+//				offsetRect.left += m_ctrl->m_GI->m_margin + offset;
+//			}
+
+			if (!m_useThemes || !DrawThemedText(*dc, tempRect.left, tempRect.top, &tempRect, string, stringLen, format, cell->GetXPStyle(), state))
+			{
+				dc->DrawText(string,-1,tempRect,format );			//draw the text			
+			}
+		}
+		else
+		{ // ellipsis
+
+			rect->left += 3; //set margins
 			rect->top = top;
-			dc->DrawText(string, rect, DT_END_ELLIPSIS | DT_SINGLELINE);
+ 
+			if (!m_useThemes || !DrawThemedText(*dc, left, top, &offsetRect, string, stringLen, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE, cell->GetXPStyle(), state))
+			{
+				dc->DrawText(string, rect, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE);
+			}
 
 			// NOTE: To get the ellipsis type to display maximum text len, even
 			//		 if a letter must be cut to do so.  Use following code.
@@ -921,17 +1017,33 @@ void CUGCellType::DrawText(CDC *dc,RECT *rect,int offset,int col,long row,CUGCel
 			// }
 		}
 	}
-	else{
-		if(overLapCol != col){
+	else
+	{
+/*		if(overLapCol != col)
+		{
 			//get the offset
-			for( int loop = col -1;loop >= overLapCol; loop --){
+			for( int loop = col -1;loop >= overLapCol; loop --)
+			{
 				left -= m_ctrl->GetColWidth(loop);
 			}
 			left += 1;
 		}
+*/
+//		DrawBackground( dc, rect, backcolor, row, col, cell, (current != 0), (selected != 0));
 
-		DrawBackground( dc, rect, backcolor );
-		dc->ExtTextOut(left,top,ETO_CLIPPED,rect,string,stringLen,NULL);
+		int mode = DT_LEFT | DT_NOPREFIX;
+		int orgTop = top;
+
+		if(alignment & UG_ALIGNBOTTOM)
+		{
+			top = offsetRect.top;
+			mode |= DT_SINGLELINE | DT_BOTTOM;
+		}
+
+		if (!m_useThemes || !DrawThemedText(*dc, left, top, &offsetRect, string, stringLen, mode, cell->GetXPStyle(), state))
+		{
+			dc->ExtTextOut(left,orgTop,ETO_CLIPPED,rect,string,stringLen,NULL);
+		}
 	}
 
 	//reset the rect
@@ -941,17 +1053,97 @@ void CUGCellType::DrawText(CDC *dc,RECT *rect,int offset,int col,long row,CUGCel
 		dc->SelectObject( pOldFont );
 }
 
+bool CUGCellType::DrawThemedText(HDC dc, int left, int top,  RECT* rect, LPCTSTR string, int stringLen, DWORD textFormat, UGXPCellType cellType, UGXPThemeState state)
+{
+	bool success = false;
+
+	if (m_useThemes && UGXPThemes::IsThemed())
+	{
+		RECT rcDraw = *rect;
+		rcDraw.left = left;
+		rcDraw.top = top;
+
+		success = UGXPThemes::WriteText(NULL, dc, cellType, state, string, stringLen, textFormat, &rcDraw);
+	}
+
+	return success;
+}
+
 /***************************************************
 DrawBackground
 Params:
 Return:
 	<none>
 ****************************************************/
-void CUGCellType::DrawBackground(CDC *dc,RECT *rect,COLORREF backcolor)
+void CUGCellType::DrawBackground(CDC *dc,RECT *rect,COLORREF backcolor, int row, int col, CUGCell * cell, bool current, bool selected)
 {
-	CBrush brush( backcolor );
-	dc->FillRect( rect, &brush );
-	dc->SetBkMode( TRANSPARENT );
+	bool isOwnerDraw = false;
+
+	if (cell != NULL)
+	{
+		UGXPThemeState state = UGXPThemes::GetState(selected, current);
+
+		if (m_useThemes)
+		{
+			RECT rcTheme = *rect;
+
+			if (row != -1 && col != -1)
+			{
+				int overLapCol = 0;
+				CUGCell olCell;
+				int width = GetCellOverlapInfo(dc, col, row, &overLapCol, &olCell);
+
+				// For some reason, GetCellOverlapInfo always returns 0 if the cell is on the left.
+				if (overLapCol != col && width != 0)// && abs(overLapCol - col) == 1)
+				{
+					int step = 1;
+
+					if (overLapCol < col) step = -1;
+
+					for(int i = col + step; i != overLapCol + step; i += step)
+					{
+						RECT rcOverlap;
+
+						m_ctrl->GetCellRect(i, row, &rcOverlap);
+
+						int owidth = rcOverlap.right - rcOverlap.left;
+
+						if (overLapCol > col)
+						{
+							rcTheme.right += owidth;
+						}
+						else
+						{
+							rcTheme.left -= owidth;
+						}
+					}
+				}
+			}
+
+			isOwnerDraw = UGXPThemes::DrawBackground(NULL, *dc, cell->GetXPStyle(), state, &rcTheme, NULL);
+	
+			// If GetDrawBorderEdges returns true, we manually draw borders around the edge cells.
+			if ((cell->GetXPStyle() == XPCellTypeTopCol ||
+				cell->GetXPStyle() == XPCellTypeLeftCol ||
+				cell->GetXPStyle() == XPCellTypeBorder) &&
+				UGXPThemes::DrawBorderEdges())
+			{
+				isOwnerDraw &= (dc->DrawEdge(&rcTheme, EDGE_BUMP, BF_TOPRIGHT) > 0);
+			}
+			else
+			{
+				// DrawEdge fails for some cell types, but this is acceptable.
+				UGXPThemes::DrawEdge(NULL, *dc, cell->GetXPStyle(), state, &rcTheme, cell->GetBorder(), 0, NULL);
+			}
+		}
+	}
+
+	if (!isOwnerDraw)
+	{
+		CBrush brush( backcolor );
+		dc->FillRect( rect, &brush );
+		dc->SetBkMode( TRANSPARENT );
+	}
 }
 
 /***************************************************
@@ -1089,12 +1281,16 @@ int CUGCellType::DrawBitmap(CDC *dc,CBitmap * bitmap,RECT *rect,COLORREF backcol
 	dcMemory.CreateCompatibleDC(dc);
 	bmpOld = (CBitmap *)dcMemory.SelectObject(bitmap);
 
-	//fill in background first
-	t =rect->right;
-	rect->right = rect->left+(int)xout+Margin*2;
-	dc->SetBkColor(backcolor);
-	DrawBackground( dc, rect, backcolor );
-	rect->right = t;
+	// If we're using themes, we draw the theme behind the bitmap - we can't do that here because we don't have a cell to pass in.
+	if (!UGXPThemes::IsThemed())
+	{
+		//fill in background first
+		t =rect->right;
+		rect->right = rect->left+(int)xout+Margin*2;
+		dc->SetBkColor(backcolor);
+		DrawBackground( dc, rect, backcolor, NULL, false, false );
+		rect->right = t;
+	}
 
 	//Draw the bitmap --- If the DC is printer, we have to 
 	//convert the bitmap to DIB first, then print the DIB.
@@ -1124,12 +1320,15 @@ int CUGCellType::DrawBitmap(CDC *dc,CBitmap * bitmap,RECT *rect,COLORREF backcol
 #endif
 	}
 
-	else{	// Display the bitmap on screen
-		if(resize){
+	else
+	{	// Display the bitmap on screen
+		if(resize)
+		{
 			dc->StretchBlt(rect->left+Margin,rect->top+Margin,(int)xout,(int)yout,
 				&dcMemory,0,0, bm.bmWidth, bm.bmHeight,SRCCOPY);
 		}
-		else{
+		else
+		{
 			t= (int)((rect->bottom - rect->top - yout)/2);
 			dc->BitBlt(rect->left+Margin,rect->top+t,(int)xout,(int)yout,
 				&dcMemory,0,0,SRCCOPY);
@@ -1163,184 +1362,187 @@ Returns:
 ****************************************************/
 void CUGCellType::DrawBorder(CDC *dc,RECT *rect,RECT *rectout,CUGCell * cell)
 {
-	long props = cell->GetPropertyFlags();
-	BOOL excelBdr = m_ctrl->m_GI->m_enableExcelBorders;
-
-	if(( props & UGCELL_BORDERSTYLE_SET ) == 0 && !excelBdr)
+	if (!m_useThemes || !UGXPThemes::DrawEdge(NULL, *dc, cell->GetXPStyle(), ThemeStateNormal, rect, cell->GetBorder(), BF_RECT, rectout))
 	{
-		CopyRect(rectout,rect);
-		return;
+		long props = cell->GetPropertyFlags();
+		BOOL excelBdr = m_ctrl->m_GI->m_enableExcelBorders;
+
+		if(( props & UGCELL_BORDERSTYLE_SET ) == 0 && !excelBdr)
+		{
+			CopyRect(rectout,rect);
+			return;
+		}
+
+		int style = cell->GetBorder();
+		CPen *pen = cell->GetBorderColor();
+		CPen *origPen = NULL;
+
+		if(style&UG_BDR_RAISED || style&UG_BDR_RECESSED)
+			excelBdr = 0;
+
+		int left=0,top=0,right=0,bottom=0;
+		if(pen != NULL)
+			dc->SelectObject(pen);
+		else
+			dc->SelectObject(m_ctrl->m_GI->m_defBorderPen);
+
+
+		if(style&15 || excelBdr){ //thin lines
+			
+			if(style & 1){ //left
+				dc->MoveTo(rect->left,rect->top);
+				dc->LineTo(rect->left,rect->bottom);
+				left=1;
+			}
+			if(style & 2){ //top
+				dc->MoveTo(rect->left,rect->top);
+				dc->LineTo(rect->right,rect->top);
+				top=1;
+			}
+			if(style & 4 || excelBdr){ //right
+				if((style&4) ==0)
+					origPen = (CPen*)dc->SelectObject(m_ctrl->m_GI->m_defBorderPen);
+
+				dc->MoveTo(rect->right-1,rect->top);
+				dc->LineTo(rect->right-1,rect->bottom);
+				right=-1;
+
+				if((style&4) ==0)
+					dc->SelectObject(origPen);
+			}
+			if(style & 8 || excelBdr){ //bottom
+				if((style&8) ==0)
+					origPen = (CPen*)dc->SelectObject(m_ctrl->m_GI->m_defBorderPen);
+
+				dc->MoveTo(rect->left,rect->bottom-1);
+				dc->LineTo(rect->right,rect->bottom-1);
+				bottom=-1;
+
+				if( origPen != NULL )
+					// deselect the pen
+					dc->SelectObject(origPen);
+			}
+		}
+		if(style &240){ //medium lines
+			if(style & 16){	//left
+				dc->MoveTo(rect->left,rect->top);
+				dc->LineTo(rect->left,rect->bottom);
+				dc->MoveTo(rect->left+1,rect->top);
+				dc->LineTo(rect->left+1,rect->bottom);
+				left=2;
+			}
+			if(style & 32){	//top
+				dc->MoveTo(rect->left,rect->top);
+				dc->LineTo(rect->right,rect->top);
+				dc->MoveTo(rect->left,rect->top+1);
+				dc->LineTo(rect->right,rect->top+1);
+				top=2;
+			}
+			if(style & 64){ //right
+				dc->MoveTo(rect->right-1,rect->top);
+				dc->LineTo(rect->right-1,rect->bottom);
+				dc->MoveTo(rect->right-2,rect->top);
+				dc->LineTo(rect->right-2,rect->bottom);
+				right=-2;
+			}
+			if(style & 128){ //bottom
+				dc->MoveTo(rect->left,rect->bottom-1);
+				dc->LineTo(rect->right,rect->bottom-1);
+				dc->MoveTo(rect->left,rect->bottom-2);
+				dc->LineTo(rect->right,rect->bottom-2);
+				bottom=-2;
+			}
+		}
+		if(style &3840){ //thick lines
+			if(style & 256){ //left
+				dc->MoveTo(rect->left,rect->top);
+				dc->LineTo(rect->left,rect->bottom);
+				dc->MoveTo(rect->left+1,rect->top);
+				dc->LineTo(rect->left+1,rect->bottom);
+				dc->MoveTo(rect->left+2,rect->top);
+				dc->LineTo(rect->left+2,rect->bottom);
+				left=3;
+			}
+			if(style & 512){ //top
+				dc->MoveTo(rect->left,rect->top);
+				dc->LineTo(rect->right,rect->top);
+				dc->MoveTo(rect->left,rect->top+1);
+				dc->LineTo(rect->right,rect->top+1);
+				dc->MoveTo(rect->left,rect->top+2);
+				dc->LineTo(rect->right,rect->top+2);
+				top=3;
+			}
+			if(style & 1024){ //right
+				dc->MoveTo(rect->right-1,rect->top);
+				dc->LineTo(rect->right-1,rect->bottom);
+				dc->MoveTo(rect->right-2,rect->top);
+				dc->LineTo(rect->right-2,rect->bottom);
+				dc->MoveTo(rect->right-3,rect->top);
+				dc->LineTo(rect->right-3,rect->bottom);
+				right=-3;
+			}
+			if(style & 2048){ //bottom
+				dc->MoveTo(rect->left,rect->bottom-1);
+				dc->LineTo(rect->right,rect->bottom-1);
+				dc->MoveTo(rect->left,rect->bottom-2);
+				dc->LineTo(rect->right,rect->bottom-2);
+				dc->MoveTo(rect->left,rect->bottom-3);
+				dc->LineTo(rect->right,rect->bottom-3);
+				bottom=-3;
+			}
+		}
+		if(style &4096){ //3D recessed
+
+			int loop;
+			//dark color
+			dc->SelectObject((CPen *)&m_ctrl->m_threeDDarkPen);
+			for(loop=0;loop<m_ctrl->m_GI->m_threeDHeight;loop++){
+				dc->MoveTo(rect->left+loop,rect->bottom-loop-1);
+				dc->LineTo(rect->left+loop,rect->top+loop);
+				dc->LineTo(rect->right-loop-1,rect->top+loop);
+			}
+			//light color
+			dc->SelectObject((CPen *)&m_ctrl->m_threeDLightPen);
+			for(loop=0;loop<m_ctrl->m_GI->m_threeDHeight;loop++){
+				dc->MoveTo(rect->right-loop-1,rect->top+loop);
+				dc->LineTo(rect->right-loop-1,rect->bottom-loop-1);
+				dc->LineTo(rect->left+loop,rect->bottom-loop-1);
+			}
+			left = m_ctrl->m_GI->m_threeDHeight;
+			top = m_ctrl->m_GI->m_threeDHeight;
+			right = -m_ctrl->m_GI->m_threeDHeight;
+			bottom = -m_ctrl->m_GI->m_threeDHeight;
+
+		}	
+
+		if(style &8192){ //3D raised
+
+			int loop;
+			//light color
+			dc->SelectObject((CPen *)&m_ctrl->m_threeDLightPen);
+			for(loop=0;loop<m_ctrl->m_GI->m_threeDHeight;loop++){
+				dc->MoveTo(rect->left+loop,rect->bottom-loop-1);
+				dc->LineTo(rect->left+loop,rect->top+loop);
+				dc->LineTo(rect->right-loop-1,rect->top+loop);
+			}
+			//dark color
+			dc->SelectObject((CPen *)&m_ctrl->m_threeDDarkPen);
+			for(loop=0;loop<m_ctrl->m_GI->m_threeDHeight;loop++){
+				dc->MoveTo(rect->right-loop-1,rect->top+loop);
+				dc->LineTo(rect->right-loop-1,rect->bottom-loop-1);
+				dc->LineTo(rect->left+loop,rect->bottom-loop-1);
+			}
+			left = m_ctrl->m_GI->m_threeDHeight;
+			top = m_ctrl->m_GI->m_threeDHeight;
+			right = -m_ctrl->m_GI->m_threeDHeight;
+			bottom = -m_ctrl->m_GI->m_threeDHeight;
+		}	
+
+		rectout->left	= rect->left + left;
+		rectout->top	= rect->top + top;
+		rectout->right	= rect->right + right;
+		rectout->bottom = rect->bottom + bottom;
 	}
-
-	int style = cell->GetBorder();
-	CPen *pen = cell->GetBorderColor();
-	CPen *origPen = NULL;
-
-	if(style&UG_BDR_RAISED || style&UG_BDR_RECESSED)
-		excelBdr = 0;
-
-	int left=0,top=0,right=0,bottom=0;
-	if(pen != NULL)
-		dc->SelectObject(pen);
-	else
-		dc->SelectObject(m_ctrl->m_GI->m_defBorderPen);
-
-
-	if(style&15 || excelBdr){ //thin lines
-		
-		if(style & 1){ //left
-			dc->MoveTo(rect->left,rect->top);
-			dc->LineTo(rect->left,rect->bottom);
-			left=1;
-		}
-		if(style & 2){ //top
-			dc->MoveTo(rect->left,rect->top);
-			dc->LineTo(rect->right,rect->top);
-			top=1;
-		}
-		if(style & 4 || excelBdr){ //right
-			if((style&4) ==0)
-				origPen = (CPen*)dc->SelectObject(m_ctrl->m_GI->m_defBorderPen);
-
-			dc->MoveTo(rect->right-1,rect->top);
-			dc->LineTo(rect->right-1,rect->bottom);
-			right=-1;
-
-			if((style&4) ==0)
-				dc->SelectObject(origPen);
-		}
-		if(style & 8 || excelBdr){ //bottom
-			if((style&8) ==0)
-				origPen = (CPen*)dc->SelectObject(m_ctrl->m_GI->m_defBorderPen);
-
-			dc->MoveTo(rect->left,rect->bottom-1);
-			dc->LineTo(rect->right,rect->bottom-1);
-			bottom=-1;
-
-			if( origPen != NULL )
-				// deselect the pen
-				dc->SelectObject(origPen);
-		}
-	}
-	if(style &240){ //medium lines
-		if(style & 16){	//left
-			dc->MoveTo(rect->left,rect->top);
-			dc->LineTo(rect->left,rect->bottom);
-			dc->MoveTo(rect->left+1,rect->top);
-			dc->LineTo(rect->left+1,rect->bottom);
-			left=2;
-		}
-		if(style & 32){	//top
-			dc->MoveTo(rect->left,rect->top);
-			dc->LineTo(rect->right,rect->top);
-			dc->MoveTo(rect->left,rect->top+1);
-			dc->LineTo(rect->right,rect->top+1);
-			top=2;
-		}
-		if(style & 64){ //right
-			dc->MoveTo(rect->right-1,rect->top);
-			dc->LineTo(rect->right-1,rect->bottom);
-			dc->MoveTo(rect->right-2,rect->top);
-			dc->LineTo(rect->right-2,rect->bottom);
-			right=-2;
-		}
-		if(style & 128){ //bottom
-			dc->MoveTo(rect->left,rect->bottom-1);
-			dc->LineTo(rect->right,rect->bottom-1);
-			dc->MoveTo(rect->left,rect->bottom-2);
-			dc->LineTo(rect->right,rect->bottom-2);
-			bottom=-2;
-		}
-	}
-	if(style &3840){ //thick lines
-		if(style & 256){ //left
-			dc->MoveTo(rect->left,rect->top);
-			dc->LineTo(rect->left,rect->bottom);
-			dc->MoveTo(rect->left+1,rect->top);
-			dc->LineTo(rect->left+1,rect->bottom);
-			dc->MoveTo(rect->left+2,rect->top);
-			dc->LineTo(rect->left+2,rect->bottom);
-			left=3;
-		}
-		if(style & 512){ //top
-			dc->MoveTo(rect->left,rect->top);
-			dc->LineTo(rect->right,rect->top);
-			dc->MoveTo(rect->left,rect->top+1);
-			dc->LineTo(rect->right,rect->top+1);
-			dc->MoveTo(rect->left,rect->top+2);
-			dc->LineTo(rect->right,rect->top+2);
-			top=3;
-		}
-		if(style & 1024){ //right
-			dc->MoveTo(rect->right-1,rect->top);
-			dc->LineTo(rect->right-1,rect->bottom);
-			dc->MoveTo(rect->right-2,rect->top);
-			dc->LineTo(rect->right-2,rect->bottom);
-			dc->MoveTo(rect->right-3,rect->top);
-			dc->LineTo(rect->right-3,rect->bottom);
-			right=-3;
-		}
-		if(style & 2048){ //bottom
-			dc->MoveTo(rect->left,rect->bottom-1);
-			dc->LineTo(rect->right,rect->bottom-1);
-			dc->MoveTo(rect->left,rect->bottom-2);
-			dc->LineTo(rect->right,rect->bottom-2);
-			dc->MoveTo(rect->left,rect->bottom-3);
-			dc->LineTo(rect->right,rect->bottom-3);
-			bottom=-3;
-		}
-	}
-	if(style &4096){ //3D recessed
-
-		int loop;
-		//dark color
-		dc->SelectObject((CPen *)&m_ctrl->m_threeDDarkPen);
-		for(loop=0;loop<m_ctrl->m_GI->m_threeDHeight;loop++){
-			dc->MoveTo(rect->left+loop,rect->bottom-loop-1);
-			dc->LineTo(rect->left+loop,rect->top+loop);
-			dc->LineTo(rect->right-loop-1,rect->top+loop);
-		}
-		//light color
-		dc->SelectObject((CPen *)&m_ctrl->m_threeDLightPen);
-		for(loop=0;loop<m_ctrl->m_GI->m_threeDHeight;loop++){
-			dc->MoveTo(rect->right-loop-1,rect->top+loop);
-			dc->LineTo(rect->right-loop-1,rect->bottom-loop-1);
-			dc->LineTo(rect->left+loop,rect->bottom-loop-1);
-		}
-		left = m_ctrl->m_GI->m_threeDHeight;
-		top = m_ctrl->m_GI->m_threeDHeight;
-		right = -m_ctrl->m_GI->m_threeDHeight;
-		bottom = -m_ctrl->m_GI->m_threeDHeight;
-
-	}	
-
-	if(style &8192){ //3D raised
-
-		int loop;
-		//light color
-		dc->SelectObject((CPen *)&m_ctrl->m_threeDLightPen);
-		for(loop=0;loop<m_ctrl->m_GI->m_threeDHeight;loop++){
-			dc->MoveTo(rect->left+loop,rect->bottom-loop-1);
-			dc->LineTo(rect->left+loop,rect->top+loop);
-			dc->LineTo(rect->right-loop-1,rect->top+loop);
-		}
-		//dark color
-		dc->SelectObject((CPen *)&m_ctrl->m_threeDDarkPen);
-		for(loop=0;loop<m_ctrl->m_GI->m_threeDHeight;loop++){
-			dc->MoveTo(rect->right-loop-1,rect->top+loop);
-			dc->LineTo(rect->right-loop-1,rect->bottom-loop-1);
-			dc->LineTo(rect->left+loop,rect->bottom-loop-1);
-		}
-		left = m_ctrl->m_GI->m_threeDHeight;
-		top = m_ctrl->m_GI->m_threeDHeight;
-		right = -m_ctrl->m_GI->m_threeDHeight;
-		bottom = -m_ctrl->m_GI->m_threeDHeight;
-	}	
-
-	rectout->left	= rect->left + left;
-	rectout->top	= rect->top + top;
-	rectout->right	= rect->right + right;
-	rectout->bottom = rect->bottom + bottom;
 
 	return;
 }
@@ -1376,7 +1578,11 @@ void CUGCellType::GetBestSize(CDC *dc,CSize *size,CUGCell *cell)
 		cell->GetBitmap()->GetBitmap( &bitmap );
 		// calculate the size of the bitmap
 		yin = bitmap.bmHeight;
-		ratio = size->cy / yin;
+		if ( yin > 0 )
+			ratio = size->cy / yin;
+		else
+			ratio = 0;
+
 		bitmapWidth = (int)( bitmap.bmWidth * ratio );
 	}
 

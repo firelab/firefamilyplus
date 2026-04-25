@@ -2,7 +2,12 @@
 				Class Implementation : CUGSideHdg
 **************************************************************************
 	Source file : UGSideHd.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
 #include "stdafx.h"
 #include "UGCtrl.h"
@@ -140,7 +145,6 @@ void CUGSideHdg::DrawCellsIntern(CDC *dc)
 				}
 
 				dcID = dc->SaveDC();
-
 				cellType = m_ctrl->GetCellType(cell.GetCellType());
 				cellType->OnDraw(dc,&cellRect,col,row,&cell,0,0);
 
@@ -178,8 +182,11 @@ void CUGSideHdg::Update()
 {
 	//calc the last col width
 	int width = 0;
-	int xIndex;
-	for(xIndex = -1;xIndex > (m_GI->m_numberSideHdgCols*-1);xIndex--)
+
+	// For VC6/2002/2003/2005 compatibility
+	int xIndex = -1;
+
+	for(;xIndex > (m_GI->m_numberSideHdgCols*-1);xIndex--)
 	{
 		width += GetSHColWidth(xIndex);
 	}
@@ -892,13 +899,14 @@ Params:
 Returns:
 	If 1, the tooltip control was found; If -1, the tooltip control was not found.
 *****************************************************/
-int CUGSideHdg::OnToolHitTest(  CPoint point, TOOLINFO *pTI ) const
+// v7.2 - update 02 - 64-bit - changed from int to UGINTRET - see UG64Bit.h
+UGINTRET CUGSideHdg::OnToolHitTest(  CPoint point, TOOLINFO *pTI ) const
 {
 	int col;
 	long row;
 	CRect rect;
 	static int lastCol = -2;
-	static long lastRow = -2;
+	static long lastRow = -2;	
 
 	if( m_ctrl->m_CUGSideHdg->GetCellFromPoint( &point, &col, &row, &rect ) == UG_SUCCESS)
 	{
@@ -910,13 +918,15 @@ int CUGSideHdg::OnToolHitTest(  CPoint point, TOOLINFO *pTI ) const
 			return -1;
 		}
 
-		pTI->cbSize = sizeof(TOOLINFO);
-		pTI->uFlags =  TTF_NOTBUTTON | TTF_ALWAYSTIP |TTF_IDISHWND ;
-		pTI->uId = (UINT)m_hWnd;
+		// v7.2 - update 03 - added TTF_TRANSPARENT flag. This prevents a 
+		//        recursive flicker of large tooltips that are forced to 
+		//        encroach on the mouse position. Reported by Kuerscht
+		pTI->uFlags =  TTF_TRANSPARENT | TTF_NOTBUTTON | TTF_ALWAYSTIP |TTF_IDISHWND ;
+		pTI->uId = (UINT_PTR)m_hWnd;
 		pTI->hwnd = (HWND)m_hWnd;
 		pTI->lpszText = LPSTR_TEXTCALLBACK;
 		return 1;
-	}
+	}	
 	return -1;
 }
 
@@ -955,10 +965,33 @@ BOOL CUGSideHdg::ToolTipNeedText( UINT id, NMHDR* pTTTStruct, LRESULT* pResult )
 	{
 		if ( m_ctrl->OnHint(col,row,UG_SIDEHEADING,&string) == TRUE )
 		{
+			// v7.2 - update 01 - Do this to Enable multiline ToolTips - reported by kassinen
+			::SendMessage( pTTT->hdr.hwndFrom, TTM_SETMAXTIPWIDTH, 0, SHRT_MAX );
+			::SendMessage( pTTT->hdr.hwndFrom, TTM_SETDELAYTIME, TTDT_AUTOPOP, SHRT_MAX );
+			::SendMessage( pTTT->hdr.hwndFrom, TTM_SETDELAYTIME, TTDT_INITIAL, 200 );
+			::SendMessage( pTTT->hdr.hwndFrom, TTM_SETDELAYTIME, TTDT_RESHOW, 200 );
  			pTTT->lpszText = const_cast<LPTSTR>((LPCTSTR)string);
 			return TRUE;
 		}
 	}
 
 	return FALSE;
+}
+
+// v7.2 update 04 - added to implement WM_PRINT handling for the side heading - TD 
+LRESULT CUGSideHdg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch (message)
+	{
+	case WM_PRINT:
+		// draw all cells to the DC passed in
+		InvalidateRect(NULL);
+	    m_drawHint.AddHint(m_GI->m_numberSideHdgCols * -1,0,0,m_GI->m_numberRows);
+		DrawCellsIntern(CDC::FromHandle((HDC)wParam));
+		return 0;
+	default:
+		return CWnd::WindowProc(message, wParam, lParam);
+	}
 }

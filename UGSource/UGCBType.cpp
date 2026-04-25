@@ -2,7 +2,12 @@
 				Class Implementation : CUGCheckBoxType
 **************************************************************************
 	Source file : UGCBType.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
 
 #include "stdafx.h"
@@ -148,9 +153,17 @@ BOOL CUGCheckBoxType::OnLClicked(int col,long row,int updn,RECT *rect,POINT *poi
 	CRect tempRect(0,0,0,0);
 	m_ctrl->GetCellIndirect( col, row, &m_cell );
 
+	int style = 0;
+	bool isDisabled = false;
+	if( m_cell.IsPropertySet( UGCELL_CELLTYPEEX_SET ))
+	{
+		style = m_cell.GetCellTypeEx();
+		isDisabled = (style & UGCT_CHECKBOXDISABLED) > 0;
+	}
+
 	// If the cell is read only, user should not be
 	// allowed to change the state of the check.
-	if ( m_cell.GetReadOnly() == TRUE )
+	if ( m_cell.GetReadOnly() || isDisabled)
 	{	
 		return FALSE;
 	}
@@ -187,7 +200,6 @@ BOOL CUGCheckBoxType::OnLClicked(int col,long row,int updn,RECT *rect,POINT *poi
 		OnCellTypeNotify(m_ID,col,row,UGCT_CHECKBOXSET,(long)m_cell.GetNumber());
 		// redraw the cell to reflect the changes.
 		m_ctrl->RedrawCell(col,row);
-		
 		return TRUE;
 	}
 
@@ -218,6 +230,16 @@ BOOL CUGCheckBoxType::OnCharDown(int col,long row,UINT *vcKey)
 {
 	m_ctrl->GetCellIndirect( col, row, &m_cell );
 
+	if( m_cell.IsPropertySet( UGCELL_CELLTYPEEX_SET ))
+	{
+		int style = m_cell.GetCellTypeEx();
+		if ((style & UGCT_CHECKBOXDISABLED) > 0)
+		{
+			return FALSE;
+		}
+
+	}
+
 	if ( *vcKey == VK_SPACE && m_cell.GetReadOnly() == FALSE )
 	{
 		int style = 0;
@@ -226,7 +248,7 @@ BOOL CUGCheckBoxType::OnCharDown(int col,long row,UINT *vcKey)
 
 		int val;
 		val = (int)m_cell.GetNumber();
-		m_cell.SetNumber((val = (val + 1) % ((style & UGCT_CHECKBOX3STATE) ? 3 : 2)));
+ 		m_cell.SetNumber((val = (val + 1) % ((style & UGCT_CHECKBOX3STATE) ? 3 : 2)));
 
 		m_ctrl->SetCell(col,row,&m_cell);
 		m_ctrl->RedrawCell(col,row);
@@ -260,24 +282,62 @@ Return
 ****************************************************/
 void CUGCheckBoxType::OnDraw(CDC *dc,RECT *rect,int col,long row,CUGCell *cell,int selected,int current)
 {
+	double fHScale = 1.0;
+	double fVScale = 1.0;
 	
+	if (dc->IsPrinting())
+	{
+		fHScale = m_ctrl->GetUGPrint()->GetPrintHScale(dc);
+		fVScale = m_ctrl->GetUGPrint()->GetPrintVScale(dc);
+	}
+
+	if (!m_drawThemesSet)
+		m_useThemes = cell->UseThemes();
+
 	// draw border of the cell using build-in routine
 	DrawBorder( dc, rect, rect, cell );
-	
+
+	int style = 0;
+	bool isDisabled = false;
+	if( cell->IsPropertySet( UGCELL_CELLTYPEEX_SET ))
+	{
+		style = cell->GetCellTypeEx();
+		isDisabled = (style & UGCT_CHECKBOXDISABLED) > 0;
+	}
+
+	UGXPCellType ct = (style & UGCT_CHECKBOXROUND) ? XPCellTypeRadio : XPCellTypeCheck;
+
+	if (cell->GetNumber() > 0)
+	{
+		if (style&UGCT_CHECKBOXCHECKMARK)
+		{
+			ct = (style & UGCT_CHECKBOXROUND) ? XPCellTypeRadioYes : XPCellTypeCheckYes;
+		}
+		else
+		{
+			ct = (style & UGCT_CHECKBOXROUND) ? XPCellTypeRadioNo : XPCellTypeCheckNo;
+		}
+	}
+
+	UGXPThemeState ts = UGXPThemes::GetState(selected>0, current>0);
+
+	if (isDisabled) ts = ThemeStateTriState;
+
+	if (cell->GetNumber() > 1)
+	{
+		ts = ThemeStateTriState;
+	}
+
 	int right = rect->right,
 		left = rect->left,
-		top,
-		checkSize;
+		top = 0,
+		checkSize = 0;
 	CRect checkrect(0,0,0,0);
 	CPen * oldpen;
 
-	int style = 0;
-	if( cell->IsPropertySet( UGCELL_CELLTYPEEX_SET ))
-		style = cell->GetCellTypeEx();
-
-	checkSize = rect->bottom - rect->top - ( UGCT_CHECKMARGIN * 2 );
-	if( checkSize > UGCT_CHECKSIZE )
-		checkSize = UGCT_CHECKSIZE;
+	checkSize = rect->bottom - rect->top - (int)( UGCT_CHECKMARGIN * 2 * fHScale );
+	if( checkSize > UGCT_CHECKSIZE * fHScale )
+		checkSize = (int)(UGCT_CHECKSIZE * fHScale);
 	top = ( rect->bottom - rect->top - checkSize ) / 2;
 
 	checkrect.CopyRect(rect);
@@ -286,185 +346,210 @@ void CUGCheckBoxType::OnDraw(CDC *dc,RECT *rect,int col,long row,CUGCell *cell,i
 
 	//*** draw the background ***
 	if ( selected || ( current && m_ctrl->m_GI->m_currentCellMode & 2 ))
-		DrawBackground( dc, rect, cell->GetHBackColor());
+		DrawBackground( dc, rect, cell->GetHBackColor(), row, col, cell, (current != 0), (selected != 0));
 	else
-		DrawBackground( dc, rect, cell->GetBackColor());
+		DrawBackground( dc, rect, cell->GetBackColor(), row, col, cell, (current != 0), (selected != 0));
 
-	//*** draw the checkbox ***
-	if( checkSize >= ( UGCT_CHECKMARGIN * 2 ) )
-	{
-		//draw a 3D Recessed check box
-		if( style & UGCT_CHECKBOX3DRECESS )
-		{	
-			oldpen = (CPen*)dc->SelectObject((CPen*)&m_darkPen);
-			dc->MoveTo(checkrect.left,checkrect.bottom);
-			dc->LineTo(checkrect.left,checkrect.top);
-			dc->LineTo(checkrect.right,checkrect.top);
-			dc->SelectObject(&m_lightPen);
-			dc->LineTo(checkrect.right,checkrect.bottom);
-			dc->LineTo(checkrect.left,checkrect.bottom);
-			checkrect.top++;
-			checkrect.left++;
-			checkrect.right--;
-			checkrect.bottom--;
-			dc->SelectObject(&m_facePen);
-			dc->MoveTo(checkrect.left,checkrect.bottom);
-			dc->LineTo(checkrect.right,checkrect.bottom);
-			dc->LineTo(checkrect.right,checkrect.top);
-			dc->SelectObject(GetStockObject(BLACK_PEN));
-			dc->LineTo(checkrect.left,checkrect.top);
-			dc->LineTo(checkrect.left,checkrect.bottom);
-			dc->SelectObject(oldpen);
-
-			checkrect.top++;
-			checkrect.left++;
-			if( cell->GetNumber() > 1 )
-				FillDitheredRect( dc, checkrect );
-		}
-		//draw a 3D Raised check box
-		else if( style & UGCT_CHECKBOX3DRAISED )
-		{	
-			oldpen = (CPen*)dc->SelectObject((CPen*)&m_lightPen);
-			dc->MoveTo(checkrect.left,checkrect.bottom);
-			dc->LineTo(checkrect.left,checkrect.top);
-			dc->LineTo(checkrect.right,checkrect.top);
-			dc->SelectObject(GetStockObject(BLACK_PEN));
-			dc->LineTo(checkrect.right,checkrect.bottom);
-			dc->LineTo(checkrect.left,checkrect.bottom);
-			checkrect.top++;
-			checkrect.left++;
-			checkrect.right--;
-			checkrect.bottom--;
-			dc->SelectObject(&m_darkPen);
-			dc->MoveTo(checkrect.left,checkrect.bottom);
-			dc->LineTo(checkrect.right,checkrect.bottom);
-			dc->LineTo(checkrect.right,checkrect.top);
-			dc->SelectObject(&m_facePen);
-			dc->LineTo(checkrect.left,checkrect.top);
-			dc->LineTo(checkrect.left,checkrect.bottom);
-			dc->SelectObject(oldpen);
-
-			checkrect.top++;
-			checkrect.left++;
-			if( cell->GetNumber() > 1 )
-				FillDitheredRect( dc, checkrect );
-		}
-		// draw a flat (radio like) check box
-		else if( style & UGCT_CHECKBOXROUND )
+	if (!m_useThemes || !UGXPThemes::DrawBackground(NULL, *dc, ct, ts, &checkrect, NULL))
+	{	
+		//*** draw the checkbox ***
+		if( checkSize >= ( UGCT_CHECKMARGIN * 2 ) )
 		{
-			//draw the circle
-			if( selected || ( current && m_ctrl->m_GI->m_currentCellMode&2 ))
-				oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(WHITE_PEN)));
-			else
-				oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN)));
-
-			dc->Arc( checkrect, CPoint(checkrect.left,(checkrect.bottom-checkrect.top)/2), CPoint(checkrect.left,(checkrect.bottom-checkrect.top)/2));
-		}
-		//draw a plain check box
-		else
-		{	
-			if( selected || ( current && m_ctrl->m_GI->m_currentCellMode&2 ))
-				oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(WHITE_PEN)));
-			else
-				oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN)));
-
-			dc->MoveTo(checkrect.left,checkrect.top);
-			dc->LineTo(checkrect.right,checkrect.top);
-			dc->LineTo(checkrect.right,checkrect.bottom);
-			dc->LineTo(checkrect.left,checkrect.bottom);
-			dc->LineTo(checkrect.left,checkrect.top);
-			dc->SelectObject(oldpen);
-				
-			checkrect.left++;
-			checkrect.top++;
-			if( cell->GetNumber() > 1 )
-				FillDitheredRect( dc, checkrect );
-		}
-
-		if ( cell->GetReadOnly() == TRUE )
-		{	// cell is set to read only
-			FillDitheredRect( dc, checkrect );
-		}
-
-		//draw the check
-		if( cell->GetNumber() > 0 )
-		{
-			if( cell->GetNumber() > 1 )
+			//draw a 3D Recessed check box
+			if( style & UGCT_CHECKBOX3DRECESS )
+			{	
 				oldpen = (CPen*)dc->SelectObject((CPen*)&m_darkPen);
-			else if( selected || ( current && m_ctrl->m_GI->m_currentCellMode&2 ))
-				oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(WHITE_PEN)));
-			else
-				oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN)));
-
-			//draw a check mark
-			if(style&UGCT_CHECKBOXCHECKMARK)
-			{ 
-				dc->MoveTo(checkrect.left+2,checkrect.bottom-4);
-				dc->LineTo(checkrect.left+4,checkrect.bottom-2);
-				dc->LineTo(checkrect.right+3,checkrect.top-1);
-				if(checkSize > 9)
-				{
-					dc->MoveTo(checkrect.left+2,checkrect.bottom-5);
-					dc->LineTo(checkrect.left+4,checkrect.bottom-3);
-					dc->LineTo(checkrect.right+3,checkrect.top-2);
-					dc->MoveTo(checkrect.left+5,checkrect.bottom-2);
-					dc->LineTo(checkrect.right+4,checkrect.top-1);
-					dc->MoveTo(checkrect.left+2,checkrect.bottom-6);
-					dc->LineTo(checkrect.left+5,checkrect.bottom-3);
-				}
+				dc->MoveTo(checkrect.left,checkrect.bottom);
+				dc->LineTo(checkrect.left,checkrect.top);
+				dc->LineTo(checkrect.right,checkrect.top);
+				dc->SelectObject(&m_lightPen);
+				dc->LineTo(checkrect.right,checkrect.bottom);
+				dc->LineTo(checkrect.left,checkrect.bottom);
+				checkrect.top++;
+				checkrect.left++;
+				checkrect.right--;
+				checkrect.bottom--;
+				dc->SelectObject(&m_facePen);
+				dc->MoveTo(checkrect.left,checkrect.bottom);
+				dc->LineTo(checkrect.right,checkrect.bottom);
+				dc->LineTo(checkrect.right,checkrect.top);
+				// v7.2 - update 01 - change to select correct pen - Brett R., charshep
+				//dc->SelectObject((CPen*)CPen::FromHandle((HPEN)(CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN))));
+				dc->SelectStockObject(BLACK_PEN);
+				dc->LineTo(checkrect.left,checkrect.top);
+				dc->LineTo(checkrect.left,checkrect.bottom);
 				dc->SelectObject(oldpen);
+
+				checkrect.top++;
+				checkrect.left++;
+				if( cell->GetNumber() > 1 ) {
+					FillDitheredRect( dc, checkrect );
+				}
 			}
-			// draw the radio style fill area
+			//draw a 3D Raised check box
+			else if( style & UGCT_CHECKBOX3DRAISED )
+			{	
+				oldpen = (CPen*)dc->SelectObject((CPen*)&m_lightPen);
+				dc->MoveTo(checkrect.left,checkrect.bottom);
+				dc->LineTo(checkrect.left,checkrect.top);
+				dc->LineTo(checkrect.right,checkrect.top);
+				// v7.2 - update 01 - change to select correct pen - Brett R., charshep
+				//dc->SelectObject((CPen*)CPen::FromHandle((HPEN)(CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN))));
+				dc->SelectStockObject(BLACK_PEN);
+				dc->LineTo(checkrect.right,checkrect.bottom);
+				dc->LineTo(checkrect.left,checkrect.bottom);
+				checkrect.top++;
+				checkrect.left++;
+				checkrect.right--;
+				checkrect.bottom--;
+				dc->SelectObject(&m_darkPen);
+				dc->MoveTo(checkrect.left,checkrect.bottom);
+				dc->LineTo(checkrect.right,checkrect.bottom);
+				dc->LineTo(checkrect.right,checkrect.top);
+				dc->SelectObject(&m_facePen);
+				dc->LineTo(checkrect.left,checkrect.top);
+				dc->LineTo(checkrect.left,checkrect.bottom);
+				dc->SelectObject(oldpen);
+
+				checkrect.top++;
+				checkrect.left++;
+				if( cell->GetNumber() > 1 ) {
+					FillDitheredRect( dc, checkrect );
+				}
+			}
+			// draw a flat (radio like) check box
 			else if( style & UGCT_CHECKBOXROUND )
 			{
-				checkrect.left += 2;
-				checkrect.top += 2;
-				checkrect.right -= 2;
-				checkrect.bottom -= 2;
-
-				CBrush brush;
-
-				if( cell->GetNumber() > 1 )
-				{
-					LOGPEN logPen;
-					m_darkPen.GetLogPen( &logPen );
-					brush.CreateSolidBrush( logPen.lopnColor );
-					dc->SelectObject( brush );
-				}
-				else if( selected || ( current && m_ctrl->m_GI->m_currentCellMode&2 ))
-					dc->SelectObject((CBrush*)CBrush::FromHandle((HBRUSH)GetStockObject(WHITE_BRUSH)));
+				//draw the circle
+				if( selected || ( current && m_ctrl->m_GI->m_currentCellMode&2 ))
+					// v7.2 - update 01 - change to select correct pen - Brett R., charshep
+					//oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)(CPen*)CPen::FromHandle((HPEN)GetStockObject(WHITE_PEN))));
+					oldpen = (CPen*)dc->SelectStockObject(WHITE_PEN);
 				else
-					dc->SelectObject((CBrush*)CBrush::FromHandle((HBRUSH)GetStockObject(BLACK_BRUSH)));
+					// v7.2 - update 01 - ditto
+					//oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)(CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN))));
+					oldpen = (CPen*)dc->SelectStockObject(BLACK_PEN);
 
-				dc->Ellipse( checkrect );
+				dc->Arc( checkrect, CPoint(checkrect.left,(checkrect.bottom-checkrect.top)/2), CPoint(checkrect.left,(checkrect.bottom-checkrect.top)/2));
 			}
-			//draw the X mark
+			//draw a plain check box
 			else
-			{
+			{	
+				if( selected || ( current && m_ctrl->m_GI->m_currentCellMode&2 ))
+					// v7.2 - update 01 - change to select correct pen - Brett R., charshep
+					//oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)(CPen*)CPen::FromHandle((HPEN)GetStockObject(WHITE_PEN))));
+					oldpen = (CPen*)dc->SelectStockObject(WHITE_PEN);
+				else
+					// v7.2 - update 01 - change to select correct pen - Brett R., charshep
+					//oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)(CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN))));
+					oldpen = (CPen*)dc->SelectStockObject(BLACK_PEN);
+
+				dc->MoveTo(checkrect.left,checkrect.top);
+				dc->LineTo(checkrect.right,checkrect.top);
+				dc->LineTo(checkrect.right,checkrect.bottom);
+				dc->LineTo(checkrect.left,checkrect.bottom);
+				dc->LineTo(checkrect.left,checkrect.top);
+				dc->SelectObject(oldpen);
+					
 				checkrect.left++;
 				checkrect.top++;
-				checkrect.right-=2;
-				checkrect.bottom-=2;
-				dc->MoveTo(checkrect.left,checkrect.top);
-				dc->LineTo(checkrect.right+1,checkrect.bottom+1);
-				dc->MoveTo(checkrect.left,checkrect.bottom);
-				dc->LineTo(checkrect.right+1,checkrect.top-1);
-				if(checkSize > 9)
-				{
-					dc->MoveTo(checkrect.left+1,checkrect.top);
-					dc->LineTo(checkrect.right+1,checkrect.bottom);
-					dc->MoveTo(checkrect.left,checkrect.bottom-1);
-					dc->LineTo(checkrect.right,checkrect.top-1);
-					dc->MoveTo(checkrect.left,checkrect.top+1);
-					dc->LineTo(checkrect.right,checkrect.bottom+1);
-					dc->MoveTo(checkrect.left+1,checkrect.bottom);
-					dc->LineTo(checkrect.right+1,checkrect.top);
+				if( cell->GetNumber() > 1 ) {
+					FillDitheredRect( dc, checkrect );
 				}
-				dc->SelectObject(oldpen);
+			}
+
+			if ( cell->GetReadOnly() == TRUE )
+			{	// cell is set to read only
+				FillDitheredRect( dc, checkrect );
+			}
+
+            //draw the check
+            if( cell->GetNumber() > 0 )
+            {
+				if( cell->GetNumber() > 1 )
+                    oldpen = (CPen*)dc->SelectObject((CPen*)&m_darkPen);
+                else if( selected || ( current && m_ctrl->m_GI->m_currentCellMode&2 ))
+					// v7.2 update 01 - incorrect pen selection - Brett R., charshep
+                    //oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)(CPen*)CPen::FromHandle((HPEN)GetStockObject(WHITE_PEN))));
+                    // oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(WHITE_PEN))); // another possibilty
+					oldpen = (CPen*)dc->SelectStockObject(WHITE_PEN);
+                else
+					// v7.2 update 01 - ditto
+                    //oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)(CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN))));
+                    // oldpen = (CPen*)dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN))); // another possibility
+					oldpen = (CPen*)dc->SelectStockObject(BLACK_PEN);
+
+				//draw a check mark
+				if(style&UGCT_CHECKBOXCHECKMARK)
+				{ 
+					dc->MoveTo(checkrect.left+2,checkrect.bottom-4);
+					dc->LineTo(checkrect.left+4,checkrect.bottom-2);
+					dc->LineTo(checkrect.right+3,checkrect.top-1);
+					if(checkSize > 9)
+					{
+						dc->MoveTo(checkrect.left+2,checkrect.bottom-5);
+						dc->LineTo(checkrect.left+4,checkrect.bottom-3);
+						dc->LineTo(checkrect.right+3,checkrect.top-2);
+						dc->MoveTo(checkrect.left+5,checkrect.bottom-2);
+						dc->LineTo(checkrect.right+4,checkrect.top-1);
+						dc->MoveTo(checkrect.left+2,checkrect.bottom-6);
+						dc->LineTo(checkrect.left+5,checkrect.bottom-3);
+					}
+					dc->SelectObject(oldpen);
+				}
+				// draw the radio style fill area
+				else if( style & UGCT_CHECKBOXROUND )
+				{
+					checkrect.left += 2;
+					checkrect.top += 2;
+					checkrect.right -= 2;
+					checkrect.bottom -= 2;
+
+					CBrush brush;
+
+					if( cell->GetNumber() > 1 )
+					{
+						LOGPEN logPen;
+						m_darkPen.GetLogPen( &logPen );
+						brush.CreateSolidBrush( logPen.lopnColor );
+						dc->SelectObject( brush );
+					}
+					else if( selected || ( current && m_ctrl->m_GI->m_currentCellMode&2 ))
+						dc->SelectObject((CBrush*)CBrush::FromHandle((HBRUSH)GetStockObject(WHITE_BRUSH)));
+					else
+						dc->SelectObject((CBrush*)CBrush::FromHandle((HBRUSH)GetStockObject(BLACK_BRUSH)));
+
+					dc->Ellipse( checkrect );
+				}
+				//draw the X mark
+				else
+				{
+					checkrect.left++;
+					checkrect.top++;
+					checkrect.right-=2;
+					checkrect.bottom-=2;
+					dc->MoveTo(checkrect.left,checkrect.top);
+					dc->LineTo(checkrect.right+1,checkrect.bottom+1);
+					dc->MoveTo(checkrect.left,checkrect.bottom);
+					dc->LineTo(checkrect.right+1,checkrect.top-1);
+					if(checkSize > 9)
+					{
+						dc->MoveTo(checkrect.left+1,checkrect.top);
+						dc->LineTo(checkrect.right+1,checkrect.bottom);
+						dc->MoveTo(checkrect.left,checkrect.bottom-1);
+						dc->LineTo(checkrect.right,checkrect.top-1);
+						dc->MoveTo(checkrect.left,checkrect.top+1);
+						dc->LineTo(checkrect.right,checkrect.bottom+1);
+						dc->MoveTo(checkrect.left+1,checkrect.bottom);
+						dc->LineTo(checkrect.right+1,checkrect.top);
+					}
+					dc->SelectObject(oldpen);
+				}
 			}
 		}
+		
 	}
-	
+
 	if (!( style & UGCT_CHECKBOXUSEALIGN ))
 	{
 		// adjust text rect
@@ -475,7 +560,7 @@ void CUGCheckBoxType::OnDraw(CDC *dc,RECT *rect,int col,long row,CUGCell *cell,i
 		CUGCellType::DrawText(dc,rect,0,col,row,cell,selected,current);
 	}	
 
-	// restore orriginal value of the left side
+	// restore original value of the left side
 	rect->left = left;
 }
 

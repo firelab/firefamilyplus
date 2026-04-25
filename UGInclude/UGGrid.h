@@ -3,7 +3,12 @@
 **************************************************************************
 	Source file : UGGrid.cpp
 	Header file : UGGrid.h
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 
 	Purpose
 		The CUGGrid takes care of the main grid area,
@@ -19,10 +24,14 @@
 #ifndef _UGGrid_H_
 #define _UGGrid_H_
 
+// v7.2 update 02 - 64-bit - added for UGINTRET
+#include "UG64Bit.h"
+
 #ifndef WM_MOUSEWHEEL
 #define ON_WM_MOUSEWHEEL
 #endif
 
+#pragma warning (disable: 4786)
 
 class UG_CLASS_DECL CUGGrid : public CWnd
 {
@@ -71,7 +80,8 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	
 	afx_msg LRESULT OnHelpHitTest(WPARAM wParam, LPARAM lParam);
 	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	
@@ -82,9 +92,13 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	BOOL ToolTipNeedText( UINT id, NMHDR * pTTTStruct, LRESULT * pResult );
-	virtual int OnToolHitTest( CPoint point, TOOLINFO* pTI ) const;
+
+	// v7.2 - update 02 - 64-bit - changed from int to UGINTRET - see UG64Bit.h
+	virtual UGINTRET OnToolHitTest( CPoint point, TOOLINFO* pTI ) const;
 
 	void DrawCellsIntern(CDC *dc,CDC *db_dc);
+
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 
 	// This protected member is used to prevent the grid from un-matched
 	// mouse button events.  This member was added in attempt to work around

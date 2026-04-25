@@ -17,7 +17,7 @@ static char THIS_FILE[] = __FILE__;
 extern char *varFormats[];
 extern CFireplusApp theApp;
 
-static DWORD CALLBACK MyStreamInCallback(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
+static DWORD_PTR CALLBACK MyStreamInCallback(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
    CFile* pFile = (CFile*) dwCookie;
 
@@ -25,7 +25,7 @@ static DWORD CALLBACK MyStreamInCallback(DWORD dwCookie, LPBYTE pbBuff, LONG cb,
 
    return 0;
 }
-static DWORD CALLBACK MyStreamOutCallback(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
+static DWORD_PTR CALLBACK MyStreamOutCallback(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
 	CFile* pFile = (CFile*) dwCookie;
 
@@ -204,7 +204,7 @@ void CDiurnalFormView::OnInitialUpdate()
 	EDITSTREAM es;
 
 	es.dwCookie = (DWORD) &tFile;
-	es.pfnCallback = MyStreamInCallback; 
+	es.pfnCallback = (EDITSTREAMCALLBACK)MyStreamInCallback; 
 	richEditCtl.StreamIn(SF_TEXT, es);
 
 	tFile.Close();
@@ -353,7 +353,7 @@ void CDiurnalFormView::SaveTheDamnThing()
 		CFile tFile(fd.GetPathName(), CFile::modeCreate | CFile::modeWrite);
 		EDITSTREAM es;
 		es.dwCookie = (DWORD) &tFile;
-		es.pfnCallback = MyStreamOutCallback; 
+		es.pfnCallback = (EDITSTREAMCALLBACK)MyStreamOutCallback;
 		richEditCtl.StreamOut(SF_TEXT, es);
 		tFile.Close();
 		theApp.SetUserDir(fd.GetPathName());

@@ -2,7 +2,12 @@
 // 					Class Implementation : CUGCell
 // ==========================================================================
 // Source file : UGCell.cpp
-// Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 // ==========================================================================
 
 #include "stdafx.h"
@@ -22,20 +27,21 @@ Constructor
 	Inits all of the cell variables (properties)
 	Calls ClearAll which clears all cell properties
 *********************************************/
-CUGCell::CUGCell(){
-	
+CUGCell::CUGCell()
+{
+	m_useThemes = true;
 	m_extraMem = NULL;
+	m_cellInitialState = NULL;
 	ClearAll();
 }
 /********************************************
 Destructor
 	Performs clean-up
 *********************************************/
-CUGCell::~CUGCell(){
-
+CUGCell::~CUGCell()
+{
 	//perform clean up
 	ClearAll();
-
 }
 
 /********************************************
@@ -71,8 +77,9 @@ void CUGCell::ClearAll()
 	m_joinRow		= -1;
 	m_joinCol		= -1;
 
-	//extra memory
-	ClearExtraMem();
+	// Clear locking info
+	m_isLocked = false;
+	m_openSize = 0;
 }
 /********************************************
 SetDefaultInfo
@@ -93,6 +100,7 @@ int CUGCell::SetDefaultInfo()
 						UGCELL_BACKCOLOR_SET |
 						UGCELL_HTEXTCOLOR_SET |
 						UGCELL_HBACKCOLOR_SET |
+						UGCELL_XP_STYLE_SET |
 						UGCELL_ALIGNMENT_SET;
 
 	m_string		= _T("");
@@ -100,6 +108,7 @@ int CUGCell::SetDefaultInfo()
 	m_label			= _T("");
 	m_format		= NULL;
 	m_cellStyle		= NULL;
+	m_cellInitialState = NULL;
 	// numberic datatype specific information
 	m_nNumber		= 0;
 	m_numDecimals	= 0;
@@ -117,6 +126,8 @@ int CUGCell::SetDefaultInfo()
 	m_hBackColor	= GetSysColor(COLOR_HIGHLIGHT);
 
 	m_alignment		= UG_ALIGNLEFT;
+
+	m_XPStyle = XPCellTypeData;
 	
 	return UG_SUCCESS;
 }
@@ -231,7 +242,9 @@ AddCellInfo
 		UG_SUCCESS	success
 		UG_ERROR	fail
 *****************************************************/
-int CUGCell::AddCellInfo(CUGCell *src,CUGCell *dest){
+int CUGCell::AddCellInfo(CUGCell *src,CUGCell *dest)
+{
+	dest->UseThemes(src->UseThemes());
 
 	//property flags
 	dest->m_propSetFlags |= src->m_propSetFlags;
@@ -297,23 +310,24 @@ int CUGCell::AddCellInfo(CUGCell *src,CUGCell *dest){
 	//alignment
 	if(src->m_propSetFlags&UGCELL_ALIGNMENT_SET)
 		dest->m_alignment = src->m_alignment;
+
+	// XP Stype
+	if(src->m_propSetFlags&UGCELL_XP_STYLE_SET)
+		dest->m_XPStyle = src->m_XPStyle;
+
 	
 	//extra memory
-	if(src->m_propSetFlags&UGCELL_EXTRAMEMORY_SET){
-		if(dest->m_extraMem != NULL)
-				delete[] dest->m_extraMem;
-		if(src->m_extraMem != NULL){
-			TRY{
-				dest->m_extraMem = new BYTE[src->m_extraMemSize];
-				memcpy(dest->m_extraMem,src->m_extraMem,(size_t)src->m_extraMemSize);
-				dest->m_extraMemSize = src->m_extraMemSize;
-			}
-			CATCH( CException, e ){
-				dest->m_extraMem = NULL;
-				dest->m_extraMemSize =0;
-			}
-			END_CATCH
-		}
+	// This has been changed so that it copies the pointers only.  
+	// The grid will clear the memory as it closes, using the ClearMemory function below.
+	// The old code would only work if no non pointer CUGCells were used to get/set cells in code.
+	if(src->m_propSetFlags&UGCELL_EXTRAMEMORY_SET)
+	{
+		dest->m_extraMem = src->m_extraMem;
+		dest->m_extraMemSize = src->m_extraMemSize;
+	}
+	else
+	{
+		src->m_extraMem = dest->m_extraMem = NULL;
 	}
 
 	//join cells
@@ -330,6 +344,9 @@ int CUGCell::AddCellInfo(CUGCell *src,CUGCell *dest){
 	//read only
 	if(src->m_propSetFlags&UGCELL_READONLY_SET)
 		dest->m_readOnlyFlag = src->m_readOnlyFlag;
+
+	// initial state
+	dest->m_cellInitialState = src->m_cellInitialState;
 
 	return UG_SUCCESS;
 }
@@ -353,6 +370,7 @@ SetText
 int	CUGCell::SetText(LPCTSTR text)
 {	
 	m_string = text;
+
 	m_dataType = UGCELLDATA_STRING;
 
 	if ( m_string.GetLength() > 0 )
@@ -432,21 +450,33 @@ LPCTSTR	CUGCell::GetText()
 	else if ( m_dataType == UGCELLDATA_NUMBER )
 	{
 		CString strDouble;
-		CString formatStr = _T("%lf");
-		strDouble.Format(_T("%.20f"), m_nNumber );
-		strDouble.TrimRight(_T('0'));
 		// parse the string without localized formatting
 		m_string = "";
 		if( m_propSetFlags&UGCELL_NUMBERDEC_SET )
-			formatStr.Format(_T("%%1.%dlf"), m_numDecimals );
+		{
 
+			CString formatStr = _T("%lf");
+			formatStr.Format(_T("%%1.%dlf"), m_numDecimals ); //
 		strDouble.Format( formatStr, m_nNumber );
+		}
+		else
+		{
+			strDouble.Format(_T("%.20f"), m_nNumber );
+			strDouble.TrimRight(_T('0'));
+		}
 
 		if(!( m_propSetFlags&UGCELL_NUMBERDEC_SET ))
 		{
 			strDouble.TrimLeft(_T('0'));
 			strDouble.TrimRight(_T('0'));
 		}
+
+		// if the number ends with a period, than remove it
+		if ( strDouble.Right( 1 ) == _T('.'))
+			strDouble.TrimRight( _T('.'));
+
+		if ( strDouble == _T("") && m_propSetFlags&UGCELL_STRING_SET )
+			strDouble = _T("0");
 
 		// create a 'proper' localized string representation of the numeric value
 		if (!( m_propSetFlags&UGCELL_DONOT_LOCALIZE ))
@@ -493,13 +523,6 @@ LPCTSTR	CUGCell::GetText()
 			else
 				strDouble = szBuffer;
 		}
-
-		// if the number ends with a period, than remove it
-		if ( strDouble.Right( 1 ) == _T('.'))
-			strDouble.TrimRight( _T('.'));
-
-		if ( strDouble == _T("") && m_propSetFlags&UGCELL_STRING_SET )
-			strDouble = _T("0");
 
 		m_string = strDouble;
 	}
@@ -1437,10 +1460,12 @@ SetBitmap
 *********************************************/
 int	CUGCell::SetBitmap(CBitmap * bitmap)
 {
-	if(NULL != bitmap) {
+	if(NULL != bitmap) 
+	{
 		m_propSetFlags |= UGCELL_BITMAP_SET;
 	}
-	else {
+	else 
+	{
 		if(	m_propSetFlags&UGCELL_BITMAP_SET)
 			 m_propSetFlags ^= UGCELL_BITMAP_SET;	// clear flag
 	}
@@ -1976,10 +2001,17 @@ SetFormatClass
 *********************************************/
 int	CUGCell::SetFormatClass(CUGCellFormat *format)
 {
-	if(format == NULL)
-		return UG_ERROR;
+	// v 7.2 - update 01 - allow resetting of the format class for NULL
+	// format class pointer - submitted by mgampi
+//	if(format == NULL)
+//		return UG_ERROR;
+	if(format == NULL) {
+		m_propSetFlags &=~UGCELL_FORMAT_SET;
+	}
+	else {
+		m_propSetFlags |= UGCELL_FORMAT_SET;
+	}
 
-	m_propSetFlags |= UGCELL_FORMAT_SET;
 	m_format = format;
 
 	return UG_SUCCESS;
@@ -2020,4 +2052,72 @@ long CUGCell::GetParam(){
 	if(m_propSetFlags&UGCELL_PARAM_SET)
 		return m_param;
 	return 0;
+}
+
+/********************************************
+SetInitialState
+	Purpose
+		Copys the current cell state into the initial
+		cell state, and additionally deletes it if it's 
+		been created before, and either way creates a new 
+		one.
+	Params
+		none
+	Return
+		none
+*********************************************/
+void CUGCell::SetInitialState()
+{
+	if (m_cellInitialState) 
+	{
+		delete m_cellInitialState;
+		m_cellInitialState = NULL;
+	}
+
+	m_cellInitialState = new CUGCell();
+
+	m_cellInitialState->CopyInfoFrom(this);
+}
+/********************************************
+LoadInitialState
+	Purpose
+		If the initial state of this cell 
+		has been set, this method will restore it
+	Params
+		none
+	Return
+		none
+*********************************************/
+void CUGCell::LoadInitialState()
+{
+	if (m_cellInitialState)
+	{
+		this->CopyInfoFrom(m_cellInitialState);
+	}
+}
+
+/********************************************
+ClearMemory
+	Purpose
+		 This method exists to provide an internalised
+		 method that can be called by the memory manager
+		 to clean up pointers that exist in the cell class,
+		 that are initialised when the cell is created, and 
+		 which cannot be deleted in the destructor, as the cell
+		 type is widely used to represent a copy of a cell.
+	Params
+		none
+	Return
+		none
+*********************************************/
+void CUGCell::ClearMemory()
+{
+	if (m_cellInitialState)
+	{
+		delete m_cellInitialState;
+		m_cellInitialState = NULL;
+	}
+
+	//extra memory
+	ClearExtraMem();
 }

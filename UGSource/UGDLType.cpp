@@ -2,7 +2,12 @@
 				Class Implementation : CUGDropListType
 **************************************************************************
 	Source file : UGDLType.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
 
 #include "stdafx.h"
@@ -35,6 +40,7 @@ CUGDropListType::CUGDropListType()
 	m_listBox = new CUGLstBox;
 	// make sure that this cell types do not overlap
 	m_canOverLap = FALSE;
+	m_useThemes = true;
 }
 
 /***************************************************
@@ -352,6 +358,7 @@ Return:
 ****************************************************/
 BOOL CUGDropListType::OnKeyDown(int col,long row,UINT *vcKey)
 {	
+	// test - TD 
 	if((*vcKey==VK_RETURN) || ((*vcKey==VK_DOWN)&&(GetKeyState(VK_CONTROL) < 0)))
 	{
 		m_btnCol = col;
@@ -413,6 +420,9 @@ Return
 ****************************************************/
 void CUGDropListType::OnDraw(CDC *dc,RECT *rect,int col,long row,CUGCell *cell,int selected,int current)
 {
+	if (!m_drawThemesSet)
+		m_useThemes = cell->UseThemes();
+
 	int left = rect->left;
 	RECT rectout;
 	CPen * oldpen;
@@ -428,112 +438,122 @@ void CUGDropListType::OnDraw(CDC *dc,RECT *rect,int col,long row,CUGCell *cell,i
 		return;
 	}
 
-	DrawBorder(dc,rect,rect,cell);
-
-	// The printer and the monitor have different resolutions.
-	// So we should adjust the size of the button.
-
 	float fScale = 1.0;
-	
+
 #ifdef UG_ENABLE_PRINTING
 	fScale = m_ctrl->GetUGPrint()->GetPrintVScale(dc);
 #endif
 
-	rect->left = rect->right - (int) (fScale * m_btnWidth);
+	RECT rcCombo = *rect;
+
+	rcCombo.left = rcCombo.right - (int) (fScale * m_btnWidth);
+
+
+	if(!m_useThemes || !UGXPThemes::DrawBackground(NULL, *dc, XPCellTypeData, UGXPThemes::GetState(selected > 0, current > 0), &rcCombo, NULL)
+		|| !UGXPThemes::DrawBackground(NULL, *dc, XPCellTypeCombo, UGXPThemes::GetState(selected > 0, current > 0), &rcCombo, NULL))
+	{
+
+		DrawBorder(dc,rect,rect,cell);
+
+		// The printer and the monitor have different resolutions.
+		// So we should adjust the size of the button.
+
+		rect->left = rect->right - (int) (fScale * m_btnWidth);
 
 #ifdef UG_ENABLE_PRINTING
-	if (dc->IsPrinting())
-	{
-		rect->left += (int) fScale;
-		rect->right -= (int) fScale;
-		rect->top += (int) fScale;
-		rect->bottom -= (int) fScale;
-	}
-#endif
-
-	// draw the 3D border
-
-	if(m_btnDown && current){
-		cell->SetBorder(UG_BDR_RECESSED);
-		DrawBorder(dc,rect,&rectout,cell);
-	}
-	else{
-		cell->SetBorder(UG_BDR_RAISED);
-		DrawBorder(dc,rect,&rectout,cell);
-	}
-
-	//fill the border in
-	dc->FillRect(&rectout,&m_brush);
-	
-	//make a line to separate the border from the rest ofthe cell
-	oldpen = (CPen *)dc->SelectObject((CPen *)&m_pen);
-	dc->MoveTo(rect->left-1,rect->top);
-	dc->LineTo(rect->left-1,rect->bottom);
-	dc->SelectObject(oldpen);
-
-	//draw the down arrow
-	if (dc->IsPrinting())
-	{
-#ifdef UG_ENABLE_PRINTING
-		CRgn rgn;
-
-		int	nWidth = rect->right - rect->left;
-		int	nHeight = rect->bottom - rect->top;
-
-		POINT point[] = {
-			{rect->left + nWidth * 3 / 10, rect->top + nHeight * 5 / 12} ,
-			{rect->left + nWidth * 7 / 10, rect->top + nHeight * 5 / 12},
-			{rect->left + nWidth / 2, rect->top + nHeight * 7 / 12}
-		};
-
-		rgn.CreatePolygonRgn(point, 3, ALTERNATE);
-
-		CBrush Brush;
-		Brush.CreateSolidBrush(RGB(0,0,0));
-		dc->FillRgn(&rgn, &Brush);
-
-		dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN)));
-		dc->MoveTo(rect->left,rect->top);
-		dc->LineTo(rect->right,rect->top);
-#endif
-	}
-	else
-	{
-		int x= (int) ((fScale * m_btnWidth-5)/2) + rect->left;
-		int y = ((rect->bottom - rect->top -3)/2) + rect->top;
-
-		// create a pen object that will be used to draw the arrow on the button
-		CPen *arrowPen = NULL;
-		if ( cell->GetReadOnly() == TRUE )
+		if (dc->IsPrinting())
 		{
-			arrowPen = new CPen;
-			arrowPen->CreatePen( PS_SOLID, 1, RGB(128,128,128));
+			rect->left += (int) fScale;
+			rect->right -= (int) fScale;
+			rect->top += (int) fScale;
+			rect->bottom -= (int) fScale;
+		}
+#endif
+
+		// draw the 3D border
+
+		if(m_btnDown && current){
+			cell->SetBorder(UG_BDR_RECESSED);
+			DrawBorder(dc,rect,&rectout,cell);
+		}
+		else{
+			cell->SetBorder(UG_BDR_RAISED);
+			DrawBorder(dc,rect,&rectout,cell);
+		}
+
+		//fill the border in
+		dc->FillRect(&rectout,&m_brush);
+		
+		//make a line to separate the border from the rest ofthe cell
+		oldpen = (CPen *)dc->SelectObject((CPen *)&m_pen);
+		dc->MoveTo(rect->left-1,rect->top);
+		dc->LineTo(rect->left-1,rect->bottom);
+		dc->SelectObject(oldpen);
+
+		//draw the down arrow
+		if (dc->IsPrinting())
+		{
+#ifdef UG_ENABLE_PRINTING
+			CRgn rgn;
+
+			int	nWidth = rect->right - rect->left;
+			int	nHeight = rect->bottom - rect->top;
+
+			POINT point[] = {
+				{rect->left + nWidth * 3 / 10, rect->top + nHeight * 5 / 12} ,
+				{rect->left + nWidth * 7 / 10, rect->top + nHeight * 5 / 12},
+				{rect->left + nWidth / 2, rect->top + nHeight * 7 / 12}
+			};
+
+			rgn.CreatePolygonRgn(point, 3, ALTERNATE);
+
+			CBrush Brush;
+			Brush.CreateSolidBrush(RGB(0,0,0));
+			dc->FillRgn(&rgn, &Brush);
+
+			dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN)));
+			dc->MoveTo(rect->left,rect->top);
+			dc->LineTo(rect->right,rect->top);
+#endif
 		}
 		else
-			arrowPen = (CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN));
-
-		oldpen = dc->SelectObject( arrowPen );
-
-		// draw the arrow
-		dc->MoveTo(x,y);
-		dc->LineTo(x+5,y);
-		dc->MoveTo(x+1,y+1);
-		dc->LineTo(x+4,y+1);
-		dc->MoveTo(x+2,y+2);
-		dc->LineTo(x+2,y+1);
-
-		if ( cell->GetReadOnly() == TRUE )
 		{
-			// clean up after temporary pen object
-			dc->SelectObject(oldpen);
-			arrowPen->DeleteObject();
-			delete arrowPen;
-			// when the arrow is disabled, add a while outline line
-			dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(WHITE_PEN)));
-			dc->MoveTo(x+3,y+2);
+			int x= (int) ((fScale * m_btnWidth-5)/2) + rect->left;
+			int y = ((rect->bottom - rect->top -3)/2) + rect->top;
+
+			// create a pen object that will be used to draw the arrow on the button
+			CPen *arrowPen = NULL;
+			if ( cell->GetReadOnly() == TRUE )
+			{
+				arrowPen = new CPen;
+				arrowPen->CreatePen( PS_SOLID, 1, RGB(128,128,128));
+			}
+			else
+				arrowPen = (CPen*)CPen::FromHandle((HPEN)GetStockObject(BLACK_PEN));
+
+			oldpen = dc->SelectObject( arrowPen );
+
+			// draw the arrow
+			dc->MoveTo(x,y);
 			dc->LineTo(x+5,y);
-			dc->MoveTo(x+3,y+3);
-			dc->LineTo(x+6,y);
+			dc->MoveTo(x+1,y+1);
+			dc->LineTo(x+4,y+1);
+			dc->MoveTo(x+2,y+2);
+			dc->LineTo(x+2,y+1);
+
+			if ( cell->GetReadOnly() == TRUE )
+			{
+				// clean up after temporary pen object
+				dc->SelectObject(oldpen);
+				arrowPen->DeleteObject();
+				delete arrowPen;
+				// when the arrow is disabled, add a while outline line
+				dc->SelectObject((CPen*)CPen::FromHandle((HPEN)GetStockObject(WHITE_PEN)));
+				dc->MoveTo(x+3,y+2);
+				dc->LineTo(x+5,y);
+				dc->MoveTo(x+3,y+3);
+				dc->LineTo(x+6,y);
+			}
 		}
 	}
 
@@ -600,7 +620,7 @@ int CUGDropListType::StartDropList()
 	}
 
 	//notify the user of the list, so it can be modified if needed
-	if ( OnCellTypeNotify(m_ID,m_btnCol,m_btnRow,UGCT_DROPLISTSTART,(long)&list) == FALSE )
+	if ( OnCellTypeNotify(m_ID,m_btnCol,m_btnRow,UGCT_DROPLISTSTART,(LONG_PTR)&list) == FALSE )
 		// if FALSE was returned from OnCellTypeNotify call, than the developer does not
 		// wish to show the drop list at the moment.
 		return UG_ERROR;
@@ -635,7 +655,7 @@ int CUGDropListType::StartDropList()
 	rect.top = rect.bottom;
 	rect.left+=10;
 	rect.right+=10;
-	len = list.GetCount();
+	len = (int)list.GetCount();
 	if(len >15)
 		len = 15;
 	rect.bottom += lf.lfHeight * len + 6;
@@ -665,33 +685,54 @@ int CUGDropListType::StartDropList()
 	//set up the font
 	if(font != NULL)
 		m_listBox->SetFont(font);
+
+	// v7.2 - update 03 - this works to eliminate blank lines that 
+	// can occur with odd sized fonts/number of items. Fix courtesy Gerbrand 
+	// .start
+	int itHeight = m_listBox->GetItemHeight(0);   
+	if (len > 15)      
+		len = 15;   
+	rect.bottom = rect.top + len * itHeight + 6;   
+	if(rect.bottom > clientRect.bottom){      
+		dif = rect.bottom - clientRect.bottom;      
+		rect.bottom -= dif;      
+		rect.top -= dif;      
+		if(rect.top <0)         
+			rect.top = 0;   
+	}   
+	
+	// v7.2 - update 03 - Adjust the rect width to accomodate the largest string
+	//			Allen Shiels
+	dif = GetMaxStringWidth(list) - (rect.right-rect.left);	
+	if (dif > 0) {		
+		if (len >= 15) // add a scroll bar width if max items in list
+			dif += GetSystemMetrics(SM_CXVSCROLL);		
+		rect.right += dif;	
+	}
+
+	if(rect.right > clientRect.right){      
+		dif = rect.right - clientRect.right;      
+		rect.right -= dif;      
+		rect.left -= dif;      
+		if(rect.left <0)         
+			rect.left = 0;   
+	}
+	// .end
 	
 	//resize the window again since a new font is being used
 	m_listBox->MoveWindow(&rect,FALSE);
 
-	//added SB
-	CString strCurData = m_ctrl->QuickGetText(m_btnCol,m_btnRow);
 	//add the items to the list
-	len = list.GetCount();
+	len = (int)list.GetCount();
 	POSITION position = list.GetHeadPosition();
 	pos =0;
-	int listLoc, selectLoc = -1;
 	while(pos < len){
-		listLoc = m_listBox->AddString(list.GetAt(position));
-		if(strCurData.GetLength() > 0 && strCurData.Compare(list.GetAt(position)) == 0)
-			selectLoc = listLoc;
+		m_listBox->AddString(list.GetAt(position));
 		pos++;
 		if(pos < len)
 			list.GetNext(position);
 	}
-	if(selectLoc >= 0)
-	{
-		m_listBox->SetTopIndex(selectLoc);
-		//m_listBox->SetCaretIndex(selectLoc);
-		//m_listBox->ShowCaret();
-		//m_listBox->SetCurSel(selectLoc);
-		//m_listBox->SelectString(-1,strCurData);
-	}
+
 	//give the list box pointers to the cell
 	m_listBox->m_col = &m_btnCol;
 	m_listBox->m_row = &m_btnRow;
@@ -703,4 +744,36 @@ int CUGDropListType::StartDropList()
 	m_ctrl->RedrawCell(m_btnCol,m_btnRow);
 
 	return UG_SUCCESS;
+}
+
+// v7.2 - update 03 - added for mods to StartDropList - adjust 
+//        droplist to width of text - Allen Shiels
+int CUGDropListType::GetMaxStringWidth(const CStringList& list) const
+{	
+	int maxWidth = 0;	
+
+	CDC* pDC = m_listBox->GetDC();	
+	CFont* pFont = m_listBox->GetFont();
+	CFont* pOldFont = pDC->SelectObject(pFont);	// Loop through each item in the list calculating	// the text extent for each string in the list box font	
+
+	int	len = (int)list.GetCount();	
+
+	POSITION position = list.GetHeadPosition();	
+
+	int pos = 0;	
+
+	while(pos < len) 
+	{		
+		CSize sz = pDC->GetTextExtent(list.GetAt(position));		
+		if (sz.cx > maxWidth)			
+			maxWidth = sz.cx;					
+		pos++;		
+		if(pos < len)			
+			list.GetNext(position);	
+	}	
+
+	pDC->SelectObject(pOldFont);	
+	m_listBox->ReleaseDC(pDC);	
+
+	return maxWidth + 10; // + a bit to stop clipping
 }

@@ -3,7 +3,12 @@
 **************************************************************************
 	Source file : UGCelTyp.cpp
 	Header file : UGCelTyp.h
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 
 	Purpose
 		The CUGCellType class is the default (normal) cell type
@@ -32,6 +37,8 @@
 #ifndef _UGCelTyp_H_
 #define _UGCelTyp_H_
 
+#include "UG64Bit.h"
+
 // MACROs used in printing bitmap
 #define IS_WIN30_DIB(lpbi)  ((*(LPDWORD)(lpbi)) == sizeof(BITMAPINFOHEADER)) 
 #define RECTWIDTH(lpRect)   ((lpRect)->right - (lpRect)->left) 
@@ -44,9 +51,14 @@
 #define WIDTHBYTES(bits)        ((unsigned)((bits+31)&(~31))/8)  /* ULONG aligned ! */
 #endif
 
-class UG_CLASS_DECL CUGCellType: public CObject{
+class UG_CLASS_DECL CUGCellType: public CObject
+{
+
+friend class CUGCell;
 
 protected:
+	bool m_drawThemesSet;
+	bool m_useThemes;
 	BOOL	m_canTextEdit;		//allow inline editing
 	BOOL	m_drawLabelText;	//draw the label instead of the string
 	BOOL	m_canOverLap;		//can the cell overlap over cells
@@ -68,12 +80,17 @@ protected:
 
 public:
 
+	bool UseThemes() { return m_useThemes; }
+	void  UseThemes(bool use) { m_useThemes = use; m_drawThemesSet = true; }
+	void ResetThemes() { m_drawThemesSet = false; }
+
 	//general purpose routines
 	virtual int  DrawBitmap(CDC *dc,CBitmap * bitmap,RECT *rect,COLORREF backcolor);
 	virtual void DrawBorder(CDC *dc,RECT *rect,RECT *rectout,CUGCell * cell);
 	virtual void DrawText(CDC *dc,RECT *rect,int offset,int col,long row,CUGCell *cell, int selected,int current);
-	virtual void DrawBackground(CDC *dc,RECT *rect,COLORREF backcolor);
+	virtual void DrawBackground(CDC *dc,RECT *rect,COLORREF backcolor, int row = -1, int col = -1, CUGCell * cell = NULL, bool current = false, bool selected = false);
 	virtual int GetCellOverlapInfo(CDC* dc,int col,long row,int *overlapCol,CUGCell *cell);
+	bool DrawThemedText(HDC dc, int left, int top, RECT* rect, LPCTSTR string, int stringLen, DWORD textFormat, UGXPCellType cellType, UGXPThemeState state);
 
 public:
 
@@ -139,7 +156,7 @@ public:
 
 	virtual long OnMessage(LPARAM lParam);
 
-	virtual int OnCellTypeNotify(long ID,int col,long row,long msg,long param);
+	virtual int OnCellTypeNotify(long ID,int col,long row,long msg,LONG_PTR param);
 };
 
 #endif // _UGCelTyp_H_

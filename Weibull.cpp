@@ -3,7 +3,7 @@
 //
 
 // weibull_distribution
-
+#include "stdafx.h"
 #include <iostream>
 #include <random>
 #include <math.h>

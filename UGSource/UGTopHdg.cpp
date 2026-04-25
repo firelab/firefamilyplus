@@ -2,10 +2,16 @@
 				Class Implementation : CUGTopHdg
 **************************************************************************
 	Source file : UGTopHdg.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
 #include "stdafx.h"
 #include "UGCtrl.h"
+#include "UGCell.h"
 // define WM_HELPHITTEST messages
 #include <afxpriv.h>
 
@@ -61,7 +67,7 @@ END_MESSAGE_MAP()
 /***************************************************
 OnPaint
 	This routine is responsible for gathering information on cells to draw,
-	and draw in an optomized fashion.
+	and draw in an optimized fashion.
 Params:
 	<none>
 Returns:
@@ -93,7 +99,7 @@ Returns:
 	<none>
 *****************************************************/
 void CUGTopHdg::DrawCellsIntern(CDC *dc)
-{
+{	
 	CRect rect(0,0,0,0), cellRect;
   	CUGCell cell;
 	CUGCellType * cellType;
@@ -179,12 +185,15 @@ Return:
 	<none>
 *************************************************/
 void CUGTopHdg::Update()
-{
+{	
 	//calc the last row height
 	//find the row
 	int height = 0;
-	int yIndex;
-	for(yIndex= -1;yIndex > (m_GI->m_numberTopHdgRows * -1) ;yIndex--)
+
+	// For VC6/2002/2003/2005 compatibility
+	int yIndex= -1;
+
+	for(;yIndex > (m_GI->m_numberTopHdgRows * -1) ;yIndex--)
 	{
 		height += GetTHRowHeight(yIndex);
 	}
@@ -249,24 +258,24 @@ void CUGTopHdg::CheckForUserResize(CPoint *point)
 		if(width > m_GI->m_gridWidth)
 			break;
 
-		if(point->x < width+3 && point->x > width-3)
-		{	
-			if(m_ctrl->GetColWidth(col+1) == 0 && (col+1) < m_GI->m_numberCols)
-				col++;
+        if(point->x < width+3 && point->x > width-3)
+        {	
+            if(m_ctrl->GetColWidth(col+1) == 0 && (col+1) < m_GI->m_numberCols)
+                col++;
 
-			if(m_ctrl->OnCanSizeCol(col) == FALSE)
-				return;
+            if(m_ctrl->OnCanSizeCol(col) == FALSE)
+                return;
 
-			m_canSize = TRUE;
-			m_colOrRowSizing	= 0;				// 0-col 1-row
-			m_sizingColRow		= col;				//column/row being sized
-			m_sizingStartSize	= m_ctrl->GetColWidth(col);//original size
-			m_sizingStartPos	= point->x;			//original start pos
+            m_canSize = TRUE;
+            m_colOrRowSizing	= 0;				// 0-col 1-row
+            m_sizingColRow		= col;				//column/row being sized
+            m_sizingStartSize	= m_ctrl->GetColWidth(col);//original size
+            m_sizingStartPos	= point->x;			//original start pos
 
-			SetCursor(m_GI->m_WEResizseCursor);
-			return;
-		}
-	}
+            SetCursor(m_GI->m_WEResizseCursor);
+            return;
+        }
+    }
 
 	//top heading row sizing
 	int height = m_GI->m_topHdgHeight;
@@ -419,7 +428,6 @@ void CUGTopHdg::OnMouseMove(UINT nFlags, CPoint point)
 		{
 			int col,row;
 			RECT rect;
-			point.y = 1;
 
 			//find the column that the mouse is over
 			if(GetCellFromPoint(&point,&col,&row,&rect) != UG_SUCCESS)
@@ -1079,7 +1087,8 @@ Params:
 Returns:
 	If 1, the tooltip control was found; If -1, the tooltip control was not found.
 *****************************************************/
-int CUGTopHdg::OnToolHitTest(  CPoint point, TOOLINFO *pTI ) const
+// v7.2 - update 02 - 64-bit - changed from int to UGINTRET - see UG64Bit.h
+UGINTRET CUGTopHdg::OnToolHitTest(  CPoint point, TOOLINFO *pTI ) const
 {
 	int col, row;
 	CRect rect;
@@ -1096,9 +1105,11 @@ int CUGTopHdg::OnToolHitTest(  CPoint point, TOOLINFO *pTI ) const
 			return -1;
 		}
 
-		pTI->cbSize = sizeof(TOOLINFO);
-		pTI->uFlags =  TTF_NOTBUTTON | TTF_ALWAYSTIP |TTF_IDISHWND ;
-		pTI->uId = (UINT)m_hWnd;
+		// v7.2 - update 03 - added TTF_TRANSPARENT flag. This prevents a 
+		//        recursive flicker of large tooltips that are forced to 
+		//        encroach on the mouse position. Reported by Kuerscht
+		pTI->uFlags =  TTF_TRANSPARENT | TTF_NOTBUTTON | TTF_ALWAYSTIP |TTF_IDISHWND ;
+		pTI->uId = (UINT_PTR)m_hWnd;
 		pTI->hwnd = (HWND)m_hWnd;
 		pTI->lpszText = LPSTR_TEXTCALLBACK;
 		return 1;
@@ -1141,10 +1152,34 @@ BOOL CUGTopHdg::ToolTipNeedText( UINT id, NMHDR* pTTTStruct, LRESULT* pResult )
 	{
 		if ( m_ctrl->OnHint(col,row,UG_TOPHEADING,&string) == TRUE )
 		{
+			// v7.2 - update 01 - Do this to Enable multiline ToolTips - reported by kassinen
+			::SendMessage( pTTT->hdr.hwndFrom, TTM_SETMAXTIPWIDTH, 0, SHRT_MAX );
+			::SendMessage( pTTT->hdr.hwndFrom, TTM_SETDELAYTIME, TTDT_AUTOPOP, SHRT_MAX );
+			::SendMessage( pTTT->hdr.hwndFrom, TTM_SETDELAYTIME, TTDT_INITIAL, 200 );
+			::SendMessage( pTTT->hdr.hwndFrom, TTM_SETDELAYTIME, TTDT_RESHOW, 200 );
  			pTTT->lpszText = const_cast<LPTSTR>((LPCTSTR)string);
 			return TRUE;
 		}
 	}
 
 	return FALSE;
+}
+
+// v7.2 update 04 - added to implement WM_PRINT handling for the top heading - TD 
+LRESULT CUGTopHdg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch (message)
+	{
+		// TD - added to implement WM_PRINT handling for the grid
+	case WM_PRINT:
+		// draw all top heading cells to the DC passed in
+		InvalidateRect(NULL);
+		m_drawHint.AddHint(0,m_GI->m_numberTopHdgRows * -1,m_GI->m_numberCols,0);
+		DrawCellsIntern(CDC::FromHandle((HDC)wParam));
+		return 0;
+	default:
+		return CWnd::WindowProc(message, wParam, lParam);
+	}
 }

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "CTimeZones.h"
 
 using namespace std;

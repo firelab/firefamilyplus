@@ -51,6 +51,9 @@
     <ClInclude Include="UGInclude\ExtCheckBox.h">
       <Filter>Header Files\UG Headers</Filter>
     </ClInclude>
+    <ClInclude Include="UGInclude\UG64Bit.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
     <ClInclude Include="UGInclude\UGCBType.h">
       <Filter>Header Files\UG Headers</Filter>
     </ClInclude>
@@ -69,10 +72,13 @@
     <ClInclude Include="UGInclude\UGCTbutn.h">
       <Filter>Header Files\UG Headers</Filter>
     </ClInclude>
-    <ClInclude Include="UGInclude\UGCTdtp.h">
+    <ClInclude Include="UGInclude\ugctelps.h">
       <Filter>Header Files\UG Headers</Filter>
     </ClInclude>
     <ClInclude Include="UGInclude\UGCtrl.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\UGCTsarw.h">
       <Filter>Header Files\UG Headers</Filter>
     </ClInclude>
     <ClInclude Include="UGInclude\ugdefine.h">
@@ -132,6 +138,9 @@
     <ClInclude Include="UGInclude\ugsidehd.h">
       <Filter>Header Files\UG Headers</Filter>
     </ClInclude>
+    <ClInclude Include="UGInclude\UGStrOp.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
     <ClInclude Include="UGInclude\ugstruct.h">
       <Filter>Header Files\UG Headers</Filter>
     </ClInclude>
@@ -142,6 +151,12 @@
       <Filter>Header Files\UG Headers</Filter>
     </ClInclude>
     <ClInclude Include="UGInclude\ugvscrol.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\ugxpthemes.h">
+      <Filter>Header Files\UG Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UGInclude\utedit.h">
       <Filter>Header Files\UG Headers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -185,10 +200,13 @@
     <ClCompile Include="UGSource\UGCTbutn.cpp">
       <Filter>Source Files\UG Source</Filter>
     </ClCompile>
-    <ClCompile Include="UGSource\UGCTdtp.cpp">
+    <ClCompile Include="UGSource\ugctelps.cpp">
       <Filter>Source Files\UG Source</Filter>
     </ClCompile>
     <ClCompile Include="UGSource\UGCtrl.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGCTsarw.cpp">
       <Filter>Source Files\UG Source</Filter>
     </ClCompile>
     <ClCompile Include="UGSource\UGDLType.cpp">
@@ -245,6 +263,9 @@
     <ClCompile Include="UGSource\ugsidehd.cpp">
       <Filter>Source Files\UG Source</Filter>
     </ClCompile>
+    <ClCompile Include="UGSource\UGStrOp.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
     <ClCompile Include="UGSource\ugtab.cpp">
       <Filter>Source Files\UG Source</Filter>
     </ClCompile>
@@ -252,6 +273,12 @@
       <Filter>Source Files\UG Source</Filter>
     </ClCompile>
     <ClCompile Include="UGSource\ugvscrol.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UGXPThemes.cpp">
+      <Filter>Source Files\UG Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UGSource\UTEdit.cpp">
       <Filter>Source Files\UG Source</Filter>
     </ClCompile>
   </ItemGroup>

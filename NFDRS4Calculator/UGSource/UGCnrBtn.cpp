@@ -2,9 +2,14 @@
 				Class Implementation : CUGnrBtn
 **************************************************************************
 	Source file : UGnrBtn.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
-#include "..\pch.h"
+#include "pch.h"
 #include "UGCtrl.h"
 // define WM_HELPHITTEST messages
 #include <afxpriv.h>
@@ -97,6 +102,39 @@ void CUGCnrBtn::OnPaint()
 	if( m_GI->m_defFont != NULL && pOldFont != NULL )
 		dc.SelectObject( pOldFont );
 }
+
+// v7.2 - update 04 - added as a pared down version of OnPaint to handle 
+//        WM_PRINT message - called from WindowProc below. TD
+void CUGCnrBtn::OnPrint(CDC *dc) 
+{
+	
+	RECT rect;
+	GetClientRect(&rect);
+
+	CUGCellType * cellType;
+	CUGCell cell;
+	m_ctrl->GetCellIndirect(-1,-1,&cell);
+
+	//get the cell type to draw the cell
+	if(cell.IsPropertySet(UGCELL_CELLTYPE_SET))
+		cellType = m_ctrl->GetCellType(cell.GetCellType());
+	else
+		cellType = m_ctrl->GetCellType(-1);
+	
+	CFont * pOldFont = NULL;
+
+	// get the default font if there is one
+	if( m_GI->m_defFont != NULL )
+	{
+		pOldFont = dc->SelectObject( ( CFont* )m_GI->m_defFont );
+	}
+	
+	cellType->OnDraw(dc,&rect,-1,-1,&cell,0,0);
+
+	if( m_GI->m_defFont != NULL && pOldFont != NULL )
+		dc->SelectObject( pOldFont );
+}
+
 /************************************************
 Update
 	This function is called by the grid when certian properties are changed and
@@ -400,7 +438,8 @@ Params:
 Returns:
 	If 1, the tooltip control was found; If -1, the tooltip control was not found.
 *****************************************************/
-int CUGCnrBtn::OnToolHitTest(  CPoint point, TOOLINFO *pTI ) const
+// v7.2 - update 02 - 64-bit - changed from int to UGINTRET - see UG64Bit.h
+UGINTRET CUGCnrBtn::OnToolHitTest(  CPoint point, TOOLINFO *pTI ) const
 {
 	UNREFERENCED_PARAMETER(point);
 
@@ -417,9 +456,11 @@ int CUGCnrBtn::OnToolHitTest(  CPoint point, TOOLINFO *pTI ) const
 		return -1;
 	}
 
-	pTI->cbSize = sizeof(TOOLINFO);
-	pTI->uFlags =  TTF_NOTBUTTON | TTF_ALWAYSTIP |TTF_IDISHWND ;
-	pTI->uId = (UINT)m_hWnd;
+	// v7.2 - update 03 - added TTF_TRANSPARENT flag. This prevents a 
+	//        recursive flicker of large tooltips that are forced to 
+	//        encroach on the mouse position. Reported by Kuerscht
+	pTI->uFlags =  TTF_TRANSPARENT | TTF_NOTBUTTON | TTF_ALWAYSTIP |TTF_IDISHWND ;
+	pTI->uId = (UINT_PTR)m_hWnd;
 	pTI->hwnd = (HWND)m_hWnd;
 	pTI->lpszText = LPSTR_TEXTCALLBACK;
 	return 1;
@@ -453,9 +494,32 @@ BOOL CUGCnrBtn::ToolTipNeedText( UINT id, NMHDR* pTTTStruct, LRESULT* pResult )
 
 	if ( m_ctrl->OnHint(col,row,UG_CORNERBUTTON,&string) == TRUE )
 	{
- 		pTTT->lpszText = const_cast<LPTSTR>((LPCTSTR)string);
+		// Do this to Enable multiline ToolTips
+		::SendMessage( pTTT->hdr.hwndFrom, TTM_SETMAXTIPWIDTH, 0, SHRT_MAX );
+		::SendMessage( pTTT->hdr.hwndFrom, TTM_SETDELAYTIME, TTDT_AUTOPOP, SHRT_MAX );
+		::SendMessage( pTTT->hdr.hwndFrom, TTM_SETDELAYTIME, TTDT_INITIAL, 200 );
+		::SendMessage( pTTT->hdr.hwndFrom, TTM_SETDELAYTIME, TTDT_RESHOW, 200 );
+		pTTT->lpszText = const_cast<LPTSTR>((LPCTSTR)string);
 		return TRUE;
 	}
 
 	return FALSE;
+}
+
+// v7.2 update 04 - added to implement WM_PRINT handling for the top heading - TD 
+LRESULT CUGCnrBtn::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch (message)
+	{
+		// TD - added to implement WM_PRINT handling for the grid
+	case WM_PRINT:
+		// call OnPrint to print the corner button
+		InvalidateRect(NULL);
+		OnPrint(CDC::FromHandle((HDC) wParam));
+		return 0;
+	default:
+		return CWnd::WindowProc(message, wParam, lParam);
+	}
 }

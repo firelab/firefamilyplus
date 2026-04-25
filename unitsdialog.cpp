@@ -79,10 +79,10 @@ BOOL CUnitsDialog::OnInitDialog()
 	              // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-int CUnitsDialog::DoModal() 
+INT_PTR CUnitsDialog::DoModal()
 {
 	// TODO: Add your specialized code here and/or call the base class
-	int ret =  CDialog::DoModal();
+	INT_PTR ret =  CDialog::DoModal();
 	unitSet.Close();
 	return ret;
 }

@@ -3,7 +3,12 @@
 **************************************************************************
 	Source file : UGCtrl.cpp
 	Header file : UGCtrl.h
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 
 	Purpose
 		This is the main grid's class.  It contains and
@@ -81,6 +86,7 @@ class CUGCellFormat;
 #include "UGTab.h"
 #include "UGGdInfo.h"
 #include "UGFormat.h"
+#include "UGXPThemes.h"
 #ifdef UG_ENABLE_SCROLLHINTS
 	#include "ughint.h"
 #endif 
@@ -102,7 +108,6 @@ class CUGCellFormat;
 /////////////////////////////////////////////////
 class UG_CLASS_DECL CUGCtrl : public CWnd
 {
-
 // Construction
 public:
 	CUGCtrl();
@@ -146,8 +151,23 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	void SetInitialCellStates();
 
 	int m_contructorResults;
+
+	// Methods used to reset the grid
+	void ResetCells(int startRow, int endRow, int startCol, int endCol);
+	void ResetAll(bool allSheets = true);
+	void ResetSizes(int startRow, int endRow, int startCol, int endCol);
+
+protected:
+
+	void UseDefaultStateStorage(bool use) { m_storeInitialStates = use; }
+
+private:
+	// This method stores the startup row and col sizes in the grid info class.
+	void SetInitialSizes();
+	bool m_storeInitialStates;
 
 protected:
 
@@ -270,8 +290,12 @@ public:
 	//*************** creation/setup *****************
 	//window creation
 	BOOL CreateGrid(DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID);
+
 	//dialog resource functions
 	BOOL AttachGrid(CWnd * wnd,UINT ID);
+	// v7.2 - update 01 - see note ugctrl.cpp
+	BOOL DetachGrid();	
+
 
 	void AdjustComponentSizes();	//adjusts and positions the child windows
 
@@ -326,7 +350,8 @@ public:
 
 	int FindDialog();
 	int ReplaceDialog();
-	long ProcessFindDialog(UINT,long);
+	// v7.2 - update 02 - 64-bit - was defined as long ProcessFindDialog(UINT,long);
+	LRESULT ProcessFindDialog(WPARAM,LPARAM);
 	int FindInAllCols(BOOL state);
 	BOOL m_findDialogRunning;
 	BOOL m_findDialogStarted;
@@ -590,6 +615,7 @@ public:
 	//*********** Over-ridable Notify Functions **********
 	//****************************************************
 	virtual void OnSetup();
+	virtual void OnReset();
 	virtual void OnSheetSetup(int sheetNumber);
 
 	//movement and sizing
@@ -649,7 +675,7 @@ public:
 	virtual void OnDataSourceNotify(int ID,long msg,long param);
 
 	//cell type notifications
-	virtual int OnCellTypeNotify(long ID,int col,long row,long msg,long param);
+	virtual int OnCellTypeNotify(long ID,int col,long row,long msg,LONG_PTR param);
 
 	//editing
 	virtual int OnEditStart(int col, long row,CWnd **edit);

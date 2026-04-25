@@ -35,9 +35,9 @@ CAgencyDialog::CAgencyDialog(CWnd* pParent /*=NULL*/, CDatabase *_pDB /*=NULL*/)
 	//}}AFX_DATA_INIT
 }
 
-int CAgencyDialog::DoModal() 
+INT_PTR CAgencyDialog::DoModal() 
 {
-	int ret = CDialog::DoModal();
+	INT_PTR ret = CDialog::DoModal();
 	agencySet.Close();
 	return ret;
 }

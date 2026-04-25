@@ -2,11 +2,18 @@
 				Class Implementation : CUGEdit
 **************************************************************************
 	Source file : ugedit.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
-#include "..\pch.h"
+#include "pch.h"
 #include <ctype.h>
 #include "UGCtrl.h"
+
+#include "ugxpthemes.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -105,7 +112,11 @@ Returns:
 void CUGEdit::OnUpdate() 
 {
 	CalcEditRect();
+
+	if (UGXPThemes::IsThemed())
+	    UpdateCtrl();
 }
+
 
 /***************************************************
 CalcEditRect
@@ -137,20 +148,24 @@ void CUGEdit::CalcEditRect()
 	m_ctrl->m_editParent->GetClientRect(&parentRect);
 
 	dc = GetDC();
-	if(GetFont() != NULL)
-		oldFont = (CFont *)dc->SelectObject(GetFont());
 
 	CopyRect(&fmtRect,&editRect);
 	fmtRect.right = parentRect.right;
 	fmtRect.left +=2;
-	
-	dc->DrawText(string,&fmtRect,DT_CALCRECT|DT_WORDBREAK);
- 	
-	fmtRect.left -=2;
 
-	if(GetFont() != NULL && oldFont != NULL )
-		dc->SelectObject(oldFont);
-	ReleaseDC(dc);
+//	if (!UGXPThemes::GetTextExtent(m_hWnd, *dc, XPCellTypeData, ThemeStateNormal, string.GetBuffer(string.GetLength()), string.GetLength(), DT_LEFT | DT_WORDBREAK, &fmtRect))
+	{
+		if(GetFont() != NULL)
+			oldFont = (CFont *)dc->SelectObject(GetFont());
+		
+		dc->DrawText(string,&fmtRect,DT_CALCRECT|DT_WORDBREAK);
+ 		
+		fmtRect.left -=2;
+
+		if(GetFont() != NULL && oldFont != NULL )
+			dc->SelectObject(oldFont);
+		ReleaseDC(dc);
+	}
 
 	//if(fmtRect.right < editRect.right)
 	//	fmtRect.right = editRect.right;
@@ -220,7 +235,7 @@ BOOL CUGEdit::SetAutoSize(BOOL state)
 
 /***************************************************
 PreTranslateMessage
-	function is overwriten here to provide handling of the ESC key when the grid
+	function is overwritten here to provide handling of the ESC key when the grid
 	is placed on a dialog.
 Params:
 	pMsg		- please see MSDN for more information on the parameters.

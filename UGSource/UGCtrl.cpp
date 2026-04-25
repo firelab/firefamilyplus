@@ -2,10 +2,22 @@
 				Class Implementation : CUGCtrl
 **************************************************************************
 	Source file : UGCtrl.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
 #include "stdafx.h"
 #include "UGCtrl.h"
+#include "ugstrop.h"
+
+#pragma warning (push, 3)
+#include <fstream>
+#include <ATLConv.h> 
+#pragma warning (pop)
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -19,8 +31,10 @@ Constructor
 ****************************************************/
 CUGCtrl::CUGCtrl()
 {
-
 	m_contructorResults = UG_SUCCESS;
+
+	// TD changed in v7.2 - review related code (SetInitialSizes() & SetInitialCellStates())
+	m_storeInitialStates = false;
 
 	/********************************************
 	set up the internal classes
@@ -140,7 +154,6 @@ Destructor
 ****************************************************/
 CUGCtrl::~CUGCtrl()
 {
-
 	int loop;
 
 	if(m_dataSrcList != NULL)
@@ -210,7 +223,7 @@ CUGCtrl::~CUGCtrl()
 
 	if(m_CUGTab	!= NULL)
 		delete m_CUGTab;
-	
+
 	if(m_GIList != NULL){
 		for(int loop = 0; loop < m_numberSheets; loop++){
 			if(m_GIList[loop] != NULL)
@@ -219,7 +232,7 @@ CUGCtrl::~CUGCtrl()
 		delete[] m_GIList;
 	}
 
-
+//	UGXPThemes::CleanUp(); 
 }
 
 /***************************************************
@@ -243,7 +256,6 @@ BEGIN_MESSAGE_MAP(CUGCtrl, CWnd)
 	ON_REGISTERED_MESSAGE(ugmsg_FindDialog ,ProcessFindDialog)
 	ON_MESSAGE( UGCT_MESSAGE, OnCellTypeMessage)
 	//}}AFX_MSG_MAP
-
 END_MESSAGE_MAP()
 
 /***************************************************
@@ -252,7 +264,7 @@ OnEraseBkgnd
 BOOL CUGCtrl::OnEraseBkgnd( CDC* pDC )
 {
 	UNREFERENCED_PARAMETER(pDC);
-	return 1;
+	return TRUE;
 }
 
 /***************************************************
@@ -347,7 +359,7 @@ Return
 ****************************************************/
 LRESULT CUGCtrl::OnCellTypeMessage(WPARAM wParam, LPARAM lParam){
 
-	CUGCellType* ct = GetCellType(wParam);
+	CUGCellType* ct = GetCellType((int)wParam);
 	if(ct == NULL)
 		return 1;
 
@@ -797,7 +809,11 @@ void CUGCtrl::OnPaint()
 	// adjust the rect to only cover the required area
 	rect.left = rect.right - GetVS_Width();
 	rect.top = rect.bottom - GetHS_Height();
-	dc->FillRect(&rect,&brush);
+
+	if (!(UGXPThemes::IsThemed() && UGXPThemes::DrawBackground(*this, *dc, XPCellTypeBorder, ThemeStateNormal, &rect, NULL)))
+	{
+		dc->FillRect(&rect,&brush);
+	}
 	// clean up
 	ReleaseDC(dc);
 	// draw remainder of the grid window
@@ -840,9 +856,16 @@ BOOL CUGCtrl::CreateGrid(DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT
 	BOOL rt = Create((LPCTSTR)NULL,(LPCTSTR)_T(""),(DWORD) dwStyle, (const RECT&) rect, 
 		(CWnd*) pParentWnd,(UINT) nID, (CCreateContext*)NULL);
 
-	if(rt){
+	if(rt)
+	{
 		OnSetup();
+		OnReset();
 		OnSheetSetup(0);
+		if(m_storeInitialStates)
+		{
+			SetInitialSizes();
+			SetInitialCellStates();
+		}
 	}
 
 	// Allow drawing after the grid is initialized
@@ -919,6 +942,29 @@ BOOL CUGCtrl::AttachGrid(CWnd * wnd,UINT ID){
 
 	return FALSE;
 }
+
+// v7.2 - update 01 - added DetachGrid function to enable quick
+// replacement of one grid with another on a dialog control. Should 
+// be called before deleting control. Submitted by Timothy W. Okrey
+/***************************************************
+DetachGrid
+	Purpose
+		Detaches the CUGCtrl window from the dialog 
+****************************************************/
+BOOL CUGCtrl::DetachGrid(){
+
+	BOOL retcode = FALSE;
+
+	if (::IsWindow(m_hWnd))
+	{
+		if (UnsubclassWindow())
+		{
+			retcode = TRUE;
+		}
+	}
+	return retcode;
+}
+
 /***************************************************
 CalcTopRow
 	Purpose
@@ -1572,7 +1618,7 @@ int CUGCtrl::AdjustTopRow(long adjust){
 MoveCurrentRow
 	Moves the grid's current row, calls the OnCanMove
 	first to see if the process is allowed
-	Defines are avialable for this function
+	Defines are available for this function
 	'flag'  0-lineup 1-linedown 2-pageup 
 			3-pagedown 4-top 5-bottom
 
@@ -2600,8 +2646,9 @@ int	CUGCtrl::StartEdit(int col,long row,int key)
 		{	
 			m_editInProgress = TRUE;
 
-			if ( m_editCell.GetDataType() == UGCELLDATA_NUMBER && !( m_editCell.GetPropertyFlags()&UGCELL_DONOT_LOCALIZE ))
-				m_editCell.SetPropertyFlags( m_editCell.GetPropertyFlags()|UGCELL_DONOT_LOCALIZE );
+// These lines meant that the edit box always showed numbers in Western format, which was not acceptable for users in other locales
+//			if ( m_editCell.GetDataType() == UGCELLDATA_NUMBER && !( m_editCell.GetPropertyFlags()&UGCELL_DONOT_LOCALIZE ))
+//				m_editCell.SetPropertyFlags( m_editCell.GetPropertyFlags()|UGCELL_DONOT_LOCALIZE );
 
 			m_editCtrl->SetWindowText( m_editCell.GetText());
 
@@ -2670,7 +2717,10 @@ GetCell
 		UG_SUCCESS	success
 		UG_ERROR	cell not found
 ****************************************************/
-int CUGCtrl::GetCell(int col,long row,CUGCell * cell){
+int CUGCtrl::GetCell(int col,long row,CUGCell * cell)
+{
+	// This is so we don't copy the initial state when we don't want to.
+	cell->m_cellInitialState = NULL;
 
 	if(col >= m_GI->m_numberCols)
 		return UG_ERROR;
@@ -2713,8 +2763,17 @@ int	CUGCtrl::GetCellIndirect(int col,long row,CUGCell *cell){
 		if(m_GI->m_colInfo[col].colDefault != NULL)
 			cell->CopyInfoFrom(m_GI->m_colInfo[col].colDefault);
 	}
-	else{
+	else
+	{
 		cell->CopyInfoFrom(m_GI->m_hdgDefaults);
+		if (row == -m_GI->m_numberTopHdgRows)
+		{
+			cell->SetXPStyle(XPCellTypeTopCol);
+		}
+		else if (col == -m_GI->m_numberSideHdgCols)
+		{
+			cell->SetXPStyle(XPCellTypeLeftCol);
+		}
 	}
 	
 	if(row >= m_GI->m_numberRows)
@@ -2730,7 +2789,10 @@ int	CUGCtrl::GetCellIndirect(int col,long row,CUGCell *cell){
 	//get the cell from the datasource
 	if(col >=0 && col < m_GI->m_numberCols){
 		ds->GetCell(m_GI->m_colInfo[col].colTranslation,row,cell);
-		OnGetCell(m_GI->m_colInfo[col].colTranslation,row,cell);
+		// v7.2 - update 01 - this is not necessary here - thanks
+		// to JohnBarnes2858
+		//OnGetCell(m_GI->m_colInfo[col].colTranslation,row,cell);
+		OnGetCell(col,row,cell);
 	}
 	else{
 		ds->GetCell(col,row,cell);
@@ -3334,10 +3396,12 @@ int CUGCtrl::SetNumberCols(int cols,BOOL redraw){
 
 	//create the array
 	UGCOLINFO * tempColWidths	= new UGCOLINFO[cols];
-		
+	
+	// Create outside the for statement so it works in VC6 and also 2002/2003/2005
+	int loop = 0;
+
 	//copy the col information over
-	int loop;
-	for(loop = 0;loop < cols ; loop++){
+	for(;loop < cols ; loop++){
 		if(loop < oldNumCols){
 			tempColWidths[loop].width = m_GI->m_colInfo[loop].width;			
 			tempColWidths[loop].dataSource = m_GI->m_colInfo[loop].dataSource;
@@ -3958,7 +4022,8 @@ int	CUGCtrl::InsertRow(long row){
 	ds = m_GI->m_defDataSource;
 
 	int rt = ds->InsertRow(row);
-	if(rt == UG_SUCCESS){
+	if(rt == UG_SUCCESS)
+	{
 		SetNumberRows(m_GI->m_numberRows + 1);
 	}
 	return rt;
@@ -4061,7 +4126,8 @@ int CUGCtrl::FindInAllCols(BOOL state){
 	Params
 	Return
 ***************************************************/
-long CUGCtrl::ProcessFindDialog(UINT,long)
+// v7.2 - update 02 - 64-bit - was defined as long ProcessFindDialog(UINT,long);
+LRESULT CUGCtrl::ProcessFindDialog(WPARAM,LPARAM)
 {
 	BOOL bFoundSomething = FALSE;
 	
@@ -4081,6 +4147,10 @@ long CUGCtrl::ProcessFindDialog(UINT,long)
 	int col = m_GI->m_currentCol;
 	long row = m_GI->m_currentRow;
 
+	int startCol = -1;				// added to prevent loop on same Find and Replace text
+	int startRow = -1;
+	BOOL bStarted = FALSE;
+
 	CString string = m_findReplaceDialog->GetFindString();
 	CString string2 = m_findReplaceDialog->GetReplaceString();
 	int findFlags = 0;
@@ -4097,20 +4167,43 @@ long CUGCtrl::ProcessFindDialog(UINT,long)
 
 	if( m_findReplaceDialog->ReplaceCurrent())
 	{
-		QuickSetText(m_GI->m_currentCol,row,string2);
-		RedrawCell(m_GI->m_currentCol,row);
+		// check that we are on a cell that has the Find text TD
+		CString strTemp = QuickGetText(col, row);
+		CString strTemp2 = string;
+		if(findFlags & UG_FIND_CASEINSENSITIVE) {
+			strTemp.MakeUpper();
+			strTemp2.MakeUpper();
+		}
+		BOOL bFound = FALSE;
+		if(findFlags & UG_FIND_PARTIAL) {
+			if(strTemp.Find(strTemp2) != -1) {
+				bFound = TRUE;
+			}
+		}
+		else {
+			if(strTemp == strTemp2) {
+				bFound = TRUE;
+			}
+		}
+		if(bFound) {
+			QuickSetText(m_GI->m_currentCol,row,string2);
+			RedrawCell(m_GI->m_currentCol,row);
+		}
 	}
 
-	if(string2 == string)
-		return UG_SUCCESS;
-	if(findFlags&UG_FIND_PARTIAL) 
-	{
-		if(string2.Find(string) != -1) 
-			return UG_SUCCESS;
-	}
+	// removed this TD
+//	if(string2 == string)
+//		return UG_SUCCESS;
+//	if(findFlags&UG_FIND_PARTIAL) 
+//	{
+//		if(string2.Find(string) != -1) 
+//			return UG_SUCCESS;
+//	}
 
 	while(FindNext(&string,&col,&row,findFlags) == UG_SUCCESS ) 
 	{
+		// prevent infinite loop on same Find and Replace text
+
 		bFoundSomething = TRUE;
 		// find display location of the found column
 		for ( int tempCol = 0; tempCol < m_GI->m_numberCols; tempCol ++ )
@@ -4126,8 +4219,20 @@ long CUGCtrl::ProcessFindDialog(UINT,long)
 
 		if( m_findReplaceDialog->ReplaceAll())
 		{
+			
 			QuickSetText(col,row,string2);
 			RedrawCell(col,row);
+			if(bStarted == FALSE) {		// track first replacement to prevent loop TD
+				bStarted = TRUE;
+				startCol = col;
+				startRow = row;
+			}
+			else {
+				if(startCol == col && startRow == row) {
+					// prevent loop
+					break;
+				}
+			}
 		}
 		else
 		{
@@ -4265,8 +4370,6 @@ int	CUGCtrl::SetSH_Width(int width){
 	for(loop = 0;loop < m_GI->m_numberSideHdgCols;loop++){
 		totalWidth += m_GI->m_sideHdgWidths[loop];
 	}
-	if(totalWidth == 0)
-		return UG_SUCCESS;
 	//find the adjustment value
 	adjust = (double)width / (double)totalWidth;
 	//adjust each col width
@@ -4811,7 +4914,8 @@ int CUGCtrl::CopySelected(int cutFlag){
 	//copy the items to the clipboard
 	rt = CopyToClipBoard(&clipString);
 
-	if(rt == UG_SUCCESS){
+	// v7.2 - update 01 - don't clear selections when copying - JME
+	if(cutFlag && rt == UG_SUCCESS){
 		ClearSelections();
 		RedrawAll();
 	}
@@ -4838,15 +4942,16 @@ void CUGCtrl::CreateSelectedString(CString& string,int cutFlag){
 		GetCellIndirect(col,row,&cell);
 		string += cell.GetText();
 
-		//check the cut flag
-		if(cutFlag)
-		{
-			if ( cell.GetReadOnly() != TRUE )
-			{
-				cell.ClearAll();
-				SetCell(col,row,&cell);
-			}
-		}
+        //check the cut flag
+        if(cutFlag)
+        {
+            if ( cell.GetReadOnly() != TRUE )
+            {
+                cell.ClearAll();
+                // GetColDefault(col, &cell);	// TD nicer
+                SetCell(col,row,&cell);
+            }
+        }
 		
 		//update the last row flag
 		lastrow = row;
@@ -4888,15 +4993,15 @@ CopyToClipBoard
 	UG_ERROR	fail
 ****************************************************/
 int CUGCtrl::CopyToClipBoard(CString* string){
-	
-	int		len;
+    
+    int		len;
 
-	// open clipboard, copy then close
-	OpenClipboard();
-	// empty clipboard
-	EmptyClipboard();
+    // open clipboard, copy then close
+    OpenClipboard();
+    // empty clipboard
+    EmptyClipboard();
 
-	len = (string->GetLength()+1) * sizeof(TCHAR);
+    len = (string->GetLength()+1) * sizeof(TCHAR);
 
 	// copy in both ansi and unicode formats if we 
 	// are running unicode and conversion to MBCS succeeds
@@ -4910,11 +5015,13 @@ int CUGCtrl::CopyToClipBoard(CString* string){
 	LPSTR tempStr = (LPSTR)GlobalLock(hglobal);
 	
 	// convert to text for copy...
-	res = WideCharToMultiByte(CP_ACP,0,(LPCTSTR)*string,len,tempStr,len,NULL,NULL);
+	res = WideCharToMultiByte(CP_ACP,0,(LPCTSTR)*string,len/sizeof(TCHAR),tempStr,len,NULL,NULL);
 
 #	else 
 		LPSTR tempStr = (LPTSTR)GlobalLock(hglobal);
-		_tcscpy(tempStr,(LPCTSTR)*string);
+
+		// if using VC2005 or greater, use _tcscpy_s, to avoid a warning
+		UGStr::tcscpy(tempStr, len, (LPCTSTR)*string);
 #	endif
 
 ////////////////////////////////////////////////////
@@ -4929,7 +5036,7 @@ int CUGCtrl::CopyToClipBoard(CString* string){
 	HGLOBAL hglobalu = GlobalAlloc(GMEM_ZEROINIT,len);
 
 	LPTSTR stringu = (LPTSTR)GlobalLock(hglobalu);
-	_tcscpy(stringu,(LPCTSTR)*string);
+	UGStr::tcscpy(stringu, ::wcslen(*string)+1, (LPCWSTR)*string);
 
 	GlobalUnlock(hglobalu);
 	SetClipboardData(CF_UNICODETEXT,hglobalu);
@@ -4968,7 +5075,7 @@ int CUGCtrl::CopyFromClipBoard(CString* string){
 	//lock the memory and get a pointer to it
 	data=(LPSTR)GlobalLock(hg);
 	//get the size of the text
-	size=GlobalSize(hg);
+	size=(unsigned long)GlobalSize(hg);
 
 	*string = data;
 
@@ -5133,7 +5240,10 @@ int CUGCtrl::AddDataSource(CUGDataSource * ds)
 		if(m_dataSrcList[loop] == NULL)
 		{
 			m_dataSrcList[loop] = ds;
-			m_dataSrcListLength ++;
+
+			if ( loop > m_dataSrcListLength )
+				m_dataSrcListLength = loop;
+
 			ds->SetID(loop);
 			return loop;
 		}
@@ -5231,6 +5341,10 @@ int CUGCtrl::RemoveDataSource(int index){
 
 	if(m_dataSrcList[index] != NULL){
 		m_dataSrcList[index] = NULL;
+
+		if ( index == m_dataSrcListLength )
+			m_dataSrcListLength -= 1;
+
 		return UG_SUCCESS;
 	}
 
@@ -5492,9 +5606,11 @@ int CUGCtrl::SetNumberSheets(int numSheets)
 	//create the new array
 	CUGGridInfo ** temp = new CUGGridInfo *[numSheets];
 
+	// Define outside of for statement for compatibility with VC6 and also VC2002/2003/2005
+	int loop = 0;
+
 	//copy the existing gridinfo into the new array
-	int loop;
-	for(loop = 0;loop < m_numberSheets;loop++){
+	for(;loop < m_numberSheets;loop++){
 		if(loop < numSheets)
 			temp[loop] = m_GIList[loop];
 		else
@@ -5671,6 +5787,7 @@ int	CUGCtrl::SetTH_NumberRows(int rows){
 
 	return UG_SUCCESS;
 }
+
 
 /***************************************************
 SetTH_RowHeight
@@ -5919,7 +6036,7 @@ int CUGCtrl::StartDragDrop(){
 
 #	else 
 		LPTSTR string = (LPTSTR)GlobalLock(hglobal);
-		_tcscpy(string,SelectString);
+		UGStr::tcscpy(string, SelectString.GetLength() + 1, SelectString);
 #	endif
 
 ////////////////////////////////////////////////////
@@ -5935,7 +6052,7 @@ int CUGCtrl::StartDragDrop(){
 	HGLOBAL hglobalu = GlobalAlloc(GMEM_ZEROINIT,len);
 
 	LPTSTR stringu = (LPTSTR)GlobalLock(hglobalu);
-	_tcscpy(stringu,SelectString);
+	UGStr::tcscpy(stringu, SelectString.GetLength() + 1, SelectString);
 
 	GlobalUnlock(hglobalu);
 	m_dataSource.CacheGlobalData(CF_UNICODETEXT,hglobalu,NULL);
@@ -6017,6 +6134,16 @@ OnSetup
 ****************************************************/
 void CUGCtrl::OnSetup(){
 }
+
+/****************************************************
+OnReset
+	This function is called by OnSetup, and can be 
+	called to reset the grid to it's initial state
+****************************************************/
+void CUGCtrl::OnReset()
+{
+}
+
 /***************************************************
 OnSheetSetup	
 	This notification is called for each additional sheet that the grid
@@ -6779,7 +6906,7 @@ Return:
 	TRUE - to allow celltype event
 	FALSE - to disallow the celltype event
 ****************************************************/
-int CUGCtrl::OnCellTypeNotify(long ID,int col,long row,long msg,long param){
+int CUGCtrl::OnCellTypeNotify(long ID,int col,long row,long msg,LONG_PTR param){
 	UNREFERENCED_PARAMETER(ID);
 	UNREFERENCED_PARAMETER(col);
 	UNREFERENCED_PARAMETER(row);
@@ -6864,6 +6991,7 @@ Return:
 	TRUE - to allow the edit it proceede
 	FALSE - to force the user back to editing of that same cell
 ****************************************************/
+
 int CUGCtrl::OnEditFinish(int col, long row,CWnd* edit,LPCTSTR string,BOOL cancelFlag){
 	UNREFERENCED_PARAMETER(col);
 	UNREFERENCED_PARAMETER(row);
@@ -7167,7 +7295,9 @@ int CUGCtrl::SetGridLayout( int layoutMode )
 	ToggleLayout( m_CUGTab );
 	ToggleLayout( m_CUGVScroll );
 	ToggleLayout( m_CUGHScroll );
+#ifdef UG_ENABLE_SCROLLHINTS
 	ToggleLayout( m_CUGHint );
+#endif
 	ToggleLayout( &m_defEditCtrl );
 	ToggleLayout( &m_defMaskedEditCtrl );
 
@@ -7579,25 +7709,27 @@ Return
 	2			- OnStartMenu did not allow the menu to appear
 	3			- menu failed
 ****************************************************/
-int CUGCtrl::StartMenu(int col,long row,POINT *point,int section){
-
+int CUGCtrl::StartMenu(int col,long row,POINT *point,int section)
+{
 	if(!m_GI->m_enablePopupMenu)
 		return UG_ERROR;
 
-	GetJoinStartCell(&col,&row);
+	if ( section != UG_TAB )
+		GetJoinStartCell(&col,&row);
 
-	if(OnMenuStart(col,row,section) == FALSE)
+	if( OnMenuStart( col, row, section ) == FALSE )
 		return 2;
 
 	m_menuCol = col;
 	m_menuRow = row;
 	m_menuSection = section;
 
-	if( m_menu->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,
-		point->x,point->y,this,NULL) == FALSE){
-
+	if( m_menu->TrackPopupMenu( TPM_LEFTALIGN|TPM_RIGHTBUTTON,
+		point->x, point->y, this, NULL ) == FALSE )
+	{
 		return 3;
 	}
+
 	return UG_SUCCESS;
 }
 
@@ -7677,9 +7809,10 @@ int CUGCtrl::AddFont(int height,int width,int escapement,int orientation,
 	lf.lfQuality		= quality;
 	lf.lfPitchAndFamily	= pitchAndFamily;
 	if(_tcslen(fontName) < LF_FACESIZE)
-		_tcscpy(lf.lfFaceName,fontName);
+		UGStr::tcscpy(lf.lfFaceName, _tcslen(fontName) + 1, fontName);
 	else
-		_tcscpy(lf.lfFaceName,_T(""));
+		UGStr::tcscpy(lf.lfFaceName, 1, TEXT(""));
+	
 
 	return AddFontIndirect( lf );
 }
@@ -7751,7 +7884,13 @@ int CUGCtrl::RemoveFont(int index){
 	Params
 	Return
 ****************************************************/
-int CUGCtrl::ClearAllFonts(){
+int CUGCtrl::ClearAllFonts()
+{
+	for(int index = 0; index < m_fontList->GetMaxCount(); index++)
+	{
+		CFont* font = (CFont*)m_fontList->GetPointer(index);
+		delete font;
+	}
 
 	m_fontList->EmptyList();
 
@@ -7827,21 +7966,30 @@ int CUGCtrl::AddBitmap( LPCTSTR fileName){
 	BITMAPINFO *		m_lpbmi;
 	void *				m_lpvBits;
 
-	FILE * fptr;
+	// This has been changed to use iostreams instead of C file handling, because the
+	// stuff from C is deprecated in VC2005.
 
 	// open the file
-	fptr = _tfopen(fileName,_T("rb"));
+	std::ifstream ifs;
+	
+#ifdef _UNICODE
+	USES_CONVERSION;
+	ifs.open(W2A(fileName), std::ios::binary);
+#else
+	ifs.open(fileName, std::ios::binary);
+#endif
 
 	//return if the open file failed
-	if(fptr==NULL){
+	if (!ifs.is_open())
+	{
 		return -1;
 	}
 
 	//Retrieve the BITMAPFILEHEADER structure
-	fread(&m_bmfh,1,sizeof(BITMAPFILEHEADER),fptr);
+	ifs.read((char*)&m_bmfh, sizeof(BITMAPFILEHEADER));
 
 	//Retrieve the BITMAPINFOHEADER structure
-	fread(&m_bmih,1,sizeof(BITMAPINFOHEADER),fptr);
+	ifs.read((char*)&m_bmih, sizeof(BITMAPINFOHEADER));
 
 	//Allocate memory for the BITMAPINFO structure
 	if(m_bmih.biBitCount <16)
@@ -7854,17 +8002,16 @@ int CUGCtrl::AddBitmap( LPCTSTR fileName){
 
 	//Retrieve the color table
 	if(m_bmih.biBitCount <16)
-		fread(m_lpbmi->bmiColors,1,((1<<m_bmih.biBitCount) * sizeof(RGBQUAD)),fptr);
+		ifs.read((char*) &m_lpbmi->bmiColors, ((1<<m_bmih.biBitCount) * sizeof(RGBQUAD)));
 
 	//Allocate memory for the required number of bytes
 	m_lpvBits = new char[m_bmfh.bfSize - m_bmfh.bfOffBits];
 
 	//Retrieve the bitmap data
-	fread(m_lpvBits,1,(m_bmfh.bfSize - m_bmfh.bfOffBits),fptr);
+	ifs.read((char*)m_lpvBits, (m_bmfh.bfSize - m_bmfh.bfOffBits));
 
 	//close the file
-	fclose(fptr);
-
+	ifs.close();
 
 	//check to see if a DIB was already loaded
 	//if it was then delete the old information
@@ -7899,8 +8046,13 @@ int CUGCtrl::RemoveBitmap(int index){
 	Params
 	Return
 ****************************************************/
-int CUGCtrl::ClearAllBitmaps(){
-
+int CUGCtrl::ClearAllBitmaps()
+{
+	for(int index = 0; index < m_bitmapList->GetMaxCount(); index++)
+	{
+		CBitmap* bitmap = (CBitmap*)m_bitmapList->GetPointer(index);
+		delete bitmap;
+	}
 	m_bitmapList->EmptyList();
 
 	return UG_SUCCESS;
@@ -7953,7 +8105,7 @@ BOOL CUGCtrl::OnCanColSwap(int fromCol,int toCol){
 OnColSwapped
 	Called just after column-swap operation was completed.
 Params:
-	fromCol - where the col orriginated from
+	fromCol - where the col originated from
 	toCol	- where the col will be located if the swap is allowed
 Return:
 	<none>
@@ -7970,7 +8122,7 @@ void CUGCtrl::OnColSwapped(int fromCol,int toCol){
 ****************************************************/
 int CUGCtrl::MoveColPosition(int fromCol,int toCol,BOOL insertBefore){
 
-	//check the instert before flag		
+	//check the insert before flag		
 	if(insertBefore == FALSE)
 		toCol++;
 
@@ -8179,13 +8331,15 @@ int CUGCtrl::SetNewGridClass(CUGGrid * grid){
 ****************************************************/
 int CUGCtrl::SetNewMultiSelectClass(CUGMultiSelect * multiSelect){
 
-	if(m_GI->m_multiSelect != NULL)
-		delete m_GI->m_multiSelect;
+    if(m_GI->m_multiSelect != NULL)
+        delete m_GI->m_multiSelect;
 
-	m_GI->m_multiSelect = multiSelect;
-	m_GI->m_multiSelect->m_ctrl = this;
+    m_GI->m_multiSelect = multiSelect;
+    m_GI->m_multiSelect->m_ctrl = this;
 
-	return UG_SUCCESS;
+    m_GI->m_multiSelect->m_GI = m_GI;	// TD Fix - ref gar
+
+    return UG_SUCCESS;
 }
 
 /***************************************************
@@ -8583,4 +8737,193 @@ DWORD CUGCtrl::OnGetContextHelpID( int col, long row, int section )
 	UNREFERENCED_PARAMETER(row);
 	UNREFERENCED_PARAMETER(section);
 	return 0;
+}
+
+/***************************************************
+ResetCells 
+	This method will reset the state of the cells in 
+	the range which is specified, assuming that the 
+	grid is in it's default state, which stores this
+	info after OnSetup has been called.  This method
+	works only on the current sheet of multisheet
+	grids, there is a helper method which resets all
+	cells on all sheets.
+Params:
+	startRow - first row to reset
+	endRow   - last row to reset
+	startCol - first col to reset
+	endCol   - last col to reset
+Return:
+	nothing
+****************************************************/
+void CUGCtrl::ResetCells(int startRow, int endRow, int startCol, int endCol)
+{
+	this->EditCancel();
+
+	int rows = GetNumberRows() - 1;
+	int cols = GetNumberCols() - 1;
+
+	ASSERT (endRow <= rows && endCol <= cols);
+
+	for(int col=startCol;col<=endCol;++col)
+	{
+		for(int row=startRow;row<=endRow;++row)
+		{
+			CUGCell cell;
+			GetCell(col, row, &cell);
+			cell.LoadInitialState();
+			SetCell(col, row, &cell);
+		}
+	}
+
+	RedrawAll();
+}
+
+/***************************************************
+ResetAll
+	This method will reset all the cells, and 
+	optionally all the cells across all sheets.
+	It resets both the cell state and the row/col
+	sizes.
+Params:
+	allSheets - if true, the function iterates over
+	and resets all sheets on the grid.  If false,
+	it resets only the current one
+Return:
+	nothing
+****************************************************/
+void CUGCtrl::ResetAll(bool allSheets)
+{
+	int rows = GetNumberRows() - 1;
+	int cols = GetNumberCols() - 1;
+
+	if (allSheets)
+	{
+		int initialSheet = GetSheetNumber();
+		for(int sheet = 0; sheet < m_numberSheets; ++sheet)
+		{
+			SetSheetNumber(sheet);
+			ResetCells(0, rows, 0,  cols);
+			ResetSizes(0, rows, 0, cols);
+		}
+
+		SetSheetNumber(initialSheet);
+	}
+	else
+	{
+		ResetCells(0, rows, 0,  cols);
+		ResetSizes(0, rows, 0, cols);
+	}
+}
+
+/***************************************************
+SetInitialCellStates
+	Called by the framework after cells have been 
+	set up, unless UseDefaultStateStorage was called
+	by OnSetup in the derived class and set to false.
+	This method is public so that cell state can be
+	set at any time ( for example, the Excel Demo does
+	not set the cell contents until after OnSetup ).
+Params:
+	nothing
+Return:
+	nothing
+****************************************************/
+void CUGCtrl::SetInitialCellStates()
+{
+	for(int sheet = 0; sheet < m_numberSheets; ++sheet)
+	{
+		SetSheetNumber(sheet);
+
+		const int rows = GetNumberRows();
+		const int cols = GetNumberCols();
+
+		for(int col=0;col<cols;++col)
+		{
+			for(int row=0;row<rows;++row)
+			{
+				// Need to declare this here so that data is not
+				// accidentally copied between rows when GetCell fails.
+				CUGCell cell;
+				GetCell(col, row, &cell);
+				cell.SetInitialState();
+				SetCell(col, row, &cell);
+			}
+		}
+	}
+
+	SetSheetNumber(0);
+}
+
+/***************************************************
+SetInitialSizes
+	Called by the framework after cells have been 
+	set up, unless UseDefaultStateStorage was called
+	by OnSetup in the derived class and set to false.
+	It stores the sizes of all the cells in the grid. 
+	If the grid is reset after rows or cols are added,
+	they are never stored, instead the default sizes 
+	are used.
+Params:
+	nothing
+Return:
+	nothing
+****************************************************/
+void CUGCtrl::SetInitialSizes()
+{
+	for(int sheet = 0; sheet < m_numberSheets; ++sheet)
+	{
+		SetSheetNumber(sheet);
+
+		const int rows = GetNumberRows();
+		const int cols = GetNumberCols();
+
+		m_GI->m_startingRows = rows;
+		m_GI->m_startingCols = cols;
+		m_GI->m_startingHeights = new int[rows];
+		m_GI->m_startingWidths = new int[cols];
+
+		for(int col=0;col<cols;++col)
+		{
+			m_GI->m_startingWidths[col] = GetColWidth(col);
+		}
+
+		for(int row=0;row<rows;++row)
+		{
+			m_GI->m_startingHeights[row] = GetRowHeight(row);
+		}
+	}
+
+	SetSheetNumber(0);
+}
+
+/***************************************************
+ResetSizes
+	This method resets the sizes of the rows and 
+	columns specified to those stored on startup.  
+	If no data was stored, it will reset them to
+	the default sizes.
+Params:
+	startRow - first row to reset
+	endRow   - last row to reset
+	startCol - first col to reset
+	endCol   - last col to reset
+Return:
+	nothing
+****************************************************/
+
+void CUGCtrl::ResetSizes(int startRow, int endRow, int startCol, int endCol)
+{
+	const int rows = GetNumberRows();
+	const int cols = GetNumberCols();
+
+	for(int col=0;col<cols;++col)
+	{
+		SetColWidth(col, (col < m_GI->m_startingCols) ? m_GI->m_startingWidths[col] : m_GI->m_defColWidth);
+	}
+
+	for(int row=0;row<rows;++row)
+	{
+		SetRowHeight(row, (row < m_GI->m_startingRows) ? m_GI->m_startingHeights[row] : m_GI->m_defRowHeight);
+	}
 }

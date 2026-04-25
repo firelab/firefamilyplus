@@ -54,11 +54,11 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CSubunitsDialog message handlers
 
-int CSubunitsDialog::DoModal() 
+INT_PTR CSubunitsDialog::DoModal() 
 {
 	// TODO: Add your specialized code here and/or call the base class
 	
-	int ret =  CDialog::DoModal();
+	INT_PTR ret =  CDialog::DoModal();
 	subunitSet.Close();
 	return ret;
 }

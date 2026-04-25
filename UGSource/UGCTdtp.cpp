@@ -523,7 +523,6 @@ int CUGCTDateTimePicker::DisplayMonthCalendar()
 
 	VERIFY(wndMonthCal.DestroyWindow());
 	m_ctrl->m_CUGGrid->SetFocus();
-	m_ctrl->m_CUGGrid->Update();
 
 	if(bRouteLastMessage)
 		::DispatchMessage(&lastMsg);

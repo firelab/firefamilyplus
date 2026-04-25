@@ -240,7 +240,6 @@ BOOL CNFDRS4CalculatorDlg::OnInitDialog()
 	m_spinGSIThreshold.SetBuddy(&m_editGSIThreshold);
 	m_spinSCM.SetRange(1, 1000);
 	m_spinSCM.SetPos(30);
-	m_btnHumid.SetCheck(FALSE);
 	m_spinFuelTemp.SetDecimalPlaces(0);
 	m_spinFuelTemp.SetTrimTrailingZeros(TRUE);
 	m_spinFuelTemp.SetRangeAndDelta(-50.0, 150.0, 1.0);
@@ -248,7 +247,7 @@ BOOL CNFDRS4CalculatorDlg::OnInitDialog()
 	m_spinFuelTemp.SetBuddy(&m_editFuelTemp);
 	m_spinMXDOverride.SetRange(0, 100);
 	m_spinMXDOverride.SetPos(0);
-	m_editMXDOverride.SetWindowTextW(_T(""));
+	m_editMXDOverride.SetWindowTextA(_T(""));
 	if (theApp.pOptions)
 	{
 		CString tmpStr;
@@ -439,7 +438,7 @@ void CNFDRS4CalculatorDlg::OnClickedCalculate()
 	//calculate the values
 	double fSC, fERC, fBI, fIC;
 	CStringA fmStr(m_fuelModel);
-	m_nfdrs2016.Init(45, fmStr[0], _wtoi(m_slopeClass), 30, true, true, false, 100);// , gsiMax, gsiThreshold);
+	m_nfdrs2016.Init(45, fmStr[0], atoi(m_slopeClass), 30, true, true, false, 100);// , gsiMax, gsiThreshold);
 	m_nfdrs2016.iSetFuelModel(fmStr[0]);
 	m_nfdrs2016.SetSCMax(m_spinSCM.GetPos());
 	if (m_spinMXDOverride.GetPos() > 0)
@@ -450,7 +449,7 @@ void CNFDRS4CalculatorDlg::OnClickedCalculate()
 	double fTempC;
 	fTempC = (m_fuelTemperature - 32) / 1.8;
 	m_nfdrs2016.iSetFuelMoistures(m_fm1, m_fm10, m_fm100, m_fm1000, m_fmWood, m_fmHerb, fTempC);
-	m_nfdrs2016.iCalcIndexes(m_windSpeed, _wtoi(m_slopeClass), &fSC, &fERC, &fBI, &fIC, m_gsi, m_kbdi2016);// , &iBI);
+	m_nfdrs2016.iCalcIndexes(m_windSpeed, atoi(m_slopeClass), &fSC, &fERC, &fBI, &fIC, m_gsi, m_kbdi2016);// , &iBI);
 	m_sc = fSC;
 	m_erc = fERC;
 	m_bi = fBI;
@@ -483,7 +482,7 @@ void CNFDRS4CalculatorDlg::OnEnChange1hrfm()
 {
 	CString str;
 	m_editFM1.GetWindowText(str);
-	double fm1 = _wtof(str);
+	double fm1 = atof(str.GetBuffer());
 	if (str.GetLength() > 1 && (fm1 < 1.0 || fm1 > 65.0))
 	{
 		AfxMessageBox(_T("Error: 1 - Hr FM must be between 1.0 and 65.0"));
@@ -506,7 +505,7 @@ void CNFDRS4CalculatorDlg::OnEnChange10hrfm()
 {
 	CString str;
 	m_editFM10.GetWindowText(str);
-	double fm10 = _wtof(str);
+	double fm10 = atof(str.GetBuffer());
 	if (str.GetLength() > 1 && (fm10 < 1.0 || fm10 > 65.0))
 	{
 		AfxMessageBox(_T("Error: 10 - Hr FM must be between 1.0 and 65.0"));
@@ -529,7 +528,7 @@ void CNFDRS4CalculatorDlg::OnEnChange100hrfm()
 {
 	CString str;
 	m_editFM100.GetWindowText(str);
-	double fm100 = _wtof(str);
+	double fm100 = atof(str.GetBuffer());
 	if (str.GetLength() > 1 && (fm100 < 1.0 || fm100 > 65.0))
 	{
 		AfxMessageBox(_T("Error: 100 - Hr FM must be between 1.0 and 65.0"));
@@ -552,7 +551,7 @@ void CNFDRS4CalculatorDlg::OnEnChange1000hrfm()
 {
 	CString str;
 	m_editFM1000.GetWindowText(str);
-	double fm1 = _wtof(str);
+	double fm1 = atof(str.GetBuffer());
 	if (str.GetLength() > 1 && (fm1 < 1.0 || fm1 > 65.0))
 	{
 		AfxMessageBox(_T("Error: 1000 - Hr FM must be between 1.0 and 65.0"));
@@ -575,7 +574,7 @@ void CNFDRS4CalculatorDlg::OnEnChangeHerbfm()
 {
 	CString str;
 	m_editHerb.GetWindowText(str);
-	double fmHerb = _wtof(str);
+	double fmHerb = atof(str.GetBuffer());
 	if (str.GetLength() > 2 && (fmHerb < 30.0 || fmHerb > 250.0))
 	{
 		AfxMessageBox(_T("Error: Herb FM must be between 30.0 and 250.0"));
@@ -598,7 +597,7 @@ void CNFDRS4CalculatorDlg::OnEnChangeWoodyfm()
 {
 	CString str;
 	m_editWoody.GetWindowText(str);
-	double fmWoody = _wtof(str);
+	double fmWoody = atof(str.GetBuffer());
 	if (str.GetLength() > 2 && (fmWoody < 50.0 || fmWoody > 200.0))
 	{
 		AfxMessageBox(_T("Error: Woody FM must be between 50.0 and 200.0"));
@@ -621,7 +620,7 @@ void CNFDRS4CalculatorDlg::OnEnChangeWind()
 {
 	CString str;
 	m_editWind.GetWindowText(str);
-	double val = _wtof(str);
+	double val = atof(str.GetBuffer());
 	if (str.GetLength() > 1 && (val < 0.0 || val > 99.0))
 	{
 		AfxMessageBox(_T("Error: 20' Wind must be between 0 and 99.0"));
@@ -631,9 +630,11 @@ void CNFDRS4CalculatorDlg::OnEnChangeWind()
 
 void CNFDRS4CalculatorDlg::OnChangeGsi()
 {
+	if (m_editGSI.m_hWnd == NULL)
+		return;
 	CString str;
 	m_editGSI.GetWindowText(str);
-	double val = _wtof(str);
+	double val = atof(str.GetBuffer());
 	if (str.GetLength() >= 1 && (val < 0.0 || val > 1.0))
 	{
 		AfxMessageBox(_T("Error: GSI must be between 0 and 1.0"));
@@ -656,9 +657,11 @@ void CNFDRS4CalculatorDlg::OnKillfocusGsi()
 
 void CNFDRS4CalculatorDlg::OnChangeGsiThreshold()
 {
+	if (m_editGSIThreshold.m_hWnd == NULL)
+		return;
 	CString str;
 	m_editGSIThreshold.GetWindowText(str);
-	double val = _wtof(str);
+	double val = atof(str.GetBuffer());
 	if (str.GetLength() >= 1 && (val < 0.0 || val > 1.0))
 	{
 		AfxMessageBox(_T("Error: GSI Greenup Threshold must be between 0 and 1.0"));
@@ -680,9 +683,11 @@ void CNFDRS4CalculatorDlg::OnKillfocusGsiThreshold()
 
 void CNFDRS4CalculatorDlg::OnChangeFuelTemp()
 {
+	if (m_editFuelTemp.m_hWnd == NULL)
+		return;
 	CString str;
 	m_editFuelTemp.GetWindowText(str);
-	double val = _wtof(str);
+	double val = atof(str.GetBuffer());
 	if (str.GetLength() >= 1 && (val < -50.0 || val > 150))
 	{
 		AfxMessageBox(_T("Error: Fuel Temperature must be between -50 and 150"));
@@ -705,9 +710,11 @@ void CNFDRS4CalculatorDlg::OnKillfocusFuelTemp()
 
 void CNFDRS4CalculatorDlg::OnChangeGsimax()
 {
+	if (m_editMaxGSI.m_hWnd == NULL)
+		return;
 	CString str;
 	m_editMaxGSI.GetWindowText(str);
-	double val = _wtof(str);
+	double val = atof(str.GetBuffer());
 	if (str.GetLength() >= 1 && (val < 0.0 || val > 1.0))
 	{
 		AfxMessageBox(_T("Error: Max GSI must be between 0 and 1.0"));
@@ -730,9 +737,11 @@ void CNFDRS4CalculatorDlg::OnKillfocusGsimax()
 
 void CNFDRS4CalculatorDlg::OnChangeKbdi2016()
 {
+	if (m_editKBDI2016.m_hWnd == NULL)
+		return;
 	CString str;
 	m_editKBDI2016.GetWindowText(str);
-	double val = _wtof(str);
+	double val = atof(str.GetBuffer());
 	if (str.GetLength() > 1 && (val < 0.0 || val > 800))
 	{
 		AfxMessageBox(_T("Error: KBDI must be between 0 and 800"));
@@ -755,9 +764,11 @@ void CNFDRS4CalculatorDlg::OnKillfocusKbdi2016()
 
 void CNFDRS4CalculatorDlg::OnChangeEditScm()
 {
+	if (m_editSCM.m_hWnd == NULL)
+		return;
 	CString str;
 	m_editSCM.GetWindowText(str);
-	double val = _wtof(str);
+	double val = atof(str.GetBuffer());
 	if (str.GetLength() > 1 && (val < 1.0 || val > 1000.0))
 	{
 		AfxMessageBox(_T("Error: SCM must be between 0 and 1000"));
@@ -827,11 +838,13 @@ CalcOptions::~CalcOptions()
 
 void CNFDRS4CalculatorDlg::OnChangeMxdOverride()
 {
+	if (m_editMXDOverride.m_hWnd == NULL)
+		return;
 	CString str;
 	m_editMXDOverride.GetWindowText(str);
 	if (str.GetLength() > 0)// && (val < 0.0 || val > 800))
 	{
-		int val = _wtoi(str);
+		int val = atoi(str.GetBuffer());
 		if (val < 1 || val > 100)
 		{
 			AfxMessageBox(_T("Error: MXD Override must be between 1 and 100, or blank"));

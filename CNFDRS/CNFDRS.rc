@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,7
- PRODUCTVERSION 1,0,0,7
+ FILEVERSION 1,0,0,8
+ PRODUCTVERSION 1,0,0,8
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +70,12 @@ BEGIN
             VALUE "Comments", "National Fire Danger Rating System C++ Class (CNFDRS)"
             VALUE "CompanyName", "Fire Sciences Lab"
             VALUE "FileDescription", "CNFDRS Dynamic Link Library"
-            VALUE "FileVersion", "1.0.0.7"
+            VALUE "FileVersion", "1.0.0.8"
             VALUE "InternalName", "CNFDRS"
-            VALUE "LegalCopyright", "Copyright (C) 2008-2019"
+            VALUE "LegalCopyright", "Copyright (C) 2008-2026"
             VALUE "OriginalFilename", "CNFDRS.dll"
             VALUE "ProductName", "CNFDRS Dynamic Link Library"
-            VALUE "ProductVersion", "1.0.0.7"
+            VALUE "ProductVersion", "1.0.0.8"
         END
     END
     BLOCK "VarFileInfo"

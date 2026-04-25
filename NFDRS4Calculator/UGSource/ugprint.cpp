@@ -2,9 +2,14 @@
 				Class Implementation : CUGPrint
 **************************************************************************
 	Source file : ugprint.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
-#include "..\pch.h"
+#include "pch.h"
 #include "UGCtrl.h"
  
 #ifdef _DEBUG
@@ -540,7 +545,7 @@ int CUGPrint::PrintPage(CDC * pDC, int pageNum)
 					{
 						if (row2 <= endRow)
 						{
-							m_ctrl->GetRowHeight(row,&h);		
+							m_ctrl->GetRowHeight(row2,&h);		
 							tempRect.bottom+=(int)(h* m_printVScale);
 						}
 						row2--;
@@ -556,39 +561,6 @@ int CUGPrint::PrintPage(CDC * pDC, int pageNum)
 			
 			//draw a section of the print frame if selected
 			CopyRect(&cellrect,&origCellRect);
-			if(m_printFrame)
-			{
-				//if on start row, draw top line
-				if(y == startRow){
-					pDC->MoveTo(cellrect.left,cellrect.top);
-					pDC->LineTo(cellrect.right+1,cellrect.top);
-				}
-				//if printing top and on first top row, draw top line
-				if(m_printTopHeading && y == -m_GI->m_numberTopHdgRows){
-					pDC->MoveTo(cellrect.left,cellrect.top);
-					pDC->LineTo(cellrect.right+1,cellrect.top);
-				}
-				//if on bottom row, draw bottom line
-				if(y == endRow){
-					pDC->MoveTo(cellrect.left,cellrect.bottom);
-					pDC->LineTo(cellrect.right+1,cellrect.bottom);
-				}
-				//if on start col, draw left line
-				if(x == startCol){
-					pDC->MoveTo(cellrect.left,cellrect.top);
-					pDC->LineTo(cellrect.left,cellrect.bottom+1);
-				}
-				// If printing side and on first side row, draw left line
-				if(m_printSideHeading && x == -m_GI->m_numberSideHdgCols){
-					pDC->MoveTo(cellrect.left,cellrect.top);
-					pDC->LineTo(cellrect.left,cellrect.bottom+1);
-				}
-				// If on bottom row, draw right line
-				if(x == endCol){
-					pDC->MoveTo(cellrect.right,cellrect.top);
-					pDC->LineTo(cellrect.right,cellrect.bottom+1);
-				}
-			}
 		}
 	}
 
@@ -598,9 +570,9 @@ int CUGPrint::PrintPage(CDC * pDC, int pageNum)
 			( startRow <= endRow))
 		{
 			pDC->MoveTo(leftMargin,topMargin);
-			pDC->LineTo(leftMargin,cellrect.bottom);
+			pDC->LineTo(leftMargin,cellrect.bottom-1);
 			pDC->MoveTo(leftMargin,topMargin);
-			pDC->LineTo(cellrect.right, topMargin);
+			pDC->LineTo(cellrect.right-1, topMargin);
 		}
 	}
 

@@ -1,7 +1,7 @@
 // FSD Power Law.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 //
-
+#include "stdafx.h"
 #include "PowerLaw.h"
 #include <math.h>
 #include <stdio.h>

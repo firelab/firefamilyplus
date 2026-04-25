@@ -676,7 +676,7 @@ void CFireplusApp::OnHelpContents()
 {
 	// TODO: Add your command handler code here
 	CString src;
-	src.Format("%s\\ffp4.chm", workDir);
+	src.Format("%s\\ffp4.chm", workDir.GetBuffer());
 	src += "::/FireFamilyPlus Help/Introduction/Welcome to FireFamilyPlus.htm";
 	::HtmlHelp(AfxGetMainWnd()->m_hWnd, src, HH_DISPLAY_TOC, NULL);//(DWORD)topic);
 	//if (!::WinHelp(m_pMainWnd->m_hWnd, src, HELP_FINDER, 0L))

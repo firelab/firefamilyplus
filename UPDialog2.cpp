@@ -146,7 +146,7 @@ INT_PTR CALLBACK ProgressDlgProc(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
 	{
 		pProgressDialog = (CUPDialog*)lParam;
 
-		SetWindowLongPtr(hDlg, GWL_USERDATA, (LONG_PTR)pProgressDialog);
+		SetWindowLongPtr(hDlg, GWLP_USERDATA, (LONG_PTR)pProgressDialog);
 
 		if (pProgressDialog->m_bAllowCancel == false)
 			SendMessage(hDlg, PROGRESSTHREADDATA::WM_DISABLECONTROLS, wParam, lParam);
@@ -171,7 +171,7 @@ INT_PTR CALLBACK ProgressDlgProc(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
 	}
 	case WM_COMMAND:
 	{
-		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWL_USERDATA);
+		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWLP_USERDATA);
 
 		if (pProgressDialog->m_nCancelButtonId == LOWORD(wParam))
 		{
@@ -191,7 +191,7 @@ INT_PTR CALLBACK ProgressDlgProc(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
 	}
 	case PROGRESSTHREADDATA::WM_DISABLECONTROLS:
 	{
-		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWL_USERDATA);
+		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWLP_USERDATA);
 		EnableMenuItem(GetSystemMenu(hDlg, false), SC_CLOSE, MF_DISABLED | MF_GRAYED | MF_BYCOMMAND);
 		EnableWindow(GetDlgItem(hDlg, pProgressDialog->m_nCancelButtonId), false);
 		bProcessed = TRUE;
@@ -199,7 +199,7 @@ INT_PTR CALLBACK ProgressDlgProc(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
 	}
 	case PROGRESSTHREADDATA::WM_ENABLECONTROLS:
 	{
-		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWL_USERDATA);
+		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWLP_USERDATA);
 		EnableMenuItem(GetSystemMenu(hDlg, false), SC_CLOSE, MF_ENABLED | MF_BYCOMMAND);
 		EnableWindow(GetDlgItem(hDlg, pProgressDialog->m_nCancelButtonId), true);
 		bProcessed = TRUE;
@@ -213,35 +213,35 @@ INT_PTR CALLBACK ProgressDlgProc(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
 	}
 	case PROGRESSTHREADDATA::WM_PROGRESSTEXTUPDATE:				//lParam = ProgressText;
 	{
-		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWL_USERDATA);
+		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWLP_USERDATA);
 		SendMessage(GetDlgItem(hDlg, pProgressDialog->m_nStaticControlId), WM_SETTEXT, 0, lParam);
 		bProcessed = TRUE;
 		break;
 	}
 	case PROGRESSTHREADDATA::WM_PROGRESSBARUPDATE:				//wParam = % Progress; 
 	{
-		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWL_USERDATA);
+		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWLP_USERDATA);
 		SendMessage(GetDlgItem(hDlg, pProgressDialog->m_nProgressBarControlId), PBM_SETPOS, wParam, 0);
 		bProcessed = TRUE;
 		break;
 	}
 	case PROGRESSTHREADDATA::WM_HIDEPROGRESSBAR:
 	{
-		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWL_USERDATA);
+		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWLP_USERDATA);
 		ShowWindow(GetDlgItem(hDlg, pProgressDialog->m_nProgressBarControlId), SW_HIDE);
 		bProcessed = TRUE;
 		break;
 	}
 	case PROGRESSTHREADDATA::WM_SHOWPROGRESSBAR:
 	{
-		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWL_USERDATA);
+		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWLP_USERDATA);
 		ShowWindow(GetDlgItem(hDlg, pProgressDialog->m_nProgressBarControlId), SW_SHOW);
 		bProcessed = TRUE;
 		break;
 	}
 	case PROGRESSTHREADDATA::WM_CANCELPROGRESSTHREAD:			//Enough to Signal the Thread - Actual Handle Would be Closed in the Dialog Destructor
 	{
-		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWL_USERDATA);
+		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWLP_USERDATA);
 		{
 			LPPROGRESSTHREADDATA pThreadData = (LPPROGRESSTHREADDATA)(LPVOID)(&pProgressDialog->m_ThreadData);
 			pThreadData->bTerminate = true;
@@ -261,7 +261,7 @@ INT_PTR CALLBACK ProgressDlgProc(HWND hDlg, UINT Message, WPARAM wParam, LPARAM 
 	}
 
 	if (pProgressDialog == NULL) // pProgressDialog could be NULL if we have not processed this message (or initialized the value)
-		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWL_USERDATA);
+		pProgressDialog = (CUPDialog*)GetWindowLongPtr(hDlg, GWLP_USERDATA);
 
 	if (pProgressDialog != NULL)	// pProgressDialog could be NULL if we have not yet set the GWL_USERDATA
 	{

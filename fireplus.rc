@@ -3948,8 +3948,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 5,0,0,56
- PRODUCTVERSION 5,0,0,56
+ FILEVERSION 5,0,0,64
+ PRODUCTVERSION 5,0,0,64
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x3L
@@ -3964,14 +3964,14 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "5.0.056"
+            VALUE "Comments", "5.0.064"
             VALUE "CompanyName", "Fire Sciences Lab"
-            VALUE "FileDescription", "FireFamily Plus MFC Application Research Version"
-            VALUE "FileVersion", "5.0.0.56"
+            VALUE "FileDescription", "FireFamily Plus MFC Application 64 bit"
+            VALUE "FileVersion", "5.0.0.64"
             VALUE "InternalName", "fireplus"
-            VALUE "LegalCopyright", "Copyright (C)1998-2024"
+            VALUE "LegalCopyright", "Copyright (C)1998-2026"
             VALUE "OriginalFilename", "fireplus.EXE"
-            VALUE "ProductVersion", "5.0.0.56"
+            VALUE "ProductVersion", "5.0.0.64"
         END
     END
     BLOCK "VarFileInfo"

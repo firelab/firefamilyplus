@@ -2,7 +2,12 @@
 				Class Implementation : CUGMem
 **************************************************************************
 	Source file : UGMemMan.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
 #include "stdafx.h"
 #include "UGCtrl.h"
@@ -247,7 +252,7 @@ int CUGMem::NextCol()
 	{
 		//update the current column pointer
 		m_colInfo		= m_colInfo->next;
-		m_currentCol--; 
+		m_currentCol++; 
 
 		return UG_SUCCESS;
 	}
@@ -580,6 +585,7 @@ int CUGMem::DeleteCell(int col,long row)
 			//delete the colinfo cell object
 			if(m_colInfo->cell != NULL)
 			{
+				m_colInfo->cell->ClearMemory();
 				delete m_colInfo->cell;
 				m_colInfo->cell = NULL;
 			}
@@ -629,11 +635,25 @@ int CUGMem::Empty()
 			col = col->prev;
 		}
 
+		int cols = 0;
+		UGMemCI	*	firstCol = col;
+		for(;col;col = col->next, ++cols);
+		col = firstCol;
+
+
 		//delete any columns that are attached to the row
 		while(col != NULL)
 		{
 			nextcol = col->next;
-			delete col->cell;
+			// Because of problems with creating a cell inside a cell,
+			// and the cell class being used to create temporary copies of cells,
+			// this method allows us to clean up pointers such as the initialstate cell.
+			if(col->cell)
+			{
+		        	col->cell->ClearMemory();
+		        	delete col->cell;
+				col->cell = NULL;
+			}
 			delete col;
 			col = nextcol;
 		}
@@ -804,7 +824,8 @@ int CUGMem::SetCell(int col,long row,CUGCell *cell)
 		m_rowInfo->prev	= NULL;
 		m_rowInfo->cellLookup = NULL;
 
-		m_currentRow =0;
+		m_currentRow =0;		// TD user JF offered a fix where this is 
+								// changed to '=row' - unsure of reason for fix.
 	}
 
 	//find the correct row
@@ -1289,6 +1310,7 @@ int CUGMem::SortBy(long startRow, long endRow, int *cols,int numCols,int flags)
 	//copy the (pointers to) cells from the columns to be sorted into the lookup list
 	NewListRowInfo->cellLookup = new CUGCell*[numCols];
 	m_colInfo = NewListRowInfo->col;
+	m_currentCol = 0;	// TD JF added (for init as below) 
 	for(index =0; index < numCols;index++){
 		if(GotoCol(cols[index])==UG_SUCCESS)
 			NewListRowInfo->cellLookup[index] = m_colInfo->cell;
@@ -1309,9 +1331,13 @@ int CUGMem::SortBy(long startRow, long endRow, int *cols,int numCols,int flags)
 		m_currentCol = 0;
 		for(index =0; index < numCols;index++){
 			if(GotoCol(cols[index])==UG_SUCCESS)
+			{
 				OldListRowInfo->cellLookup[index] = m_colInfo->cell;
+			}
 			else
+			{
 				OldListRowInfo->cellLookup[index] = NULL;
+		}
 		}
 
 		//check the half point 
@@ -1321,6 +1347,7 @@ int CUGMem::SortBy(long startRow, long endRow, int *cols,int numCols,int flags)
 			cell1 = OldListRowInfo->cellLookup[0];
 		else{
 			blankCell.ClearAll();
+			blankCell.ClearMemory();
 			cell1 = &blankCell;
 		}
 
@@ -1329,6 +1356,7 @@ int CUGMem::SortBy(long startRow, long endRow, int *cols,int numCols,int flags)
 			cell2 = NewListRowInfo_HalfPt->cellLookup[0];
 		else{
 			blankCell.ClearAll();
+			blankCell.ClearMemory();
 			cell2 = &blankCell;
 		}
 		
@@ -1371,6 +1399,7 @@ int CUGMem::SortBy(long startRow, long endRow, int *cols,int numCols,int flags)
 					cell1 = OldListRowInfo->cellLookup[index];
 				else{
 					blankCell.ClearAll();
+					blankCell.ClearMemory();
 					cell1 = &blankCell;
 				}
 
@@ -1379,6 +1408,7 @@ int CUGMem::SortBy(long startRow, long endRow, int *cols,int numCols,int flags)
 					cell2 = NewListRowInfo->cellLookup[index];
 				else{
 					blankCell.ClearAll();
+					blankCell.ClearMemory();
 					cell2 = &blankCell;
 				}
 				
@@ -1403,7 +1433,6 @@ int CUGMem::SortBy(long startRow, long endRow, int *cols,int numCols,int flags)
 				}
 				//if equal then check the next column to sort by
 				else if(rt == 0){
-					
 				}
 				else{
 					break;
@@ -1445,7 +1474,7 @@ int CUGMem::SortBy(long startRow, long endRow, int *cols,int numCols,int flags)
 		OldListRowInfo = OldListNextRowInfo;
 	}
 
-	//reset the linked list poisitioning pointers
+	//reset the linked list positioning pointers
 	m_currentRow = startRow;
 	m_currentCol = 0;
 	m_rowInfo = NewListStartRowInfo;
@@ -1463,9 +1492,12 @@ int CUGMem::SortBy(long startRow, long endRow, int *cols,int numCols,int flags)
 
 	//delete all of the cell lookups
 	GotoRow(0);
-	do{
+	do
+	{
 		if(m_rowInfo->cellLookup != NULL)
+		{
 			delete[] m_rowInfo->cellLookup;
+		}
 		m_rowInfo->cellLookup = NULL;
 	}while(NextRow() == UG_SUCCESS);
 	GotoRow(0);

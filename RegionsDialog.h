@@ -6,7 +6,7 @@
 #endif // _MSC_VER > 1000
 // RegionsDialog.h : header file
 //
-
+#include "stdafx.h"
 /////////////////////////////////////////////////////////////////////////////
 // CRegionsDialog dialog
 
@@ -32,7 +32,7 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CRegionsDialog)
 	public:
-	virtual int DoModal();
+	virtual INT_PTR DoModal();
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL

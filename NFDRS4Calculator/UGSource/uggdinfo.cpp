@@ -2,9 +2,14 @@
 				Class Implementation : CUGGridInfo
 **************************************************************************
 	Source file : uggdinfo.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
-#include "..\pch.h"
+#include "pch.h"
 #include "UGCtrl.h"
 
 #ifdef _DEBUG
@@ -49,6 +54,11 @@ CUGGridInfo::CUGGridInfo()
 	m_bottomRow			= 0;
 	m_dragRow			= -1;
 
+	// Starting info
+	m_startingWidths = NULL;
+	m_startingHeights = NULL;
+	m_startingRows = m_startingCols = 0;
+
 	//heading information
 	m_numberTopHdgRows	= 1;
 	m_topHdgHeights = new int[1];
@@ -64,6 +74,7 @@ CUGGridInfo::CUGGridInfo()
 	m_hdgDefaults->SetBackColor(GetSysColor(COLOR_BTNFACE));
 	m_hdgDefaults->SetBorder(UG_BDR_RAISED);
 	m_hdgDefaults->SetAlignment(UG_ALIGNCENTER|UG_ALIGNVCENTER);
+	m_hdgDefaults->SetXPStyle(XPCellTypeBorder);
 
 	//sizes
 	m_topHdgHeight	= 20;		//pixels
@@ -170,6 +181,11 @@ CUGGridInfo::~CUGGridInfo()
 		}
 		delete[] m_colInfo;
 	}
+
+	if (m_startingWidths != NULL)
+		delete [] m_startingWidths;
+	if (m_startingHeights != NULL)
+		delete [] m_startingHeights;
 
 	if(m_rowHeights	!= NULL)
 		delete[] m_rowHeights;

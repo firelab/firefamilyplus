@@ -2,9 +2,15 @@
 				Class Implementation : CUGGrid
 **************************************************************************
 	Source file : UGGrid.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
-#include "..\pch.h"
+#include "pch.h"
+
 #include <math.h>
 #include "UGCtrl.h"
 /*	define WM_HELPHITTEST and WM_COMMANDHELP messages
@@ -15,6 +21,10 @@
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
+#endif
+
+#ifndef WM_THEMECHANGED
+#define WM_THEMECHANGED                 0x031A
 #endif
 
 /***************************************************
@@ -62,6 +72,7 @@ BEGIN_MESSAGE_MAP(CUGGrid, CWnd)
 	ON_WM_RBUTTONDBLCLK()
 	ON_WM_VSCROLL()
 	ON_WM_HSCROLL()
+	ON_WM_ERASEBKGND()
 	ON_MESSAGE(WM_HELPHITTEST, OnHelpHitTest)
 	ON_WM_HELPINFO()
 	//}}AFX_MSG_MAP
@@ -148,7 +159,7 @@ BOOL CUGGrid::ToolTipNeedText( UINT id, NMHDR* pTTTStruct, LRESULT* pResult )
 
 /***************************************************
 OnToolHitTest
-	The framework calls this member function to detemine whether a point is in
+	The framework calls this member function to determine whether a point is in
 	the bounding rectangle of the specified tool. If the point is in the
 	rectangle, it retrieves information about the tool.
 Params:
@@ -157,13 +168,14 @@ Params:
 Returns:
 	If 1, the tooltip control was found; If -1, the tooltip control was not found.
 *****************************************************/
-int CUGGrid::OnToolHitTest( CPoint point, TOOLINFO* pTI ) const
+// v7.2 - update 02 - 64-bit - changed from int to UGINTRET - see UG64Bit.h
+UGINTRET CUGGrid::OnToolHitTest( CPoint point, TOOLINFO* pTI ) const
 {
 	int col;
 	long row;
 	static int lastCol = -2;
 	static long lastRow = -2;
-
+	
 	if(m_ctrl->GetCellFromPoint(point.x,point.y,&col,&row) == UG_SUCCESS)
 	{
 		if(col != lastCol || row != lastRow)
@@ -174,9 +186,11 @@ int CUGGrid::OnToolHitTest( CPoint point, TOOLINFO* pTI ) const
 			return -1;
 		}
 
-		pTI->cbSize = sizeof(TOOLINFO);
-		pTI->uFlags =  TTF_NOTBUTTON | TTF_ALWAYSTIP |TTF_IDISHWND ;
-		pTI->uId = (UINT)m_hWnd;
+		// v7.2 - update 03 - added TTF_TRANSPARENT flag. This prevents a 
+		//        recursive flicker of large tooltips that are forced to 
+		//        encroach on the mouse position. Reported by Kuerscht
+		pTI->uFlags =  TTF_TRANSPARENT | TTF_NOTBUTTON | TTF_ALWAYSTIP |TTF_IDISHWND ;
+		pTI->uId = (UINT_PTR)m_hWnd;
 		pTI->hwnd = (HWND)m_hWnd;
 		pTI->lpszText = LPSTR_TEXTCALLBACK;
 		return 1;
@@ -425,7 +439,8 @@ void CUGGrid::DrawCellsIntern(CDC *dc,CDC *db_dc)
 				if(cell.IsPropertySet(UGCELL_CELLTYPE_SET)){
 					cellType = m_ctrl->GetCellType(cell.GetCellType());
 				}
-				else{
+				else
+				{
 					cellType = m_ctrl->GetCellType(-1);
 				}
 
@@ -542,11 +557,11 @@ void CUGGrid::DrawCellsIntern(CDC *dc,CDC *db_dc)
 	if(m_doubleBufferMode){
 		dc = origDC;
 		dc->BitBlt(0,0,m_GI->m_gridWidth,m_GI->m_gridHeight,db_dc,0,0,SRCCOPY);
-	}
-
+	}	
+	
 	//draw the focus rect, if the flag was set above
 	if(!m_tempDisableFocusRect){
-		if((m_hasFocus || m_ctrl->m_findDialogRunning) && !m_ctrl->m_editInProgress)
+		if((m_hasFocus || m_ctrl->m_findDialogRunning) && !m_ctrl->m_editInProgress)		
 		{
 			if(m_GI->m_highlightRowFlag)
 			{
@@ -1171,10 +1186,16 @@ void CUGGrid::OnMouseMove(UINT nFlags, CPoint point)
 
 	if(nFlags & MK_LBUTTON)
 	{
-		MSG msg;
+		// v7.2 - update 01 - the following loop was probably intended to 
+		// optimize efficiency on slower cpus. With the loop and message 
+		// pump removed, there is a noticable improvement in CPU usage.
+		// This change should be monitored for any unwanted effects - code is
+		// just commented out for now. Change suggested by lazymiken.
+		
+		// MSG msg;
 		int moved = FALSE;
 
-		while(1)
+		//while(1)
 		{
 			if(m_ctrl->GetCellFromPoint(point.x,point.y,&col,&row) == UG_SUCCESS)
 			{
@@ -1218,8 +1239,8 @@ void CUGGrid::OnMouseMove(UINT nFlags, CPoint point)
 				//if ballistic mode
 				if(m_GI->m_ballisticMode)
 				{
-					int increment = (int)pow((double)(point.x * -1)/ m_GI->m_defColWidth +1, 
-						(double)m_GI->m_ballisticMode); 
+					int increment = (int)pow((double)((point.x * -1)/ m_GI->m_defColWidth +1), 
+						m_GI->m_ballisticMode); 
 					m_ctrl->GotoCol(m_GI->m_dragCol - increment);
 					if(increment == 1)
 						Sleep(m_GI->m_ballisticDelay);
@@ -1235,7 +1256,7 @@ void CUGGrid::OnMouseMove(UINT nFlags, CPoint point)
 				if(m_GI->m_ballisticMode)
 				{
 					int increment = (int)pow((double)(point.x - m_GI->m_gridWidth) / 
-						(double)m_GI->m_defColWidth +1, (double)m_GI->m_ballisticMode); 
+						m_GI->m_defColWidth +1, m_GI->m_ballisticMode); 
 					m_ctrl->GotoCol(m_GI->m_dragCol + increment);
 					if(increment == 1)
 						Sleep(m_GI->m_ballisticDelay);
@@ -1250,8 +1271,8 @@ void CUGGrid::OnMouseMove(UINT nFlags, CPoint point)
 				//if ballistic mode
 				if(m_GI->m_ballisticMode)
 				{
-					long increment = (long)pow((double)(point.y* -1) / m_GI->m_defRowHeight +1, 
-						(double)m_GI->m_ballisticMode); 
+					long increment = (long)pow((double)((point.y* -1) / m_GI->m_defRowHeight +1), 
+						m_GI->m_ballisticMode); 
 					m_ctrl->GotoRow(m_GI->m_dragRow - increment);
 					if(increment == 1)
 						Sleep(m_GI->m_ballisticDelay);
@@ -1266,8 +1287,8 @@ void CUGGrid::OnMouseMove(UINT nFlags, CPoint point)
 				//if ballistic mode
 				if(m_GI->m_ballisticMode)
 				{
-					long increment = (long)pow((double)(point.y-m_GI->m_gridHeight) / 
-						(double)m_GI->m_defRowHeight +1, (double)m_GI->m_ballisticMode); 
+					long increment = (long)pow((double)((point.y-m_GI->m_gridHeight) / 
+						m_GI->m_defRowHeight +1), m_GI->m_ballisticMode); 
 					m_ctrl->GotoRow(m_GI->m_dragRow + increment);
 					if(increment == 1)
 						Sleep(m_GI->m_ballisticDelay);
@@ -1280,19 +1301,21 @@ void CUGGrid::OnMouseMove(UINT nFlags, CPoint point)
 
 			moved = FALSE;
 
-			//check for messages, if there are not then scroll some more
-			while(PeekMessage(&msg,NULL,0,0,PM_NOREMOVE))
-			{
-				if(msg.message == WM_MOUSEMOVE || msg.message == WM_LBUTTONUP)
-				{
-					m_GI->m_moveType = 0;	//key(default)
+			// v7.2 - update 01 - msg pump removed - see comments above
 
-					return;
-				}
-				GetMessage(&msg,NULL,0,0);
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
+			//check for messages, if there are not then scroll some more
+			//while(PeekMessage(&msg,NULL,0,0,PM_NOREMOVE))
+			//{
+			//	if(msg.message == WM_MOUSEMOVE || msg.message == WM_LBUTTONUP)
+			//	{
+			//		m_GI->m_moveType = 0;	//key(default)
+
+			//		return;
+			//	}
+			//	GetMessage(&msg,NULL,0,0);
+			//	TranslateMessage(&msg);
+			//	DispatchMessage(&msg);
+			//}
 		}
 	}
 
@@ -1581,11 +1604,12 @@ Returns:
 BOOL CUGGrid::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) 
 {
 	// TODO: Add your message handler code here and/or call default
-	int distance = zDelta / 120;
-	m_GI->m_moveType = 4;
-	m_ctrl->SetTopRow(m_GI->m_topRow - (distance * 3));
-	m_ctrl->m_CUGSideHdg->Invalidate();
-
+	if(!m_ctrl->m_editInProgress) {
+		int distance = zDelta / 120;
+		m_GI->m_moveType = 4;
+		m_ctrl->SetTopRow(m_GI->m_topRow - (distance * 3));
+		m_ctrl->m_CUGSideHdg->Invalidate();
+	}
 	return CWnd::OnMouseWheel(nFlags, zDelta, pt);
 }
 #endif
@@ -1773,4 +1797,37 @@ BOOL CUGGrid::OnHelpInfo(HELPINFO* pHelpInfo)
 		return TRUE;
 	}
 	return FALSE;
+}
+
+LRESULT CUGGrid::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
+{
+	switch (message)
+	{
+	// v7.2 update 04 - added to implement WM_PRINT handling for the grid cells - TD 
+	case WM_PRINT:
+		{
+			// draw all cells to the DC passed in 
+			InvalidateRect(NULL);
+			m_drawHint.AddHint(0,0,m_GI->m_numberCols,m_GI->m_numberRows);
+			// avoid double buffering - not needed, and would require 2nd DC
+			int buffering = m_doubleBufferMode;
+			m_doubleBufferMode = 0;
+			DrawCellsIntern(CDC::FromHandle((HDC)wParam), NULL);
+			m_doubleBufferMode = buffering;
+		}
+		return 0;
+	case WM_THEMECHANGED:
+		// This function closes all open handles, which will force them all to reload, using the new theme.
+		UGXPThemes::CleanUp();
+		return 0;
+	default:
+		return CWnd::WindowProc(message, wParam, lParam);
+	}
+}
+
+BOOL CUGGrid::OnEraseBkgnd(CDC* pDC) 
+{
+	UNREFERENCED_PARAMETER(pDC);
+	// Don't erase background when using themes.
+	return UGXPThemes::IsThemed();
 }

@@ -2,9 +2,14 @@
 				Class Implementation : CUGLstBox
 **************************************************************************
 	Source file : ugLstBox.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
-#include "..\pch.h"
+#include "pch.h"
 #include "UGCtrl.h"
 
 #ifdef _DEBUG
@@ -210,14 +215,14 @@ void CUGLstBox::Select()
 
 		//notify the user of the selection
 		if(m_cellType->OnCellTypeNotify(m_cellTypeId,col,row, //set the id
-			UGCT_DROPLISTSELECT,(long)&string) != FALSE){
+			UGCT_DROPLISTSELECT,(LONG_PTR)&string) != FALSE){
 
 			m_ctrl->GetCellIndirect(col,row,&cell);
 			cell.SetText(string);
 			m_ctrl->SetCell(col,row,&cell);
 
 			// notify the user that the selection was set
-			m_cellType->OnCellTypeNotify(m_cellTypeId,col,row,UGCT_DROPLISTPOSTSELECT,(long)&string);
+			m_cellType->OnCellTypeNotify(m_cellTypeId,col,row,UGCT_DROPLISTPOSTSELECT,(LONG_PTR)&string);
 
 			m_ctrl->RedrawCell(col,row);
 		}

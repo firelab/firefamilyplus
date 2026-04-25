@@ -225,8 +225,10 @@ BOOL CFireplusDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	{
 		//strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
 		//	"Dbq=%s;Uid=admin;Pwd=;", lpszPathName);
-		strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
-			"Dbq=%s;Uid=admin;Pwd=;", lpszPathName);
+		//strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
+		//	"Dbq=%s;Uid=admin;Pwd=;", lpszPathName);
+		strConnect.Format("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DSN='';DBQ=%s", lpszPathName);
+
 	}
 	// Attempt to open the new database before replacing our ptr
 	try
@@ -1524,8 +1526,9 @@ BOOL CFireplusDoc::OnOpenDocument(LPCTSTR lpszPathName)
 				CDatabase masterDB;
 
 				CString strConnect;
-				strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
-					"Dbq=%s;Uid=admin;Pwd=;", master_path);
+				strConnect.Format("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DSN='';DBQ=%s", master_path);
+				//strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
+				//	"Dbq=%s;Uid=admin;Pwd=;", master_path);
 				// Attempt to open the new database before replacing our ptr
 				try
 				{
@@ -1969,8 +1972,9 @@ int CFireplusDoc::CreateRefDOIUnitsTable()
 	CDatabase masterDB;
 
 	CString strConnect;
-	strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
-        "Dbq=%s;Uid=admin;Pwd=;", master_path);
+	strConnect.Format("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DSN='';DBQ=%s", master_path);
+	//strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
+    //    "Dbq=%s;Uid=admin;Pwd=;", master_path);
 	// Attempt to open the new database before replacing our ptr
 	try
 	{
@@ -2375,8 +2379,9 @@ int CFireplusDoc::CreateRefDOICauseTable()
 	CDatabase tmpDB;
 
 	CString strConnect;
-	strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
-        "Dbq=%s;Uid=admin;Pwd=;", master_path);
+	strConnect.Format("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DSN='';DBQ=%s", master_path);
+	//strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
+    //    "Dbq=%s;Uid=admin;Pwd=;", master_path);
 	// Attempt to open the new database before replacing our ptr
 	try
 	{
@@ -5529,8 +5534,9 @@ bool CFireplusDoc::NewCheckClimateOptionsTable()
 	CDatabase masterDB;
 
 	CString strConnect;
-	strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
-		"Dbq=%s;Uid=admin;Pwd=;", master_path);
+	//strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
+	//	"Dbq=%s;Uid=admin;Pwd=;", master_path);
+	strConnect.Format("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DSN='';DBQ=%s", master_path);
 	try
 	{
 		masterDB.OpenEx(strConnect, CDatabase::noOdbcDialog);
@@ -7915,8 +7921,9 @@ void CFireplusDoc::CheckWxStationTable()
 	     CDatabase tmpDB;
 
 	     CString strConnect;
-	     strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
-             "Dbq=%s;Uid=admin;Pwd=;Exclusive=1", master_path);
+		 strConnect.Format("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DSN='';DBQ=%s", master_path);
+		 //strConnect.Format("Provider=MSDASQL;Driver={Microsoft Access Driver (*.mdb)};"
+         //    "Dbq=%s;Uid=admin;Pwd=;Exclusive=1", master_path);
 	     // Attempt to open the new database before replacing our ptr
 	     try
 	     {

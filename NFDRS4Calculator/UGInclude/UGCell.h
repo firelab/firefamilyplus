@@ -3,7 +3,12 @@
 **************************************************************************
 	Source file : UGCell.cpp
 	Header file : UGCell.h
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 
 	Purpose
 		The CUGCell object is the main interface object
@@ -27,6 +32,9 @@
 		process for some of the most common properties.
 
 *************************************************************************/
+
+#pragma warning (disable: 4786)
+
 #ifndef _UGCell_H_
 #define _UGCell_H_
 
@@ -56,6 +64,9 @@
 #define UGCELL_READONLY_SET		BIT24
 #define UGCELL_NUMBERDEC_SET	BIT25
 #define UGCELL_DONOT_LOCALIZE	BIT26
+#define UGCELL_XP_STYLE_SET		BIT27
+// TD v 7.2 - for kvt xml ds changes
+#define UGCELL_MULTIROWCELL		BIT31
 
 #define UGCELLDATA_STRING		1
 #define UGCELLDATA_NUMBER		2
@@ -65,11 +76,30 @@
 
 class CUGCtrl;
 
+// the cell type enum represents any item which we may want to draw using XP themes
+enum UGXPCellType {XPCellTypeData = 16, XPCellTypeTopCol = 32, XPCellTypeLeftCol = 64, XPCellTypeBorder = 128, 
+XPCellTypeCombo = 256, XPCellTypeCheck = 512, XPCellTypeCheckYes = 1024, XPCellTypeCheckNo = 2048,
+XPCellTypeRadio = 4096, XPCellTypeRadioYes = 8192, XPCellTypeRadioNo = 16384, XPCellTypeButton = 32768, 
+XPCellTypeSpinUp = 65536, XPCellTypeSpinDown = 131072, XPCellTypeProgressSelected = 262144, XPCellTypeProgressUnselected = 524288};
+
+// the theme state enum represents the state of cells being drawn.  ThemeStateNormal is always used for items that cannot be selected or current.
+enum UGXPThemeState { ThemeStateNormal = 1, ThemeStateCurrent = 2, ThemeStateSelected = 4, ThemeStateTriState = 8, ThemeStatePressed = 16 };
+
 class UG_CLASS_DECL CUGCell: public CObject
 {
+	friend class CUGMem; // So it can call ClearMemory
+	friend class CUGCtrl;
 protected:
+	CUGCell * m_cellInitialState;
+
+protected:
+
+	void ClearMemory();
+
 	unsigned long m_propSetFlags;	//one bit is used as a set/unset flag 
 									//for each cell property
+
+	bool m_useThemes;
 
 
 	CUGCellFormat* m_format;//CUGCellFormat *m_format;
@@ -116,14 +146,28 @@ protected:
 
 	BOOL	m_joinOrigin;	//joined cells
 	long	m_joinRow;		//relative position
-	long	m_joinCol;	
+	long	m_joinCol;
+	
+	bool	m_isLocked;
+	int	m_openSize;
+	
+	UGXPCellType m_XPStyle;	// The style of this cell, from an enum above
 
 public:
 
 	CUGCell();
 	~CUGCell();
 
+	bool UseThemes() { return m_useThemes; }
+	void UseThemes(bool use) { m_useThemes = use; }
+
 	void ClearAll();
+	void SetInitialState();
+	void LoadInitialState();
+
+	// XP style set and get
+	UGXPCellType GetXPStyle() { return m_XPStyle; }
+	void SetXPStyle(UGXPCellType type) { m_XPStyle = type; /*m_propSetFlags &= UGCELL_XP_STYLE_SET;*/ }
 
 	//cell information copying functions
 	int		CopyInfoTo(CUGCell *dest);

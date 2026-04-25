@@ -78,7 +78,7 @@ double CNumSpinCtrl::GetPos()
 	{
 		CString str;
 		pEdit->GetWindowText (str);
-		double val = _wtof(str);
+		double val = atof(str.GetBuffer());
 		return val;
 	}
 	else

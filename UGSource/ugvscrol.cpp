@@ -2,7 +2,12 @@
 				Class Implementation : CUGVScroll
 **************************************************************************
 	Source file : UGVScrol.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
 #include "stdafx.h"
 #include "UGCtrl.h"
@@ -71,6 +76,8 @@ void CUGVScroll::Moved()
 	if ( m_GI->m_paintMode == FALSE )
 		return;
 
+	BOOL bScrolled = FALSE;
+
 	//set the scroll range
 	if(	m_lastMaxTopRow != m_GI->m_maxTopRow ||
 		m_lastScrollMode != m_GI->m_vScrollMode ||
@@ -113,6 +120,7 @@ void CUGVScroll::Moved()
 				SetScrollInfo(&ScrollInfo,FALSE);
 				Invalidate();
 			}
+			bScrolled = TRUE;
 			m_multiRange = 1;
 			m_multiPos	= 1;			
 		}
@@ -125,7 +133,7 @@ void CUGVScroll::Moved()
 			{
 				SetScrollRange(0,2,FALSE);
 				m_multiRange = 1;
-				m_multiPos	= 1;			
+				m_multiPos	= 1;
 			}
 			else
 			{
@@ -137,11 +145,12 @@ void CUGVScroll::Moved()
 				ScrollInfo.nMax = 1000;
 				SetScrollInfo(&ScrollInfo,FALSE);
 			}
+			bScrolled = TRUE;
 		}
 	}
 
 	//set the scroll pos
-	if(m_GI->m_lastTopRow != m_GI->m_topRow )
+	if( m_GI->m_lastTopRow != m_GI->m_topRow || bScrolled == TRUE )
 	{
 		if(UG_SCROLLJOYSTICK == m_GI->m_vScrollMode)
 			SetScrollPos(1,TRUE);
@@ -150,9 +159,6 @@ void CUGVScroll::Moved()
 
 		m_ctrl->OnViewMoved( UG_VSCROLL, m_GI->m_lastTopRow, m_GI->m_topRow );
 	}
-
-	Invalidate();
-	UpdateWindow();
 }
 
 /***************************************************

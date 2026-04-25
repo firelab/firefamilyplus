@@ -20,7 +20,7 @@
 			UGCT_CHECKBOX3DRAISED
 			UGCT_CHECKBOXCHECKMARK			
 ************************************************/
-#include "..\pch.h"
+#include "pch.h"
 #include "ExtCheckBox.h"
 
 #ifdef _DEBUG

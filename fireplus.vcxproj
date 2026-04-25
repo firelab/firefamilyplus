@@ -66,8 +66,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Dynamic</UseOfMfc>
-    <CharacterSet>MultiByte</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>NotSet</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
@@ -196,8 +196,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\.;.\UGInclude;.\NFDRS2016;.\CNFDRS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\.;.\UGInclude;D:\Repos\NFDRS4\out\install\x64-Debug\include;.\CNFDRS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -217,10 +217,10 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\Debug/fireplus.exe</OutputFile>
+      <AdditionalDependencies>NFDRS4.lib;fw21.lib;shlwapi.lib;odbc32.lib;csv_readrow.lib;time64.lib;utctime.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Repos\NFDRS4\out\install\x64-Debug\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/fireplus.pdb</ProgramDatabaseFile>
@@ -301,12 +301,12 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\.;.\UGInclude;.\NFDRS2016;.\CNFDRS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;.\UGInclude;D:\Repos\NFDRS4\out\install\x64-Release\include;.\CNFDRS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>.\Release/fireplus.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
       <ObjectFileName>.\Release/</ObjectFileName>
@@ -324,10 +324,10 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\Release/fireplus4_beta.exe</OutputFile>
+      <AdditionalDependencies>NFDRS4.lib;fw21.lib;shlwapi.lib;odbc32.lib;csv_readrow.lib;time64.lib;utctime.lib;htmlhelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Repos\NFDRS4\out\install\x64-Release\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>.\Release/fireplus.map</MapFileName>
@@ -349,7 +349,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AddToTermDialog.cpp" />
+    <ClCompile Include="AddToTermDialog.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="AgencyDialog.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -1503,7 +1505,6 @@
     <ClCompile Include="NFDRS2016WxFrame.cpp" />
     <ClCompile Include="NFDRS2016WxSet.cpp" />
     <ClCompile Include="NFDRS2016WxView.cpp" />
-    <ClCompile Include="NFDRS4\time64.c" />
     <ClCompile Include="NoWxDialog.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -1859,8 +1860,6 @@
     <ClCompile Include="RunFireAssocSet.cpp" />
     <ClCompile Include="RunFireOptionsSet.cpp" />
     <ClCompile Include="RunMaintenanceManual.cpp" />
-    <ClCompile Include="RunNFDRS\csv_readrow.cpp" />
-    <ClCompile Include="RunNFDRS\fw21.cpp" />
     <ClCompile Include="RunOptionsSet.cpp" />
     <ClCompile Include="RunPocketCardSet.cpp" />
     <ClCompile Include="RunRestoreDialog.cpp" />
@@ -2105,6 +2104,41 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="UGSource\ExtCheckBox.cpp" />
+    <ClCompile Include="UGSource\UGCBType.cpp" />
+    <ClCompile Include="UGSource\UGCell.cpp" />
+    <ClCompile Include="UGSource\UGCelTyp.cpp" />
+    <ClCompile Include="UGSource\UGCnrBtn.cpp" />
+    <ClCompile Include="UGSource\UGCTarrw.cpp" />
+    <ClCompile Include="UGSource\UGCTbutn.cpp" />
+    <ClCompile Include="UGSource\UGCTdtp.cpp" />
+    <ClCompile Include="UGSource\ugctelps.cpp" />
+    <ClCompile Include="UGSource\UGCtrl.cpp" />
+    <ClCompile Include="UGSource\UGCTsarw.cpp" />
+    <ClCompile Include="UGSource\UGDLType.cpp" />
+    <ClCompile Include="UGSource\UGDrgDrp.cpp" />
+    <ClCompile Include="UGSource\UGDrwHnt.cpp" />
+    <ClCompile Include="UGSource\UGDtaSrc.cpp" />
+    <ClCompile Include="UGSource\UGEdit.cpp" />
+    <ClCompile Include="UGSource\UGEditBase.cpp" />
+    <ClCompile Include="UGSource\ugformat.cpp" />
+    <ClCompile Include="UGSource\uggdinfo.cpp" />
+    <ClCompile Include="UGSource\UGGrid.cpp" />
+    <ClCompile Include="UGSource\UGHint.cpp" />
+    <ClCompile Include="UGSource\ughscrol.cpp" />
+    <ClCompile Include="UGSource\ugLstBox.cpp" />
+    <ClCompile Include="UGSource\UGMEdit.cpp" />
+    <ClCompile Include="UGSource\UGMemMan.cpp" />
+    <ClCompile Include="UGSource\UGMultiS.cpp" />
+    <ClCompile Include="UGSource\ugprint.cpp" />
+    <ClCompile Include="UGSource\ugptrlst.cpp" />
+    <ClCompile Include="UGSource\ugsidehd.cpp" />
+    <ClCompile Include="UGSource\UGStrOp.cpp" />
+    <ClCompile Include="UGSource\ugtab.cpp" />
+    <ClCompile Include="UGSource\UGTopHdg.cpp" />
+    <ClCompile Include="UGSource\ugvscrol.cpp" />
+    <ClCompile Include="UGSource\UGXPThemes.cpp" />
+    <ClCompile Include="UGSource\UTEdit.cpp" />
     <ClCompile Include="UnitsDialog.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -2257,192 +2291,6 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="UGSource\ExtCheckBox.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGCBType.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGCell.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGCelTyp.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGCnrBtn.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGCTarrw.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGCTbutn.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGCTdtp.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGCtrl.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGDLType.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGDrgDrp.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGDrwHnt.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGDtaSrc.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGEdit.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGEditBase.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\ugformat.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\uggdinfo.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGGrid.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGHint.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\ughscrol.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\ugLstBox.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGMEdit.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGMemMan.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGMultiS.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\ugprint.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\ugptrlst.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\ugsidehd.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\ugtab.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\UGTopHdg.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UGSource\ugvscrol.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <ClCompile Include="UTEdit.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\UGInclude;$(SolutionDir)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\UGInclude;..\..\FFP5;</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2712,6 +2560,44 @@
     <ClInclude Include="TermsDialog.h" />
     <ClInclude Include="TermsSet.h" />
     <ClInclude Include="TextDialog.h" />
+    <ClInclude Include="UGInclude\ExtCheckBox.h" />
+    <ClInclude Include="UGInclude\UG64Bit.h" />
+    <ClInclude Include="UGInclude\UGCBType.h" />
+    <ClInclude Include="UGInclude\UGCell.h" />
+    <ClInclude Include="UGInclude\UGCelTyp.h" />
+    <ClInclude Include="UGInclude\UGCnrBtn.h" />
+    <ClInclude Include="UGInclude\UGCTarrw.h" />
+    <ClInclude Include="UGInclude\UGCTbutn.h" />
+    <ClInclude Include="UGInclude\UGCTdtp.h" />
+    <ClInclude Include="UGInclude\ugctelps.h" />
+    <ClInclude Include="UGInclude\UGCtrl.h" />
+    <ClInclude Include="UGInclude\UGCTsarw.h" />
+    <ClInclude Include="UGInclude\ugdefine.h" />
+    <ClInclude Include="UGInclude\UGDLType.h" />
+    <ClInclude Include="UGInclude\UGDrgDrp.h" />
+    <ClInclude Include="UGInclude\UGDrwHnt.h" />
+    <ClInclude Include="UGInclude\UGDtaSrc.h" />
+    <ClInclude Include="UGInclude\UGEdit.h" />
+    <ClInclude Include="UGInclude\UGEditBase.h" />
+    <ClInclude Include="UGInclude\ugformat.h" />
+    <ClInclude Include="UGInclude\uggdinfo.h" />
+    <ClInclude Include="UGInclude\UGGrid.h" />
+    <ClInclude Include="UGInclude\UGHint.h" />
+    <ClInclude Include="UGInclude\ughscrol.h" />
+    <ClInclude Include="UGInclude\uglstbox.h" />
+    <ClInclude Include="UGInclude\UGMEdit.h" />
+    <ClInclude Include="UGInclude\UGMemMan.h" />
+    <ClInclude Include="UGInclude\UGMultiS.h" />
+    <ClInclude Include="UGInclude\ugprint.h" />
+    <ClInclude Include="UGInclude\ugptrlst.h" />
+    <ClInclude Include="UGInclude\ugsidehd.h" />
+    <ClInclude Include="UGInclude\UGStrOp.h" />
+    <ClInclude Include="UGInclude\ugstruct.h" />
+    <ClInclude Include="UGInclude\ugtab.h" />
+    <ClInclude Include="UGInclude\UGTopHdg.h" />
+    <ClInclude Include="UGInclude\ugvscrol.h" />
+    <ClInclude Include="UGInclude\ugxpthemes.h" />
+    <ClInclude Include="UGInclude\utedit.h" />
     <ClInclude Include="UnitsDialog.h" />
     <ClInclude Include="UPDialog2.h" />
     <ClInclude Include="UserBrowseDialog.h" />
@@ -2734,39 +2620,6 @@
     <ClInclude Include="WxSet.h" />
     <ClInclude Include="WxStationSet.h" />
     <ClInclude Include="YearsPage.h" />
-    <ClInclude Include="UGInclude\ExtCheckBox.h" />
-    <ClInclude Include="UGInclude\UGCBType.h" />
-    <ClInclude Include="UGInclude\UGCell.h" />
-    <ClInclude Include="UGInclude\UGCelTyp.h" />
-    <ClInclude Include="UGInclude\UGCnrBtn.h" />
-    <ClInclude Include="UGInclude\UGCTarrw.h" />
-    <ClInclude Include="UGInclude\UGCTbutn.h" />
-    <ClInclude Include="UGInclude\UGCTdtp.h" />
-    <ClInclude Include="UGInclude\UGCtrl.h" />
-    <ClInclude Include="UGInclude\ugdefine.h" />
-    <ClInclude Include="UGInclude\UGDLType.h" />
-    <ClInclude Include="UGInclude\UGDrgDrp.h" />
-    <ClInclude Include="UGInclude\UGDrwHnt.h" />
-    <ClInclude Include="UGInclude\UGDtaSrc.h" />
-    <ClInclude Include="UGInclude\UGEdit.h" />
-    <ClInclude Include="UGInclude\UGEditBase.h" />
-    <ClInclude Include="UGInclude\ugformat.h" />
-    <ClInclude Include="UGInclude\uggdinfo.h" />
-    <ClInclude Include="UGInclude\UGGrid.h" />
-    <ClInclude Include="UGInclude\UGHint.h" />
-    <ClInclude Include="UGInclude\ughscrol.h" />
-    <ClInclude Include="UGInclude\uglstbox.h" />
-    <ClInclude Include="UGInclude\UGMEdit.h" />
-    <ClInclude Include="UGInclude\UGMemMan.h" />
-    <ClInclude Include="UGInclude\UGMultiS.h" />
-    <ClInclude Include="UGInclude\ugprint.h" />
-    <ClInclude Include="UGInclude\ugptrlst.h" />
-    <ClInclude Include="UGInclude\ugsidehd.h" />
-    <ClInclude Include="UGInclude\ugstruct.h" />
-    <ClInclude Include="UGInclude\ugtab.h" />
-    <ClInclude Include="UGInclude\UGTopHdg.h" />
-    <ClInclude Include="UGInclude\ugvscrol.h" />
-    <ClInclude Include="utedit.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resource.hm" />

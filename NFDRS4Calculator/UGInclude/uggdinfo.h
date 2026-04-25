@@ -3,7 +3,12 @@
 **************************************************************************
 	Source file : uggdinfo.cpp
 	Header file : uggdinfoh
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 
 	Purpose
 		The CUGGridInfo class contains setup information
@@ -16,6 +21,9 @@
 *************************************************************************/
 #ifndef _uggdinfo_H_
 #define _uggdinfo_H_
+
+#pragma warning (disable: 4786)
+
 
 typedef struct _UGCOLINFO
 {
@@ -42,6 +50,8 @@ public:
 	int		m_defColWidth;
 	int		m_rightCol;
 	int		m_dragCol;
+	int	*	m_startingWidths;
+	int		m_startingCols;
 
 	UGCOLINFO*	m_colInfo;
 
@@ -57,6 +67,8 @@ public:
 	int		m_uniformRowHeightFlag;	//true or false
 	long	m_bottomRow;
 	long	m_dragRow;
+	int *	m_startingHeights;
+	int		m_startingRows;
 
 	//headings
 	int		m_numberTopHdgRows;

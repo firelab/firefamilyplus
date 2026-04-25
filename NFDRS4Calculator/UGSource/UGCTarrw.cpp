@@ -2,9 +2,14 @@
 				Class Implementation : CUGArrowType
 **************************************************************************
 	Source file : UGCTarrw.cpp
-	Copyright © Dundas Software Ltd. 1994 - 2002, All Rights Reserved
+// This software along with its related components, documentation and files ("The Libraries")
+// is © 1994-2007 The Code Project (1612916 Ontario Limited) and use of The Libraries is
+// governed by a software license agreement ("Agreement").  Copies of the Agreement are
+// available at The Code Project (www.codeproject.com), as part of the package you downloaded
+// to obtain this file, or directly from our office.  For a copy of the license governing
+// this software, you may contact us at legalaffairs@codeproject.com, or by calling 416-849-8900.
 *************************************************************************/
-#include "..\pch.h"
+#include "pch.h"
 #include "UGCtrl.h"
 //#include "UGCTarrw.h"
 
@@ -124,7 +129,7 @@ void CUGArrowType::OnDraw(CDC *dc,RECT *rect,int col,long row,CUGCell *cell,int 
 		backcolor = cell->GetBackColor();
 	}
 
-	DrawBackground( dc, rect, backcolor );
+	DrawBackground( dc, rect, backcolor, row, col, cell, (current > 0 ), (selected != 0));
 
 	//check the width of the drawing area
 	if((rect->right - rect->left) <4)

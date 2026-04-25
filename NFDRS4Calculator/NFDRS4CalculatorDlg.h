@@ -75,7 +75,6 @@ protected:
 	CEdit m_editFuelTemp;
 	CSpinButtonCtrl m_spinSCM;
 	CEdit m_editSCM;
-	CButton m_btnHumid;
 	CFMParamsDlg* pFMParamsDlg;
 
 	// Generated message map functions

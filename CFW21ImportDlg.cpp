@@ -91,7 +91,7 @@ bool ImportFW21RunProc(const CUPDUPDATA* pCUPDUPData)
 	progText.Format("Reading %s", pData->importFileName.c_str());
 	pCUPDUPData->SetProgress(progText);
 	CFW21Data fw21Data;
-	int fw21Status = fw21Data.LoadFile(pData->importFileName.c_str());
+	int fw21Status = fw21Data.LoadFile(pData->importFileName.c_str(), pData->stationID.c_str());
 	if (fw21Status != 0)
 	{
 		CString msg;
