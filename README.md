@@ -1,31 +1,20 @@
 # firefamilyplus
-RD-FireFamilyPlus
+FireFamilyPlus5
 
-FireFamily Plus contains source code for the FireFamily Plus application, National Fire Danger Rating System (NFDRS), and NFDRS2016 update to the National Fire Danger Rating system.
+FireFamily Plus contains source code for the FireFamily Plus application, National Fire Danger Rating System (NFDRS 1978), and the NFDRS4 Calculator application.
 
 Home directory contains source code for the FireFamily Plus application
 
 /CNFDRS directory contains source code for the National Fire Danger Rating System
 
-/NFDRS2016 directory contains source code for the NFDRS2016 update to the National Fire Danger Rating System
+/NFDRS4Calculator directory contains source code for the NFDRS Calculator application.
 
-/RunNFDRS directory contains source code for the command line version of running/testing the NFDRS2016 system.
-
-/NFDRSCalculator2 directory contains source code for the NFDRS Calculator application.
-
-/FFP5Setup directory contains the project for building installation for FireFamily Plus and the NFDRS Calculator applications. This project requires the Microsoft Visual Studio Installer Projects extension for Visual Studio 2019
+/FFP5Setup directory contains the project for building installation for FireFamily Plus and the NFDRS4 Calculator applications. This project requires the Microsoft Visual Studio Installer Projects extension for Visual Studio 2022
 
 /UGInclude and /UGSource are directories containing source code for Ultimate Grid control utilized by FireFamily Plus
 
 
-FireFamily Plus and NFDRSCalculator both require Microsoft Foundation Classes (MFC) be installed with Visual Studio 2019
-
-FireFamily Plus can only be built for x86.
-
-RunNFDRS can only be built for x64.
-
-
-
+FireFamily Plus and NFDRS4Calculator both require Microsoft Foundation Classes (MFC) be installed with Visual Studio 2022
 
 
 
