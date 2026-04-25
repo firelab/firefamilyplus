@@ -13,6 +13,9 @@ Home directory contains source code for the FireFamily Plus application
 
 /UGInclude and /UGSource are directories containing source code for Ultimate Grid control utilized by FireFamily Plus
 
+FireFamily Plus is a Visual Studio 2022 solution (fireplus.sln)
+
+NFDR4 must be built for Windows x64, and appropriate settings must be modified to point to NFDRS4 include, lib, and bin directories
 
 FireFamily Plus and NFDRS4Calculator both require Microsoft Foundation Classes (MFC) be installed with Visual Studio 2022
 
