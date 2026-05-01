@@ -39,7 +39,7 @@ public:
 	virtual void OnDClicked(int col,long row,RECT *rect,POINT *point,BOOL processed);
 	virtual void OnCharDown(UINT *vcKey,BOOL processed);
 	virtual void OnKeyDown(UINT *vcKey,BOOL processed);
-	virtual int OnCellTypeNotify(long ID,int col,long row,long msg,long param);
+	virtual int OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param);
 	virtual COLORREF OnGetDefBackColor(int section);
 	CUGButtonType m_buttonCT;
 	CString varsStr;

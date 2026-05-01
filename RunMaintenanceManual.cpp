@@ -449,7 +449,7 @@ COLORREF RunMaintenanceCUG::OnGetDefBackColor(int section)
 }
 
 
-int RunMaintenanceCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int RunMaintenanceCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	//UNREFERENCED_PARAMETER(ID);
 	//UNREFERENCED_PARAMETER(col);

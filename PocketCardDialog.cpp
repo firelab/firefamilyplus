@@ -94,7 +94,7 @@ void PocketCardCUG::OnSetup()
 	SetNumberRows(3);
 }
 
-int PocketCardCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int PocketCardCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	//UNREFERENCED_PARAMETER(ID);
 	//UNREFERENCED_PARAMETER(col);

@@ -213,7 +213,7 @@ int EventLocatorCUG::OnEditStart(int col, long row,CWnd **edit)
 	return TRUE;
 }
 
-int EventLocatorCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int EventLocatorCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	if (msg == UGCT_BUTTONCLICK)
 	{

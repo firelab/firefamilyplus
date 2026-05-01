@@ -446,7 +446,7 @@ void HourlyEventLocatorCUG::OnDrawFocusRect(CDC *dc,RECT *rect)
 	dc->DrawFocusRect(rect);
 }
 
-int HourlyEventLocatorCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int HourlyEventLocatorCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	if (msg == UGCT_BUTTONCLICK)
 	{

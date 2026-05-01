@@ -286,7 +286,7 @@ COLORREF BatchEditCUG::OnGetDefBackColor(int section)
 }
 
 
-int BatchEditCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int BatchEditCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	//UNREFERENCED_PARAMETER(ID);
 	//UNREFERENCED_PARAMETER(col);

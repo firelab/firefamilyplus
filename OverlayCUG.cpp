@@ -902,7 +902,7 @@ void OverlayCUG::OnDataSourceNotify(int ID,long msg,long param)
 //	Return:
 //		TRUE - to allow celltype event
 //		FALSE - to disallow the celltype event
-int OverlayCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int OverlayCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	//UNREFERENCED_PARAMETER(ID);
 	//UNREFERENCED_PARAMETER(col);

@@ -98,7 +98,7 @@ void MergeCUG::OnSetup()
 	
 }
 
-int MergeCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int MergeCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	//UNREFERENCED_PARAMETER(ID);
 	//UNREFERENCED_PARAMETER(col);

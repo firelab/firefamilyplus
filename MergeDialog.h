@@ -27,7 +27,7 @@ protected:
 public:
 	//***** Over-ridable Notify Functions *****
 	virtual void OnSetup();
-	virtual int OnCellTypeNotify(long ID,int col,long row,long msg,long param);
+	virtual int OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param);
 	virtual void OnDrawFocusRect(CDC *dc,RECT *rect);
 	virtual COLORREF OnGetDefBackColor(int section);
 };

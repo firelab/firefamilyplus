@@ -82,7 +82,7 @@ COLORREF FireSelCUG::OnGetDefBackColor(int section)
 		return GetSysColor(COLOR_BTNFACE);	
 }
 
-int FireSelCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int FireSelCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	//UNREFERENCED_PARAMETER(ID);
 	UNREFERENCED_PARAMETER(col);

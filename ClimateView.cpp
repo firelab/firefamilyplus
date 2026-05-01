@@ -191,7 +191,7 @@ void ClimateCUG::OnKeyDown(UINT *vcKey,BOOL processed)
 	}
 }
 
-int ClimateCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int ClimateCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	//UNREFERENCED_PARAMETER(ID);
 	//UNREFERENCED_PARAMETER(col);

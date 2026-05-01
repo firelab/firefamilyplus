@@ -611,7 +611,7 @@ void CustomInitsCUG::OnKeyDown(UINT *vcKey,BOOL processed)
 	}*/
 }
 
-int CustomInitsCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int CustomInitsCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	if(ID == m_iDTPickerIndex)
 	{

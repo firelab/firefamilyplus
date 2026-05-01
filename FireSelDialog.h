@@ -20,7 +20,7 @@ public:
 	virtual void OnSetup();
 	virtual void OnDrawFocusRect(CDC *dc,RECT *rect);
 	virtual COLORREF OnGetDefBackColor(int section);
-	virtual int OnCellTypeNotify(long ID,int col,long row,long msg,long param);
+	virtual int OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param);
 	CFireSelectDataSource m_data;
 protected:
 	CUGButtonType		m_button;

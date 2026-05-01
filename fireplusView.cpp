@@ -629,7 +629,7 @@ void FFPViewCUG::OnKeyDown(UINT *vcKey,BOOL processed)
 	}
 }
 
-int FFPViewCUG::OnCellTypeNotify(long ID,int col,long row,long msg,long param)
+int FFPViewCUG::OnCellTypeNotify(long ID,int col,long row,long msg, LONG_PTR param)
 {
 	if(ID == m_iDTPickerIndex)
 	{
